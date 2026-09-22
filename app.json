@@ -1,0 +1,91 @@
+{
+  "expo": {
+    "name": "ElderCareAI",
+    "slug": "eldercare-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "eldercareai",
+    "icon": "./assets/images/eldercare-logo.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.eldercareai.mobile"
+    },
+    "android": {
+      "package": "com.eldercareai.mobile",
+      "softwareKeyboardLayoutMode": "resize",
+      "permissions": [
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/eldercare-logo.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/eldercare-logo.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "color": "#38BDF8",
+          "defaultChannel": "care-reminders"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFFFFF",
+          "image": "./assets/images/eldercare-logo.png",
+          "imageWidth": 190,
+          "dark": {
+            "backgroundColor": "#0F172A",
+            "image": "./assets/images/eldercare-logo.png"
+          }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow ElderCareAI to select a profile photo.",
+          "cameraPermission": "Allow ElderCareAI to take a profile photo.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "ElderCareAI records this phone's location only when a wearable connects or health data is synchronized. It does not track the watch or run in the background.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false
+        }
+      ],
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6f5fbaaf-eb95-4f21-b2a8-8a9eb71b4eb6"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/6f5fbaaf-eb95-4f21-b2a8-8a9eb71b4eb6"
+    }
+  }
+}

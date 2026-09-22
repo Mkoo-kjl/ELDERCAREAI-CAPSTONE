@@ -1,0 +1,13 @@
+project_id = "eldercare-ai"
+
+[functions.google-health-oauth-start]
+verify_jwt = false
+
+[functions.google-health-oauth-callback]
+verify_jwt = false
+
+[functions.google-health-sync]
+verify_jwt = false
+
+[functions.google-health-disconnect]
+verify_jwt = false
