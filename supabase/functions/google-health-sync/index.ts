@@ -3,6 +3,32 @@ import { corsHeaders, json } from '../_shared/cors.ts';
 
 type Json = Record<string, any>;
 
+function positiveNumber(value: unknown) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function sleepMinutesFromPoint(point: Json | undefined) {
+  const sleep = point?.sleep;
+  if (!sleep) return null;
+
+  const summaryMinutes = positiveNumber(sleep.summary?.minutesAsleep);
+  if (summaryMinutes !== null) return summaryMinutes;
+
+  const asleepStageTypes = new Set(['ASLEEP', 'LIGHT', 'DEEP', 'REM']);
+  const summarizedStageMinutes = (sleep.summary?.stagesSummary ?? []).reduce(
+    (total: number, stage: Json) => total + (asleepStageTypes.has(stage.type) ? (positiveNumber(stage.minutes) ?? 0) : 0),
+    0,
+  );
+  if (summarizedStageMinutes > 0) return summarizedStageMinutes;
+
+  const intervalStart = sleep.interval?.startTime;
+  const intervalEnd = sleep.interval?.endTime;
+  if (!intervalStart || !intervalEnd) return null;
+  const intervalMinutes = (new Date(intervalEnd).getTime() - new Date(intervalStart).getTime()) / 60000;
+  return Number.isFinite(intervalMinutes) && intervalMinutes > 0 ? intervalMinutes : null;
+}
+
 async function refreshGoogleToken(token: Json, clientId: string, clientSecret: string) {
   const expiresAt = token.token_expires_at ? new Date(token.token_expires_at).getTime() : 0;
   if (expiresAt > Date.now() + 60_000) return token.google_access_token as string;
@@ -86,7 +112,10 @@ Deno.serve(async (request) => {
       getPoints('heart-rate'),
       getPoints('oxygen-saturation'),
       getPoints('daily-oxygen-saturation'),
-      getPoints('sleep'),
+      // Sleep can contain an unfinished nap or processing record ahead of the
+      // completed overnight session. Inspect the allowed maximum of 25 and
+      // select the newest usable main sleep below.
+      getPoints('sleep', undefined, 25),
       getPoints('steps', `steps.interval.start_time >= "${since}"`, 10000),
       getPoints('daily-sleep-temperature-derivations'),
       getPoints('heart-rate-variability'),
@@ -96,11 +125,14 @@ Deno.serve(async (request) => {
     const spo2 = Number(oxygen.dataPoints?.[0]?.oxygenSaturation?.percentage)
       || Number(dailyOxygen.dataPoints?.[0]?.dailyOxygenSaturation?.averagePercentage)
       || null;
-    const sleepPoint = sleep.dataPoints?.[0]?.sleep;
-    const sleepMinutes = Number(sleepPoint?.summary?.minutesAsleep)
-      || (sleepPoint?.interval?.startTime && sleepPoint?.interval?.endTime
-        ? (new Date(sleepPoint.interval.endTime).getTime() - new Date(sleepPoint.interval.startTime).getTime()) / 60000
-        : 0);
+    const sleepPoints = (sleep.dataPoints ?? []) as Json[];
+    const sleepDataPoint = sleepPoints.find((point) =>
+      point.sleep?.metadata?.mainSleep === true
+      && point.sleep?.metadata?.processed === true
+      && sleepMinutesFromPoint(point) !== null)
+      ?? sleepPoints.find((point) => point.sleep?.metadata?.processed === true && sleepMinutesFromPoint(point) !== null)
+      ?? sleepPoints.find((point) => sleepMinutesFromPoint(point) !== null);
+    const sleepMinutes = sleepMinutesFromPoint(sleepDataPoint);
     const stepCount = (steps.dataPoints ?? []).reduce((sum: number, point: Json) => sum + (Number(point.steps?.count) || 0), 0) || null;
     const skinTemp = Number(temperature.dataPoints?.[0]?.dailySleepTemperatureDerivations?.nightlyTemperatureCelsius) || null;
     const rmssd = Number(hrv.dataPoints?.[0]?.heartRateVariability?.rootMeanSquareOfSuccessiveDifferencesMilliseconds) || null;
@@ -151,7 +183,22 @@ Deno.serve(async (request) => {
       : admin.from('vital_sign_logs').insert(log);
     const { data: saved, error: saveError } = await saveQuery.select().single();
     if (saveError) throw saveError;
-    return json({ vital: saved, hasData: true, changed: !unchanged, warnings });
+    return json({
+      vital: saved,
+      hasData: true,
+      changed: !unchanged,
+      warnings,
+      diagnostics: {
+        sleep: {
+          dataPointCount: sleepPoints.length,
+          selected: Boolean(sleepDataPoint),
+          mainSleep: sleepDataPoint?.sleep?.metadata?.mainSleep ?? null,
+          processed: sleepDataPoint?.sleep?.metadata?.processed ?? null,
+          stagesStatus: sleepDataPoint?.sleep?.metadata?.stagesStatus ?? null,
+          minutesAsleep: sleepMinutes,
+        },
+      },
+    });
   } catch (error) {
     return json({ error: error instanceof Error ? error.message : 'Google Health synchronization failed.' }, 500);
   }

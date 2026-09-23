@@ -55,6 +55,7 @@ const HealthDataContext = createContext<ContextValue | null>(null);
 
 export function HealthDataProvider({ children }: PropsWithChildren) {
   const { session, onboarding } = useAuth();
+  const userId = session?.user.id;
   const [elderly, setElderly] = useState<ElderlyProfile | null>(null);
   const [history, setHistory] = useState<VitalLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,6 +66,8 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
   const [newReadingAt, setNewReadingAt] = useState<string | null>(null);
   const syncInFlight = useRef(false);
   const refreshRef = useRef<(sync?: boolean) => Promise<void>>(async () => undefined);
+  const realtimeInstanceId = useRef(`${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const realtimeGeneration = useRef(0);
 
   const load = useCallback(async () => {
     if (!session) return;
@@ -143,18 +146,37 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
   }, [load]);
 
   useEffect(() => {
-    if (!session || !elderly?.elderly_id) return;
-    const channel = supabase.channel(`vital-signs:${elderly.elderly_id}`)
-      .on('postgres_changes', {
-        event: '*', schema: 'public', table: 'vital_sign_logs', filter: `elderly_id=eq.${elderly.elderly_id}`,
-      }, (payload) => {
-        setNewReadingAt(new Date().toISOString());
-        if (payload.eventType !== 'DELETE') setLastSuccessfulSyncAt(new Date().toISOString());
-        void load();
-      })
-      .subscribe();
-    return () => { void supabase.removeChannel(channel); };
-  }, [elderly?.elderly_id, load, session]);
+    if (!userId || !elderly?.elderly_id) return;
+    // RealtimeClient.channel() reuses a matching topic. OAuth/session refreshes can
+    // rerun this effect before the previous async removal finishes, so every
+    // subscription lifecycle receives a unique topic and can never inherit an
+    // already-subscribed channel.
+    const generation = ++realtimeGeneration.current;
+    const topic = `vital-signs:${elderly.elderly_id}:${realtimeInstanceId.current}:${generation}`;
+    const channel = supabase.channel(topic);
+    try {
+      channel
+        .on('postgres_changes', {
+          event: '*', schema: 'public', table: 'vital_sign_logs', filter: `elderly_id=eq.${elderly.elderly_id}`,
+        }, (payload) => {
+          setNewReadingAt(new Date().toISOString());
+          if (payload.eventType !== 'DELETE') setLastSuccessfulSyncAt(new Date().toISOString());
+          void load();
+        })
+        .subscribe((status, subscriptionError) => {
+          if (subscriptionError) console.warn(`Vital-sign Realtime ${status}:`, subscriptionError.message);
+        });
+    } catch (subscriptionError) {
+      // Polling and manual synchronization remain available if Realtime cannot
+      // start, so a socket problem must not interrupt Google Health OAuth/sync.
+      console.warn('Unable to start vital-sign Realtime:', subscriptionError);
+    }
+    return () => {
+      void supabase.removeChannel(channel).catch((removalError) => {
+        console.warn('Unable to remove vital-sign Realtime channel:', removalError);
+      });
+    };
+  }, [elderly?.elderly_id, load, userId]);
 
   useEffect(() => {
     const authorized = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
