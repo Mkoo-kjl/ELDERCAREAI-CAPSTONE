@@ -3,30 +3,31 @@ import type { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
 import { getTheme } from '@/src/theme/colors';
+import { fontFamily } from '@/src/theme/typography';
 
-type Props = { icon: ComponentProps<typeof Ionicons>['name']; title: string; value: string; unit: string; timestamp: string; color: string; fullWidth?: boolean; onPress?: () => void };
+type Props = { icon: ComponentProps<typeof Ionicons>['name']; title: string; value: string; unit: string; timestamp: string; color: string; surface?: string; fullWidth?: boolean; onPress?: () => void };
 
-export function MetricCard({ icon, title, value, unit, timestamp, color, fullWidth, onPress }: Props) {
+export function MetricCard({ icon, title, value, unit, timestamp, color, surface, fullWidth, onPress }: Props) {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
   return (
-    <Pressable accessibilityRole="button" accessibilityHint="Opens details and recent readings" disabled={!onPress} onPress={onPress} style={({ pressed }) => [styles.card, fullWidth ? styles.full : styles.half, { backgroundColor: theme.cardElevated, borderColor: theme.border, shadowColor: isDark ? '#000' : '#94A3B8' }, pressed && styles.pressed]}>
+    <Pressable accessibilityRole="button" accessibilityHint="Opens details and recent readings" disabled={!onPress} onPress={onPress} style={({ pressed }) => [styles.card, fullWidth ? styles.full : styles.half, { backgroundColor: isDark ? theme.cardElevated : surface ?? theme.cardElevated, borderColor: isDark ? theme.border : 'transparent' }, pressed && styles.pressed]}>
       <View style={styles.topRow}>
-        <View style={[styles.icon, { backgroundColor: `${color}16` }]}><Ionicons name={icon} size={21} color={color} /></View>
-        {onPress ? <Ionicons name="information-circle-outline" size={17} color={theme.subtitle} /> : null}
+        <Ionicons name={icon} size={17} color={color} />
+        {onPress ? <Ionicons name="chevron-forward" size={15} color={theme.subtitle} /> : null}
       </View>
-      <Text numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.82} style={[styles.title, { color: theme.subtitle }]}>{title}</Text>
+      <Text numberOfLines={2} style={[styles.title, { color: theme.text }]}>{title}</Text>
       <View style={styles.valueRow}><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.62} style={[styles.value, { color: theme.text }]}>{value}</Text><Text numberOfLines={1} style={[styles.unit, { color: theme.subtitle }]}>{unit}</Text></View>
-      <Text style={[styles.timestamp, { color: theme.subtitle }]}>{timestamp}</Text>
+      <Text numberOfLines={1} style={[styles.timestamp, { color: theme.subtitle }]}>{timestamp}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { minHeight: 164, padding: 13, borderWidth: 1, borderRadius: 19, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.07, shadowRadius: 10, elevation: 3 },
-  half: { flexGrow: 1, flexBasis: 0, minWidth: 0, aspectRatio: 0.94 }, full: { width: '100%', minHeight: 150 }, topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  icon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }, title: { minHeight: 30, marginTop: 7, fontSize: 12.5, lineHeight: 15, fontWeight: '700' },
-  valueRow: { marginTop: 5, flexDirection: 'row', alignItems: 'baseline', gap: 5, minWidth: 0 }, value: { flexShrink: 1, fontSize: 29, lineHeight: 34, fontWeight: '800', letterSpacing: -0.5 },
-  unit: { fontSize: 12, fontWeight: '600' }, timestamp: { marginTop: 5, fontSize: 10.5, fontWeight: '500' },
-  pressed: { opacity: 0.82, transform: [{ scale: 0.985 }] },
+  card: { minWidth: 0, padding: 14, borderWidth: 1, borderRadius: 8, justifyContent: 'space-between' },
+  half: { width: '48%', minHeight: 148 }, full: { width: '100%', minHeight: 128 }, topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  title: { minHeight: 32, fontSize: 12, lineHeight: 16, fontFamily: fontFamily.medium },
+  valueRow: { flexDirection: 'row', alignItems: 'baseline', gap: 4, minWidth: 0 }, value: { flexShrink: 1, fontSize: 25, lineHeight: 31, fontFamily: fontFamily.semiBold, fontVariant: ['tabular-nums'] },
+  unit: { flexShrink: 0, fontSize: 11, fontFamily: fontFamily.medium }, timestamp: { fontSize: 10, fontFamily: fontFamily.regular },
+  pressed: { opacity: 0.8 },
 });

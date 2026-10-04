@@ -59,7 +59,7 @@ export function ProfilePhotoPicker({ value, remoteUrl, onChange, label = 'Add pr
           <Image source={{ uri: source }} style={styles.photo} />
         ) : (
           <View style={styles.placeholder}>
-            <Ionicons name="person" size={43} color="#FFFFFF" />
+            <Ionicons name="person-outline" size={36} color={palette.primaryDark} />
           </View>
         )}
         <View style={styles.cameraBadge}>
@@ -74,8 +74,8 @@ export function ProfilePhotoPicker({ value, remoteUrl, onChange, label = 'Add pr
 const styles = StyleSheet.create({
   container: { alignItems: 'center', marginBottom: 24 },
   photoButton: { width: 112, height: 112 },
-  photo: { width: 112, height: 112, borderRadius: 56, borderWidth: 4, borderColor: '#FFFFFF' },
-  placeholder: { width: 112, height: 112, borderRadius: 56, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.primary },
-  cameraBadge: { position: 'absolute', right: 1, bottom: 5, width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.accent, borderWidth: 3, borderColor: '#FFFFFF' },
+  photo: { width: 112, height: 112, borderRadius: 8 },
+  placeholder: { width: 112, height: 112, borderRadius: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.aquaSurface },
+  cameraBadge: { position: 'absolute', right: -6, bottom: -6, width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.primaryDark, borderWidth: 2, borderColor: '#FFFFFF' },
   label: { marginTop: 10, fontSize: 12, fontWeight: '600' },
 });

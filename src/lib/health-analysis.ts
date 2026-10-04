@@ -1,7 +1,7 @@
 import type { VitalLog } from '@/src/providers/HealthDataProvider';
 
 export type AnalysisSeverity = 'positive' | 'info' | 'warning' | 'critical';
-export type AnalysisMetric = 'heart' | 'oxygen' | 'sleep' | 'steps' | 'temperature' | 'stress' | 'data';
+export type AnalysisMetric = 'heart' | 'oxygen' | 'sleep' | 'steps' | 'temperature' | 'hrv' | 'data';
 export type AnalysisResult = {
   id: string;
   title: string;
@@ -11,7 +11,7 @@ export type AnalysisResult = {
   confidence?: 'Low' | 'Moderate' | 'High';
 };
 
-type NumericVitalKey = 'heart_rate_bpm' | 'spo2_percent' | 'sleep_hours' | 'steps_count' | 'skin_temp_celsius' | 'stress_score';
+type NumericVitalKey = 'heart_rate_bpm' | 'spo2_percent' | 'sleep_hours' | 'steps_count' | 'skin_temp_celsius' | 'hrv_rmssd_ms';
 
 function series(history: VitalLog[], key: NumericVitalKey) {
   const ordered = [...history].sort((a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime());
@@ -39,6 +39,7 @@ export function buildHealthInsights(history: VitalLog[]): AnalysisResult[] {
   const sleep = series(history, 'sleep_hours');
   const steps = series(history, 'steps_count');
   const temperature = series(history, 'skin_temp_celsius');
+  const hrv = series(history, 'hrv_rmssd_ms');
 
   if (heart.length) {
     const latest = heart.at(-1)!;
@@ -70,6 +71,17 @@ export function buildHealthInsights(history: VitalLog[]): AnalysisResult[] {
     const baseline = mean(temperature.slice(-8, -1));
     const difference = latest - baseline;
     results.push({ id: 'temperature-insight', metric: 'temperature', title: Math.abs(difference) >= 1 ? 'Nightly skin temperature shifted' : 'Skin-temperature trend', body: `Latest nightly value is ${format(latest, 1)} °C, ${Math.abs(difference).toFixed(1)} °C ${difference >= 0 ? 'above' : 'below'} the recent personal average.`, severity: Math.abs(difference) >= 1 ? 'warning' : 'info' });
+  }
+  if (hrv.length) {
+    const latest = hrv.at(-1)!;
+    const recent = hrv.slice(-7);
+    results.push({
+      id: 'hrv-insight',
+      metric: 'hrv',
+      title: latest < 30 ? 'Low HRV reading' : 'HRV snapshot',
+      body: `Latest RMSSD HRV: ${format(latest)} ms. Recent recorded average: ${format(mean(recent))} ms.`,
+      severity: latest < 30 ? 'warning' : 'info',
+    });
   }
   return results.length ? results : [{ id: 'partial', title: 'Partial health data received', body: 'Google Health is connected, but the available records do not yet contain metrics that can be analyzed.', severity: 'info', metric: 'data' }];
 }
@@ -116,7 +128,7 @@ export function buildHealthAnomalies(history: VitalLog[]): AnalysisResult[] {
   if (latest.spo2_percent !== null && latest.spo2_percent < 95) anomalies.push({ id: 'low-spo2', title: 'Low SpO₂ threshold crossed', body: `The latest SpO₂ is ${latest.spo2_percent.toFixed(1)}%, below the app’s 95% review threshold. Confirm the wearable reading and consider appropriate medical guidance.`, severity: 'critical', metric: 'oxygen' });
   if (latest.heart_rate_bpm !== null && (latest.heart_rate_bpm > 110 || latest.heart_rate_bpm < 50)) anomalies.push({ id: 'heart-threshold', title: 'Heart-rate threshold crossed', body: `The latest heart rate is ${latest.heart_rate_bpm.toFixed(0)} bpm, outside the app’s 50–110 bpm review range. Context such as activity and symptoms matters.`, severity: 'critical', metric: 'heart' });
   if (latest.sleep_hours !== null && latest.sleep_hours < 5) anomalies.push({ id: 'short-sleep', title: 'Very short recorded sleep', body: `The latest synchronized sleep duration is ${latest.sleep_hours.toFixed(1)} hours.`, severity: 'warning', metric: 'sleep' });
-  if (latest.stress_score !== null && latest.stress_score >= 75) anomalies.push({ id: 'stress-elevated', title: 'HRV-derived strain estimate is elevated', body: `The demo strain score is ${latest.stress_score}/100. This reflects HRV—not a diagnosis of emotional stress.`, severity: 'warning', metric: 'stress' });
+  if (latest.hrv_rmssd_ms !== null && latest.hrv_rmssd_ms < 30) anomalies.push({ id: 'low-hrv', title: 'Low HRV reading', body: `The latest RMSSD HRV is ${latest.hrv_rmssd_ms.toFixed(0)} ms. HRV is best interpreted against the patient's own trend and does not diagnose stress or illness.`, severity: 'warning', metric: 'hrv' });
 
   const personalized: { key: NumericVitalKey; id: string; metric: AnalysisMetric; label: string; unit: string; minimumDelta: number }[] = [
     { key: 'heart_rate_bpm', id: 'heart-personal', metric: 'heart', label: 'Heart rate', unit: 'bpm', minimumDelta: 10 },

@@ -6,6 +6,7 @@ import { getPostAuthRoute } from '@/src/lib/onboarding-route';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { HealthDataProvider } from '@/src/providers/HealthDataProvider';
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily } from '@/src/theme/typography';
 
 const tabIcons = {
   dashboard: ['home-outline', 'home'], health: ['pulse-outline', 'pulse'], alerts: ['alert-circle-outline', 'alert-circle'],
@@ -22,11 +23,11 @@ export default function TabLayout() {
     <HealthDataProvider>
       <Tabs screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: palette.primaryDark,
+        tabBarActiveTintColor: palette.text,
         tabBarInactiveTintColor: theme.subtitle,
-        tabBarStyle: { backgroundColor: theme.cardElevated, borderTopColor: theme.border, height: 66, paddingTop: 5, paddingBottom: 7 },
+        tabBarStyle: { backgroundColor: theme.cardElevated, borderTopColor: theme.border, height: 65, paddingTop: 6, paddingBottom: 7 },
         tabBarHideOnKeyboard: true,
-        tabBarLabelStyle: { fontSize: 9.5, fontWeight: '700' },
+        tabBarLabelStyle: { fontFamily: fontFamily.medium, fontSize: 10 },
         tabBarIcon: ({ color, focused, size }) => {
           const icons = tabIcons[route.name as keyof typeof tabIcons];
           return <Ionicons name={icons?.[focused ? 1 : 0] ?? 'ellipse-outline'} color={color} size={size} />;

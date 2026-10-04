@@ -9,6 +9,7 @@ import { relativeTime } from '@/src/lib/format';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily, typeScale } from '@/src/theme/typography';
 
 type SyncLocation = {
   id: string;
@@ -120,11 +121,11 @@ export default function LastSyncLocationScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 }, header: { minHeight: 74, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', borderBottomWidth: StyleSheet.hairlineWidth },
-  back: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center' }, headerCopy: { flex: 1, marginLeft: 12 },
-  title: { fontSize: 21, fontWeight: '800', letterSpacing: -0.3 }, subtitle: { marginTop: 2, fontSize: 11.5 }, content: { padding: 18 },
-  notice: { padding: 14, borderRadius: 16, borderWidth: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 10 }, noticeText: { flex: 1, fontSize: 12, lineHeight: 18 },
-  state: { minHeight: 320, alignItems: 'center', justifyContent: 'center', padding: 30 }, stateTitle: { marginTop: 10, fontSize: 17, fontWeight: '800' }, stateText: { marginTop: 7, fontSize: 12.5, lineHeight: 19, textAlign: 'center' },
-  mapCard: { marginTop: 16, borderWidth: 1, borderRadius: 20, overflow: 'hidden' }, map: { width: '100%', height: 360 }, mapFallback: { alignItems: 'center', justifyContent: 'center', padding: 24 }, details: { padding: 16, gap: 14 },
-  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 10 }, detailLabel: { fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 }, detailValue: { marginTop: 2, fontSize: 12.5, fontWeight: '600' },
-  openButton: { minHeight: 48, borderRadius: 14, backgroundColor: palette.primaryDark, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, openButtonText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
+  back: { width: 42, height: 42, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }, headerCopy: { flex: 1, marginLeft: 12 },
+  title: { ...typeScale.sectionTitle }, subtitle: { marginTop: 2, fontSize: 11.5 }, content: { padding: 18 },
+  notice: { padding: 14, borderRadius: 8, borderWidth: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 10 }, noticeText: { flex: 1, fontSize: 12, lineHeight: 18 },
+  state: { minHeight: 320, alignItems: 'center', justifyContent: 'center', padding: 30 }, stateTitle: { marginTop: 10, ...typeScale.sectionTitle }, stateText: { marginTop: 7, fontSize: 12.5, lineHeight: 19, textAlign: 'center' },
+  mapCard: { marginTop: 16, borderWidth: 1, borderRadius: 8, overflow: 'hidden' }, map: { width: '100%', height: 360 }, mapFallback: { alignItems: 'center', justifyContent: 'center', padding: 24 }, details: { padding: 16, gap: 14 },
+  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 10 }, detailLabel: { fontSize: 9.5, fontFamily: fontFamily.medium }, detailValue: { marginTop: 2, fontSize: 12.5, fontFamily: fontFamily.medium },
+  openButton: { minHeight: 48, borderRadius: 8, backgroundColor: palette.primaryDark, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, openButtonText: { color: '#FFFFFF', fontSize: 12, fontFamily: fontFamily.semiBold },
 });

@@ -1,6 +1,6 @@
 # ElderCareAI
 
-Expo SDK 54 / React Native app for caregivers. It includes Supabase Google sign-in, persisted onboarding, real Google Health API v4 authorization/synchronization, foreground-only phone-location consent, a Leaflet last-sync map, health dashboards, data-driven health analysis, SOS/event logging, care-management CRUD, a static-response AI chat demo, exports, and settings.
+Expo SDK 54 / React Native app for caregivers. It includes Supabase Google sign-in, persisted onboarding, real Google Health API v4 authorization/synchronization, foreground-only phone-location consent, a Leaflet last-sync map, health dashboards, data-driven health analysis, SOS/event logging, care-management CRUD, a Gemini-powered caregiver assistant, exports, and settings.
 
 ## Device notifications
 
@@ -66,11 +66,16 @@ For local development you can instead allow `eldercareai://**`, but prefer the e
 
 ### Database and Storage
 
-The repository contains three ordered migrations. They are additive to the existing ElderCareAI tables in the project:
+The repository contains ordered migrations. They are additive to the existing ElderCareAI tables in the project:
 
 - `supabase/migrations/20260922000000_create_profiles.sql`
 - `supabase/migrations/20260922010000_add_onboarding.sql`
 - `supabase/migrations/20260922020000_app_rls.sql`
+- `supabase/migrations/20260922030000_fix_profile_photo_rls.sql`
+- `supabase/migrations/20260922040000_enable_vitals_realtime.sql`
+- `supabase/migrations/20261003050000_add_doctor_contacts.sql`
+- `supabase/migrations/20261004090000_add_raw_hrv_to_vitals.sql`
+- `supabase/migrations/20261004100000_add_intro_onboarding_step.sql`
 
 Apply them with the Supabase CLI:
 
@@ -80,7 +85,7 @@ npx supabase link --project-ref YOUR_PROJECT_REF
 npx supabase db push
 ```
 
-The onboarding migration extends the existing tables, creates `onboarding_progress`, creates the `profile-photos` Storage bucket and policies, and creates `wearable_sync_locations`. The final migration adds ownership-based RLS policies for vitals, medications, appointments, notes, alerts, notifications, emergencies, and chatbot data. These migrations do not replace the schema supplied with the project. Supabase Auth stores the canonical Google email in `auth.users`; the trigger also ensures the user exists in `caregivers` and the app writes their completed details there.
+The onboarding migration extends the existing tables, creates `onboarding_progress`, creates the `profile-photos` Storage bucket and policies, and creates `wearable_sync_locations`. Later migrations add ownership-based RLS policies for vitals, medications, appointments, notes, alerts, notifications, emergencies, and chatbot data, plus doctor contacts, raw HRV storage, and the intro-screen completion flag. These migrations do not replace the schema supplied with the project. Supabase Auth stores the canonical Google email in `auth.users`; the trigger also ensures the user exists in `caregivers` and the app writes their completed details there.
 
 ### Google Health Edge Functions
 
@@ -102,7 +107,18 @@ The connection and sync functions call these real v4 endpoints:
 - `GET https://health.googleapis.com/v4/users/me/pairedDevices`
 - `GET https://health.googleapis.com/v4/users/me/dataTypes/{dataType}/dataPoints`
 
-The sync function requests `heart-rate`, `oxygen-saturation`, `daily-oxygen-saturation`, `sleep`, `steps`, `daily-sleep-temperature-derivations`, and `heart-rate-variability`, then writes one consolidated row to `vital_sign_logs`. Stress is explicitly a demo derivation from HRV, not a raw Google Health measurement or medical assessment.
+The sync function requests `heart-rate`, `oxygen-saturation`, `daily-oxygen-saturation`, `sleep`, `steps`, `daily-sleep-temperature-derivations`, and `heart-rate-variability`, then writes one consolidated row to `vital_sign_logs`. HRV is stored as the raw RMSSD value from Google Health in milliseconds, without converting it into a synthetic score.
+
+### Gemini care assistant Edge Function
+
+Elle uses a Supabase Edge Function so the Gemini API key never ships in the mobile app. Store the key as a server-side secret and deploy the function:
+
+```bash
+npx supabase secrets set GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+npx supabase functions deploy ai-care-assistant
+```
+
+Optionally set `GEMINI_MODEL` as a Supabase secret to override the default model. The assistant reads the signed-in caregiver profile, patient profile, saved doctor contact, recent vitals, today's readings, medications, appointments, notes, and alerts from Supabase before calling Gemini. Its prompt explicitly says Elle is not a medical-grade AI, must not diagnose or prescribe, and must refer to patient readings as the patient's vitals or sleep rather than "your vitals."
 
 ## 3. Run with a development build
 
@@ -158,7 +174,7 @@ For iOS, use `npx expo run:ios --device` on macOS or create an EAS iOS developme
 4. The app exchanges the one-time code for a persisted session.
 5. The database trigger and client upsert synchronize the user's email/profile.
 6. Expo Router loads `onboarding_progress` and routes to the first unfinished step.
-7. Caregiver, older-adult, wearable, and location-consent completion timestamps are persisted separately.
+7. Intro, caregiver, older-adult, wearable, and location-consent completion timestamps are persisted separately.
 8. Completed users enter `/home`, which redirects into the protected dashboard tabs. Skipped or unpaired wearables display a disconnected state and empty readings.
 
 ## Location behavior
@@ -173,7 +189,7 @@ The Home screen links to a last-sync location screen. It renders the newest auth
 - **Predictions** apply simple linear regression to at least four distinct readings and display the sample-based confidence level.
 - **Anomalies** combine explicit review thresholds with two-standard-deviation changes from the available personal baseline.
 
-These calculations use synchronized database history and are no longer static cards, but they are still statistical decision support—not a trained clinical model, medical diagnosis, or substitute for professional assessment. The Elle chatbot remains a separate keyword-based demo.
+These calculations use synchronized database history and are no longer static cards, but they are still statistical decision support—not a trained clinical model, medical diagnosis, or substitute for professional assessment. The Elle chatbot is a separate Gemini-powered caregiver assistant with the same non-diagnostic safety boundary.
 
 ## Live dashboard and reports
 
@@ -186,7 +202,7 @@ Settings → Data Management generates shareable PDF files through `expo-print` 
 ## Required values and redirect checklist
 
 - Mobile `.env`: `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- Supabase Edge Function secrets: `GOOGLE_HEALTH_CLIENT_ID`, `GOOGLE_HEALTH_CLIENT_SECRET`
+- Supabase Edge Function secrets: `GOOGLE_HEALTH_CLIENT_ID`, `GOOGLE_HEALTH_CLIENT_SECRET`, `GEMINI_API_KEY`
 - Supabase Auth redirect allow-list: `eldercareai://auth/callback`
 - Google OAuth web-client redirects:
   - `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`

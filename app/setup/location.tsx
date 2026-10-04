@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
 import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -10,6 +9,7 @@ import { SetupScaffold } from '@/src/components/SetupScaffold';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily, typeScale } from '@/src/theme/typography';
 
 export default function LocationConsentScreen() {
   const router = useRouter();
@@ -66,9 +66,9 @@ export default function LocationConsentScreen() {
   return (
     <SetupScaffold step={4} title="Phone location consent" subtitle="Choose whether ElderCareAI may record this phone’s location at specific health-sync events.">
       <View style={styles.hero}>
-        <LinearGradient colors={[palette.primary, palette.purple]} style={styles.heroIcon}>
-          <Ionicons name="phone-portrait-outline" size={46} color="#FFFFFF" />
-        </LinearGradient>
+        <View style={styles.heroIcon}>
+          <Ionicons name="phone-portrait-outline" size={40} color={palette.primaryDark} />
+        </View>
         <Text style={[styles.heroTitle, { color: theme.text }]}>Your phone, not the watch</Text>
         <Text style={[styles.heroText, { color: theme.subtitle }]}>This permission does not expose the Fitbit Inspire 3’s live GPS location.</Text>
       </View>
@@ -109,17 +109,17 @@ function ConsentRow({ icon, title, body, last }: { icon: keyof typeof Ionicons.g
 
 const styles = StyleSheet.create({
   hero: { alignItems: 'center', marginBottom: 22 },
-  heroIcon: { width: 94, height: 94, borderRadius: 30, alignItems: 'center', justifyContent: 'center', marginBottom: 17 },
-  heroTitle: { fontSize: 22, fontWeight: '800', letterSpacing: -0.3 },
+  heroIcon: { width: 82, height: 82, borderRadius: 8, backgroundColor: palette.aquaSurface, alignItems: 'center', justifyContent: 'center', marginBottom: 17 },
+  heroTitle: { ...typeScale.sectionTitle },
   heroText: { marginTop: 7, maxWidth: 350, fontSize: 13, lineHeight: 19, textAlign: 'center' },
-  card: { borderRadius: 20, borderWidth: 1, paddingHorizontal: 17 },
+  card: { borderRadius: 8, borderWidth: 1, paddingHorizontal: 17 },
   row: { flexDirection: 'row', paddingVertical: 17 },
-  rowIcon: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  rowIcon: { width: 42, height: 42, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
   rowCopy: { flex: 1, marginLeft: 12 },
-  rowTitle: { fontSize: 14, fontWeight: '700' },
+  rowTitle: { ...typeScale.cardTitle },
   rowBody: { marginTop: 3, fontSize: 12, lineHeight: 18 },
-  disclosure: { marginTop: 16, padding: 14, borderRadius: 14, borderWidth: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  disclosure: { marginTop: 16, padding: 14, borderRadius: 8, borderWidth: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   disclosureText: { flex: 1, fontSize: 12, lineHeight: 18 },
   skipButton: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
-  skipText: { fontSize: 14, fontWeight: '600' },
+  skipText: { fontSize: 13, fontFamily: fontFamily.medium },
 });

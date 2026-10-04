@@ -9,7 +9,6 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,12 +17,12 @@ import { isSupabaseConfigured } from '@/src/lib/supabase';
 import { getPostAuthRoute } from '@/src/lib/onboarding-route';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily, typeScale } from '@/src/theme/typography';
 
 export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const isDark = useColorScheme() === 'dark';
-  const theme = getTheme(isDark);
+  const theme = getTheme(false);
   const { session, onboarding, isLoading, isOnboardingLoading, isSigningIn, authError, signInWithGoogle, clearAuthError } = useAuth();
   const rise = useRef(new Animated.Value(18)).current;
   const opacity = useRef(new Animated.Value(0)).current;
@@ -45,21 +44,19 @@ export default function LoginScreen() {
 
   return (
     <LinearGradient
-      colors={isDark ? ['#0F172A', '#162544', '#0F172A'] : ['#FFFFFF', '#EBF4FF', '#E0EFFF']}
-      locations={[0, 0.6, 1]}
+      colors={[palette.background, '#FFFFFF', palette.aquaSurface]}
+      locations={[0, 0.52, 1]}
       style={[styles.container, { paddingTop: insets.top + 18, paddingBottom: insets.bottom + 18 }]}
     >
       <Animated.View style={[styles.content, { opacity, transform: [{ translateY: rise }] }]}>
         <View style={styles.brandBlock}>
-          <View style={[styles.logoCard, { backgroundColor: isDark ? theme.card : '#FFFFFF' }]}>
-            <Image
-              source={require('@/assets/images/eldercare-logo.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-          <Text style={[styles.title, { color: theme.text }]}>ElderCare<Text style={{ color: palette.primary }}>AI</Text></Text>
-          <Text style={[styles.subtitle, { color: theme.subtitle }]}>Smart care for your loved ones</Text>
+          <Image
+            source={require('@/assets/images/eldercare-logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={[styles.title, { color: theme.text }]}>ElderCare<Text style={{ color: palette.primaryDark }}>AI</Text></Text>
+          <Text style={[styles.subtitle, { color: theme.subtitle }]}>Care updates for the people who look after them</Text>
         </View>
 
         <View
@@ -68,18 +65,12 @@ export default function LoginScreen() {
             {
               backgroundColor: theme.cardElevated,
               borderColor: theme.border,
-              shadowColor: isDark ? '#000000' : '#94A3B8',
             },
           ]}
         >
           <View style={styles.cardHeader}>
-            <View style={styles.shieldIcon}>
-              <Ionicons name="shield-checkmark" size={20} color={palette.accent} />
-            </View>
-            <View style={styles.cardHeaderCopy}>
-              <Text style={[styles.cardTitle, { color: theme.text }]}>Secure caregiver access</Text>
-              <Text style={[styles.cardSubtitle, { color: theme.subtitle }]}>Sign in with the Google account connected to your Google Health app to sync vitals.</Text>
-            </View>
+            <Text style={[styles.cardTitle, { color: theme.text }]}>Caregiver sign in</Text>
+            <Text style={[styles.cardSubtitle, { color: theme.subtitle }]}>Use the Google account connected to Google Health to sync vitals and care reminders.</Text>
           </View>
 
           <Pressable
@@ -90,7 +81,7 @@ export default function LoginScreen() {
             style={({ pressed }) => [styles.buttonWrap, pressed && styles.buttonPressed]}
           >
             <LinearGradient
-              colors={[palette.google, palette.googleDark]}
+              colors={[palette.primaryDark, palette.primaryDark]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.googleButton}
@@ -109,6 +100,11 @@ export default function LoginScreen() {
             </LinearGradient>
           </Pressable>
 
+          <View style={styles.cueRow}>
+            <CareCue icon="pulse" label="Vitals sync" />
+            <CareCue icon="calendar" label="Care schedule" />
+          </View>
+
           {!isSupabaseConfigured && !authError ? (
             <View style={[styles.message, { backgroundColor: `${palette.warning}16` }]}>
               <Ionicons name="information-circle" size={18} color={palette.warning} />
@@ -122,11 +118,6 @@ export default function LoginScreen() {
               <Text style={[styles.messageText, { color: palette.error }]}>{authError}</Text>
             </View>
           ) : null}
-
-          <View style={styles.securityLine}>
-            <Ionicons name="lock-closed" size={13} color={theme.subtitle} />
-            <Text style={[styles.securityText, { color: theme.subtitle }]}>Protected by Google and Supabase authentication</Text>
-          </View>
         </View>
       </Animated.View>
 
@@ -135,58 +126,49 @@ export default function LoginScreen() {
   );
 }
 
+function CareCue({ icon, label }: { icon: keyof typeof Ionicons.glyphMap; label: string }) {
+  return (
+    <View style={styles.cue}>
+      <Ionicons name={icon} size={15} color={palette.primaryDark} />
+      <Text style={styles.cueText}>{label}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 22 },
   content: { flex: 1, justifyContent: 'center' },
-  brandBlock: { alignItems: 'center', marginBottom: 30 },
-  logoCard: {
-    width: 132,
-    height: 132,
-    borderRadius: 66,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-    shadowColor: '#38BDF8',
-    shadowOffset: { width: 0, height: 9 },
-    shadowOpacity: 0.16,
-    shadowRadius: 20,
-    elevation: 6,
-  },
-  logo: { width: 112, height: 112 },
-  title: { fontSize: 28, fontWeight: '800', letterSpacing: -0.4, textAlign: 'center' },
-  subtitle: { maxWidth: 340, marginTop: 10, fontSize: 15, lineHeight: 22, fontWeight: '400', textAlign: 'center' },
+  brandBlock: { alignItems: 'center', marginBottom: 26 },
+  logo: { width: 112, height: 112, marginBottom: 14 },
+  title: { ...typeScale.screenTitle, textAlign: 'center' },
+  subtitle: { maxWidth: 330, marginTop: 8, fontSize: 13, lineHeight: 20, textAlign: 'center' },
   card: {
     width: '100%',
     maxWidth: 460,
     alignSelf: 'center',
-    padding: 20,
-    borderRadius: 20,
+    padding: 18,
+    borderRadius: 8,
     borderWidth: 1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
   },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  shieldIcon: { width: 42, height: 42, borderRadius: 13, backgroundColor: '#E9FBEA', alignItems: 'center', justifyContent: 'center' },
-  cardHeaderCopy: { flex: 1, marginLeft: 12 },
-  cardTitle: { fontSize: 16, fontWeight: '700' },
-  cardSubtitle: { marginTop: 3, fontSize: 13, fontWeight: '400' },
-  buttonWrap: { borderRadius: 14 },
-  buttonPressed: { opacity: 0.86, transform: [{ scale: 0.99 }] },
+  cardHeader: { marginBottom: 16 },
+  cardTitle: { ...typeScale.sectionTitle, textAlign: 'center' },
+  cardSubtitle: { alignSelf: 'center', maxWidth: 300, marginTop: 7, fontSize: 12, lineHeight: 18, textAlign: 'center' },
+  buttonWrap: { borderRadius: 8 },
+  buttonPressed: { opacity: 0.86 },
   googleButton: {
-    height: 56,
-    borderRadius: 14,
+    height: 52,
+    borderRadius: 8,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   googleIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  googleButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700', letterSpacing: 0.1 },
+  googleButtonText: { color: '#FFFFFF', fontSize: 14, fontFamily: fontFamily.semiBold },
+  cueRow: { marginTop: 15, flexDirection: 'row', gap: 9 },
+  cue: { flex: 1, minHeight: 40, borderRadius: 8, backgroundColor: palette.aquaSurface, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  cueText: { color: palette.primaryDark, fontSize: 11, fontFamily: fontFamily.medium },
   message: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginTop: 14, padding: 11, borderRadius: 12 },
   messageText: { flex: 1, fontSize: 12, lineHeight: 17, fontWeight: '500' },
-  securityLine: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 18 },
-  securityText: { fontSize: 11, fontWeight: '500' },
   legal: { alignSelf: 'center', maxWidth: 330, fontSize: 11, lineHeight: 16, textAlign: 'center', paddingHorizontal: 10 },
 });

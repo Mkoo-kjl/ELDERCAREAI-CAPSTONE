@@ -1,7 +1,7 @@
 import { supabase } from '@/src/lib/supabase';
 import type { LocalPhoto } from '@/src/components/ProfilePhotoPicker';
 
-export async function uploadProfilePhoto(userId: string, kind: 'caregiver' | 'elderly', photo: LocalPhoto) {
+export async function uploadProfilePhoto(userId: string, kind: 'caregiver' | 'elderly' | 'doctor', photo: LocalPhoto) {
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) {
     throw new Error('Profile photo upload failed: your session expired. Please sign in again.');

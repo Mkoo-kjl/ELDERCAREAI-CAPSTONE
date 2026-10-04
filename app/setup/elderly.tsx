@@ -176,20 +176,20 @@ export default function ElderlySetupScreen() {
         <FormField label="Emergency contact name" required value={emergencyName} onChangeText={setEmergencyName} error={errors.emergencyName} icon="person-add-outline" autoCapitalize="words" />
         <FormField label="Emergency contact phone" required value={emergencyPhone} onChangeText={setEmergencyPhone} error={errors.emergencyPhone} icon="call-outline" keyboardType="phone-pad" />
       </View>
-      <GradientButton label={mode === 'edit' ? 'Save changes' : 'Save profile'} onPress={() => void save()} loading={saving} colors={[palette.accent, palette.accentDark]} />
+      <GradientButton label={mode === 'edit' ? 'Save changes' : 'Save profile'} onPress={() => void save()} loading={saving} colors={[palette.accentDark, palette.accentDark]} />
     </SetupScaffold>
   );
 }
 
 const styles = StyleSheet.create({
-  section: { padding: 18, borderRadius: 20, borderWidth: 1, marginBottom: 16 },
-  sectionTitle: { marginBottom: 16, fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  section: { padding: 18, borderRadius: 8, borderWidth: 1, marginBottom: 16 },
+  sectionTitle: { marginBottom: 16, fontSize: 11, fontWeight: '600' },
   or: { marginTop: -8, marginBottom: 8, textAlign: 'center', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   twoColumns: { flexDirection: 'row', gap: 10 },
   column: { flex: 1 },
   fieldLabel: { marginBottom: 9, fontSize: 13, fontWeight: '700' },
   bloodGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  bloodButton: { width: '23%', minHeight: 46, borderWidth: 1, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  bloodButton: { width: '23%', minHeight: 44, borderWidth: 1, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   bloodSelected: { backgroundColor: palette.error },
   bloodText: { fontSize: 14, fontWeight: '700' },
   multiline: { minHeight: 76, textAlignVertical: 'top' },

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily } from '@/src/theme/typography';
 
 type ChoiceChipsProps = {
   label: string;
@@ -46,11 +47,11 @@ export function ChoiceChips({ label, options, value, onChange, error, accent = p
 
 const styles = StyleSheet.create({
   group: { marginBottom: 16 },
-  label: { marginBottom: 8, fontSize: 13, fontWeight: '700' },
+  label: { marginBottom: 8, fontSize: 12, fontFamily: fontFamily.medium },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
-  chip: { minWidth: 92, minHeight: 44, flex: 1, borderWidth: 1, borderRadius: 14, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
+  chip: { minWidth: 92, minHeight: 42, flex: 1, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
   radio: { width: 16, height: 16, borderRadius: 8, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   radioDot: { width: 8, height: 8, borderRadius: 4 },
-  text: { fontSize: 13, fontWeight: '600' },
+  text: { fontSize: 12, fontFamily: fontFamily.medium },
   error: { marginTop: 5, color: palette.error, fontSize: 12, fontWeight: '500' },
 });

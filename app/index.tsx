@@ -7,20 +7,18 @@ import {
   Image,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/src/providers/AuthProvider';
 import { getPostAuthRoute } from '@/src/lib/onboarding-route';
-import { getTheme, palette } from '@/src/theme/colors';
+import { palette } from '@/src/theme/colors';
+import { fontFamily } from '@/src/theme/typography';
 
 export default function SplashScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const isDark = useColorScheme() === 'dark';
-  const theme = getTheme(isDark);
   const { session, onboarding, isLoading, isOnboardingLoading } = useAuth();
   const logoScale = useRef(new Animated.Value(0.78)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -61,32 +59,25 @@ export default function SplashScreen() {
 
   return (
     <LinearGradient
-      colors={isDark ? ['#0F172A', '#162544', '#0F172A'] : ['#FFFFFF', '#FFFFFF', '#FFFFFF']}
-      locations={[0, 0.55, 1]}
+      colors={[palette.background, '#FFFFFF', palette.background]}
+      locations={[0, 0.58, 1]}
       style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
     >
       <View style={styles.content}>
         <Animated.View
-          style={{ opacity: logoOpacity, transform: [{ scale: logoScale }] }}
+          style={[styles.logoStage, { opacity: logoOpacity, transform: [{ scale: logoScale }] }]}
         >
-          <View style={[styles.logoHalo, { backgroundColor: isDark ? '#1E293B' : '#FFFFFF' }]}>
-            <Image
-              source={require('@/assets/images/eldercare-logo.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
+          <Image
+            source={require('@/assets/images/eldercare-logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
         </Animated.View>
 
         <Animated.View style={[styles.copy, { opacity: textOpacity }]}>
-          <Text style={[styles.title, { color: theme.text }]}>ElderCareAI</Text>
-          <Text style={[styles.subtitle, { color: theme.subtitle }]}>Care that stays connected</Text>
+          <Text style={styles.title}>ElderCare<Text style={styles.titleAccent}>AI</Text></Text>
+          <PulsingDots />
         </Animated.View>
-      </View>
-
-      <View style={styles.footer}>
-        <PulsingDots />
-        <Text style={[styles.footerText, { color: theme.subtitle }]}>HEALTH • SAFETY • PEACE OF MIND</Text>
       </View>
     </LinearGradient>
   );
@@ -131,24 +122,11 @@ function PulsingDots() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
-  logoHalo: {
-    width: 220,
-    height: 220,
-    borderRadius: 64,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#38BDF8',
-    shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.18,
-    shadowRadius: 30,
-    elevation: 8,
-  },
-  logo: { width: 184, height: 184 },
-  copy: { alignItems: 'center', marginTop: 32 },
-  title: { fontSize: 38, lineHeight: 44, fontWeight: '800', letterSpacing: -0.5 },
-  subtitle: { marginTop: 8, fontSize: 15, fontWeight: '500', letterSpacing: 0.2 },
-  footer: { alignItems: 'center', paddingHorizontal: 40, paddingBottom: 28 },
-  dots: { height: 18, marginBottom: 16, flexDirection: 'row', alignItems: 'center', gap: 9 },
+  logoStage: { alignItems: 'center', justifyContent: 'center' },
+  logo: { width: 180, height: 180 },
+  copy: { alignItems: 'center', marginTop: 24 },
+  title: { color: palette.text, fontSize: 32, lineHeight: 39, fontFamily: fontFamily.semiBold },
+  titleAccent: { color: palette.primaryDark },
+  dots: { height: 18, marginTop: 36, flexDirection: 'row', alignItems: 'center', gap: 9 },
   dot: { width: 9, height: 9, borderRadius: 5 },
-  footerText: { fontSize: 10, fontWeight: '700', letterSpacing: 1.45 },
 });

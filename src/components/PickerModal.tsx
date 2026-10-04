@@ -2,6 +2,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily, typeScale } from '@/src/theme/typography';
 
 type Props = {
   visible: boolean;
@@ -50,9 +51,9 @@ export function PickerModal({ visible, value, onChange, onClose }: Props) {
 
 function PickerRow({ label, values, selected, onSelect }: { label: string; values: { label: string; value: number }[]; selected: number; onSelect: (value: number) => void }) {
   const theme = getTheme(useColorScheme() === 'dark');
-  return <View style={styles.row}><Text style={[styles.label, { color: theme.subtitle }]}>{label.toUpperCase()}</Text><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.options}>{values.map((item) => <Pressable key={item.value} onPress={() => onSelect(item.value)} style={[styles.option, { backgroundColor: theme.card, borderColor: theme.border }, selected === item.value && styles.selected]}><Text style={[styles.optionText, { color: theme.text }, selected === item.value && styles.selectedText]}>{item.label}</Text></Pressable>)}</ScrollView></View>;
+  return <View style={styles.row}><Text style={[styles.label, { color: theme.subtitle }]}>{label.toUpperCase()}</Text><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.options}>{values.map((item) => <Pressable key={item.value} onPress={() => onSelect(item.value)} style={[styles.option, { backgroundColor: theme.card, borderColor: theme.border }, selected === item.value && styles.selected]}><Text style={[styles.optionText, { color: selected === item.value ? palette.text : theme.text }]}>{item.label}</Text></Pressable>)}</ScrollView></View>;
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: '#00000066', justifyContent: 'flex-end' }, sheet: { borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: 18 }, top: { paddingHorizontal: 20, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, title: { fontSize: 20, fontWeight: '800' }, done: { color: palette.primaryDark, fontWeight: '800' }, row: { marginTop: 13 }, label: { paddingHorizontal: 20, marginBottom: 7, fontSize: 10, fontWeight: '800', letterSpacing: 1 }, options: { paddingHorizontal: 18, gap: 7 }, option: { minWidth: 52, height: 40, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 11 }, selected: { backgroundColor: palette.primary, borderColor: palette.primary }, optionText: { fontSize: 12, fontWeight: '700' }, selectedText: { color: '#FFFFFF' },
+  overlay: { flex: 1, backgroundColor: '#00000066', justifyContent: 'flex-end' }, sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 18 }, top: { paddingHorizontal: 20, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, title: { ...typeScale.sectionTitle }, done: { color: palette.primaryDark, fontFamily: fontFamily.semiBold }, row: { marginTop: 13 }, label: { paddingHorizontal: 20, marginBottom: 7, fontSize: 10, fontFamily: fontFamily.medium }, options: { paddingHorizontal: 18, gap: 7 }, option: { minWidth: 52, height: 40, borderRadius: 8, borderWidth: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 11 }, selected: { backgroundColor: palette.aquaSurface, borderColor: palette.primaryDark }, optionText: { fontSize: 12, fontFamily: fontFamily.medium },
 });

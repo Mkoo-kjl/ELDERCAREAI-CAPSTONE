@@ -3,6 +3,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import type { ComponentProps } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 
+import { palette } from '@/src/theme/colors';
+import { fontFamily } from '@/src/theme/typography';
+
 type Props = {
   label: string;
   onPress: () => void;
@@ -12,7 +15,7 @@ type Props = {
   icon?: ComponentProps<typeof Ionicons>['name'];
 };
 
-export function GradientButton({ label, onPress, loading, disabled, colors = ['#38BDF8', '#2DA3DC'], icon }: Props) {
+export function GradientButton({ label, onPress, loading, disabled, colors = [palette.primaryDark, palette.primaryDark], icon }: Props) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -34,8 +37,8 @@ export function GradientButton({ label, onPress, loading, disabled, colors = ['#
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginTop: 8, borderRadius: 14 },
+  wrap: { marginTop: 8, borderRadius: 8 },
   pressed: { opacity: 0.78 },
-  button: { minHeight: 56, borderRadius: 14, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
-  label: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
+  button: { minHeight: 52, borderRadius: 8, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
+  label: { color: '#FFFFFF', fontSize: 14, fontFamily: fontFamily.semiBold },
 });

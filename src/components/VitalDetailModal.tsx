@@ -6,8 +6,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { relativeTime } from '@/src/lib/format';
 import type { VitalLog } from '@/src/providers/HealthDataProvider';
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily, typeScale } from '@/src/theme/typography';
 
-export type VitalMetricKey = 'heart_rate_bpm' | 'spo2_percent' | 'sleep_hours' | 'steps_count' | 'skin_temp_celsius' | 'stress_score';
+export type VitalMetricKey = 'heart_rate_bpm' | 'spo2_percent' | 'sleep_hours' | 'steps_count' | 'skin_temp_celsius' | 'hrv_rmssd_ms';
 type MetricConfig = {
   title: string;
   shortTitle: string;
@@ -22,11 +23,11 @@ type MetricConfig = {
 
 const configs: Record<VitalMetricKey, MetricConfig> = {
   heart_rate_bpm: { title: 'Heart Rate', shortTitle: 'heart rate', icon: 'heart', color: palette.error, unit: 'bpm', digits: 0, about: 'Heart rate is the number of times the heart beats each minute. It naturally changes with movement, emotion, medication, illness, hydration, and sleep.', source: 'Latest wrist-based heart-rate sample synchronized from Google Health.', caution: 'One wearable reading cannot diagnose a heart condition. Consider activity and symptoms when interpreting it.' },
-  spo2_percent: { title: 'Blood Oxygen (SpO₂)', shortTitle: 'blood oxygen', icon: 'water', color: palette.primary, unit: '%', digits: 1, about: 'SpO₂ estimates the percentage of oxygen carried by the blood. Wearable values can be affected by movement, fit, circulation, and sensor contact.', source: 'Latest SpO₂ sample, with Google Health’s daily oxygen average used as a fallback.', caution: 'Confirm unexpectedly low values and seek appropriate medical help when symptoms or persistent concerns are present.' },
+  spo2_percent: { title: 'Blood Oxygen (SpO₂)', shortTitle: 'blood oxygen', icon: 'water', color: palette.primaryDark, unit: '%', digits: 1, about: 'SpO₂ estimates the percentage of oxygen carried by the blood. Wearable values can be affected by movement, fit, circulation, and sensor contact.', source: 'Latest SpO₂ sample, with Google Health’s daily oxygen average used as a fallback.', caution: 'Confirm unexpectedly low values and seek appropriate medical help when symptoms or persistent concerns are present.' },
   sleep_hours: { title: 'Sleep Duration', shortTitle: 'sleep', icon: 'moon', color: palette.purple, unit: 'hours', digits: 1, about: 'Sleep duration is the time the wearable classified as asleep during the most recently synchronized sleep session.', source: 'Google Health sleep minutes converted to hours.', caution: 'Wearables estimate sleep and may not exactly match time perceived asleep or a clinical sleep study.' },
   steps_count: { title: 'Recent Steps', shortTitle: 'activity', icon: 'footsteps', color: palette.accentDark, unit: 'steps', digits: 0, about: 'Steps summarize recorded walking activity and are useful for observing personal activity patterns over time.', source: 'Sum of synchronized Google Health step intervals from the rolling previous 24 hours.', caution: 'This is a rolling 24-hour value, so it may differ from a calendar-day total shown by Fitbit.' },
   skin_temp_celsius: { title: 'Overnight Skin Temperature', shortTitle: 'overnight skin temperature', icon: 'thermometer', color: palette.warning, unit: '°C', digits: 1, about: 'This is the average skin temperature captured by the wearable while the person slept. It is useful mainly for comparing overnight trends with the person’s own baseline.', source: 'Google Health daily sleep-temperature derivation from Fitbit.', caution: 'This is not the person’s current temperature, core body temperature, or a fever measurement. Use a clinical thermometer when current body temperature matters.' },
-  stress_score: { title: 'HRV-Derived Strain', shortTitle: 'strain estimate', icon: 'leaf', color: palette.pink, unit: '/100', digits: 0, about: 'ElderCareAI estimates physical strain from RMSSD heart-rate variability. Higher values in this app mean lower HRV and greater estimated strain.', source: 'Demo calculation: HRV ≥50 ms → 25, 30–49 ms → 50, below 30 ms → 75.', caution: 'This is not Fitbit’s Stress Management Score and does not diagnose emotional or psychological stress.' },
+  hrv_rmssd_ms: { title: 'Heart Rate Variability', shortTitle: 'HRV', icon: 'leaf', color: palette.pink, unit: 'ms', digits: 0, about: 'Heart rate variability here is the RMSSD value synchronized from Google Health. It reflects variation between heartbeats and is most useful as a personal trend over time.', source: 'Latest RMSSD heart-rate-variability sample synchronized from Google Health.', caution: 'HRV varies with sleep, illness, activity, hydration, and sensor conditions. This app does not diagnose stress, illness, or recovery status from HRV.' },
 };
 
 const elleImages: Record<'happy' | 'neutral' | 'worried', ImageSourcePropType> = {
@@ -35,7 +36,10 @@ const elleImages: Record<'happy' | 'neutral' | 'worried', ImageSourcePropType> =
   worried: require('../../assets/images/elle-worried.png'),
 };
 
-function valueFor(row: VitalLog, metric: VitalMetricKey) { return row[metric] as number | null; }
+function valueFor(row: VitalLog, metric: VitalMetricKey) {
+  const value = row[metric];
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
 function formatValue(value: number | null, config: MetricConfig) { return value === null ? '--' : metricNumber(value, config.digits); }
 function metricNumber(value: number, digits: number) { return digits ? value.toFixed(digits) : Math.round(value).toLocaleString(); }
 function isConcerning(metric: VitalMetricKey, value: number | null) {
@@ -43,7 +47,7 @@ function isConcerning(metric: VitalMetricKey, value: number | null) {
   if (metric === 'heart_rate_bpm') return value < 50 || value > 110;
   if (metric === 'spo2_percent') return value < 95;
   if (metric === 'sleep_hours') return value < 5;
-  if (metric === 'stress_score') return value >= 75;
+  if (metric === 'hrv_rmssd_ms') return value < 30;
   return false;
 }
 
@@ -87,10 +91,10 @@ export function VitalDetailModal({ visible, metric, history, onClose }: { visibl
 function InfoSection({ title, body, color, subtitle }: { title: string; body: string; color: string; subtitle: string }) { return <View style={styles.infoSection}><Text style={[styles.sectionTitle, { color }]}>{title}</Text><Text style={[styles.body, { color: subtitle }]}>{body}</Text></View>; }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(15,23,42,0.58)' }, sheet: { maxHeight: '91%', borderTopLeftRadius: 26, borderTopRightRadius: 26 }, handle: { alignSelf: 'center', width: 46, height: 5, borderRadius: 3, backgroundColor: '#CBD5E1', marginTop: 9 }, content: { padding: 19, paddingTop: 12 },
-  header: { flexDirection: 'row', alignItems: 'center' }, heroIcon: { width: 54, height: 54, borderRadius: 17, alignItems: 'center', justifyContent: 'center' }, headerCopy: { flex: 1, marginLeft: 12 }, eyebrow: { fontSize: 9.5, fontWeight: '800', letterSpacing: 1 }, title: { marginTop: 2, fontSize: 22, fontWeight: '800', letterSpacing: -0.35 }, close: { width: 40, height: 40, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
-  readingCard: { marginTop: 17, padding: 17, borderRadius: 18, borderWidth: 1 }, readingLabel: { fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 }, readingRow: { marginTop: 5, flexDirection: 'row', alignItems: 'baseline', gap: 6 }, reading: { fontSize: 38, lineHeight: 44, fontWeight: '800', letterSpacing: -0.8 }, unit: { fontSize: 13, fontWeight: '700' }, time: { marginTop: 2, fontSize: 11 },
-  elleCard: { marginTop: 13, minHeight: 96, padding: 12, borderRadius: 18, borderWidth: 1, flexDirection: 'row', alignItems: 'center' }, elle: { width: 72, height: 62, borderRadius: 16 }, elleCopy: { flex: 1, marginLeft: 11 }, elleName: { fontSize: 13.5, fontWeight: '800' }, elleText: { marginTop: 3, fontSize: 11.5, lineHeight: 17 },
-  sectionTitle: { marginTop: 19, marginBottom: 8, fontSize: 14, fontWeight: '800' }, chartCard: { padding: 14, borderRadius: 18, borderWidth: 1 }, bars: { height: 108, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', gap: 5 }, barColumn: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' }, barValue: { fontSize: 8.5, marginBottom: 4 }, bar: { width: '62%', minWidth: 9, maxWidth: 24, borderRadius: 6 }, barDate: { marginTop: 4, fontSize: 8 }, chartNote: { marginTop: 8, fontSize: 10.5, textAlign: 'center' }, emptyChart: { padding: 18, borderRadius: 16 },
-  infoSection: { marginTop: 2 }, body: { fontSize: 12.5, lineHeight: 19 }, caution: { marginTop: 18, padding: 14, borderRadius: 16, flexDirection: 'row', alignItems: 'flex-start', gap: 9 }, cautionText: { flex: 1, fontSize: 11.5, lineHeight: 17 },
+  overlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(15,23,42,0.58)' }, sheet: { maxHeight: '91%', borderTopLeftRadius: 20, borderTopRightRadius: 20 }, handle: { alignSelf: 'center', width: 46, height: 5, borderRadius: 3, backgroundColor: palette.border, marginTop: 9 }, content: { padding: 19, paddingTop: 12 },
+  header: { flexDirection: 'row', alignItems: 'center' }, heroIcon: { width: 48, height: 48, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }, headerCopy: { flex: 1, marginLeft: 11 }, eyebrow: { fontSize: 9.5, fontFamily: fontFamily.medium }, title: { marginTop: 2, ...typeScale.sectionTitle }, close: { width: 38, height: 38, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  readingCard: { marginTop: 17, padding: 16, borderRadius: 8, borderWidth: 1 }, readingLabel: { fontSize: 9.5, fontFamily: fontFamily.medium }, readingRow: { marginTop: 5, flexDirection: 'row', alignItems: 'baseline', gap: 6 }, reading: { fontSize: 32, lineHeight: 39, fontFamily: fontFamily.semiBold, fontVariant: ['tabular-nums'] }, unit: { fontSize: 12, fontFamily: fontFamily.medium }, time: { marginTop: 2, fontSize: 11 },
+  elleCard: { marginTop: 13, minHeight: 90, padding: 12, borderRadius: 8, borderWidth: 1, flexDirection: 'row', alignItems: 'center' }, elle: { width: 65, height: 58, borderRadius: 7 }, elleCopy: { flex: 1, marginLeft: 11 }, elleName: { ...typeScale.cardTitle }, elleText: { marginTop: 3, fontSize: 11.5, lineHeight: 17 },
+  sectionTitle: { marginTop: 19, marginBottom: 8, ...typeScale.cardTitle }, chartCard: { padding: 14, borderRadius: 8, borderWidth: 1 }, bars: { height: 108, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', gap: 5 }, barColumn: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' }, barValue: { fontSize: 8.5, marginBottom: 4 }, bar: { width: '62%', minWidth: 9, maxWidth: 24, borderRadius: 4 }, barDate: { marginTop: 4, fontSize: 8 }, chartNote: { marginTop: 8, fontSize: 10.5, textAlign: 'center' }, emptyChart: { padding: 18, borderRadius: 8 },
+  infoSection: { marginTop: 2 }, body: { fontSize: 12.5, lineHeight: 19 }, caution: { marginTop: 18, padding: 14, borderRadius: 8, flexDirection: 'row', alignItems: 'flex-start', gap: 9 }, cautionText: { flex: 1, fontSize: 11.5, lineHeight: 17 },
 });

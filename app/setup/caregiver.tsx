@@ -108,6 +108,6 @@ export default function CaregiverSetupScreen() {
 }
 
 const styles = StyleSheet.create({
-  section: { padding: 18, borderRadius: 20, borderWidth: 1, marginBottom: 12 },
-  sectionTitle: { marginBottom: 16, fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  section: { padding: 18, borderRadius: 8, borderWidth: 1, marginBottom: 12 },
+  sectionTitle: { marginBottom: 16, fontSize: 11, fontWeight: '600' },
 });

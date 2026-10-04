@@ -136,7 +136,6 @@ Deno.serve(async (request) => {
     const stepCount = (steps.dataPoints ?? []).reduce((sum: number, point: Json) => sum + (Number(point.steps?.count) || 0), 0) || null;
     const skinTemp = Number(temperature.dataPoints?.[0]?.dailySleepTemperatureDerivations?.nightlyTemperatureCelsius) || null;
     const rmssd = Number(hrv.dataPoints?.[0]?.heartRateVariability?.rootMeanSquareOfSuccessiveDifferencesMilliseconds) || null;
-    const stressScore = rmssd === null ? null : rmssd >= 50 ? 25 : rmssd >= 30 ? 50 : 75;
     const riskScore = Math.min(100, (heartRate && heartRate > 100 ? 25 : 0) + (spo2 && spo2 < 95 ? 45 : 0) + (sleepMinutes && sleepMinutes < 360 ? 20 : 0));
     const status = riskScore >= 45 ? 'warning' : 'normal';
 
@@ -159,7 +158,7 @@ Deno.serve(async (request) => {
       elderly_id: elderly.elderly_id,
       heart_rate_bpm: heartRate,
       spo2_percent: spo2,
-      stress_score: stressScore,
+      hrv_rmssd_ms: rmssd,
       skin_temp_celsius: skinTemp,
       steps_count: stepCount,
       sleep_hours: sleepMinutes ? Math.round((sleepMinutes / 60) * 10) / 10 : null,
@@ -176,7 +175,7 @@ Deno.serve(async (request) => {
       .order('recorded_at', { ascending: false })
       .limit(1)
       .maybeSingle();
-    const metricKeys = ['heart_rate_bpm', 'spo2_percent', 'stress_score', 'skin_temp_celsius', 'steps_count', 'sleep_hours'] as const;
+    const metricKeys = ['heart_rate_bpm', 'spo2_percent', 'hrv_rmssd_ms', 'skin_temp_celsius', 'steps_count', 'sleep_hours'] as const;
     const unchanged = latest && metricKeys.every((key) => latest[key] === log[key]);
     const saveQuery = unchanged
       ? admin.from('vital_sign_logs').update({ synced_at: log.synced_at }).eq('id', latest.id)

@@ -21,6 +21,7 @@ const REDIRECT_URI = Linking.createURL('auth/callback', { scheme: 'eldercareai' 
 
 export type OnboardingProgress = {
   user_id: string;
+  intro_completed_at: string | null;
   caregiver_completed_at: string | null;
   elderly_completed_at: string | null;
   wearable_status: 'not_started' | 'connected' | 'authorized_no_device' | 'skipped' | 'error';
@@ -109,7 +110,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setIsOnboardingLoading(true);
     const { data, error } = await supabase
       .from('onboarding_progress')
-      .select('user_id, caregiver_completed_at, elderly_completed_at, wearable_status, paired_device_count, wearable_completed_at, location_permission, location_consent_at, completed_at')
+      .select('user_id, intro_completed_at, caregiver_completed_at, elderly_completed_at, wearable_status, paired_device_count, wearable_completed_at, location_permission, location_consent_at, completed_at')
       .eq('user_id', activeSession.user.id)
       .maybeSingle();
 

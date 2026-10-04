@@ -22,5 +22,9 @@ export async function getFunctionErrorMessage(error: unknown, fallback: string) 
       // Fall through to the SDK error message when the response is not JSON.
     }
   }
-  return error instanceof Error && error.message ? error.message : fallback;
+  if (error instanceof Error && error.message) {
+    const genericHttpError = /^(Bad Request|Unauthorized|Forbidden|Not Found|Internal Server Error|Service Unavailable)$/i.test(error.message.trim());
+    return genericHttpError ? fallback : error.message;
+  }
+  return fallback;
 }

@@ -27,7 +27,7 @@ export type VitalLog = {
   elderly_id: string;
   heart_rate_bpm: number | null;
   spo2_percent: number | null;
-  stress_score: number | null;
+  hrv_rmssd_ms: number | null;
   skin_temp_celsius: number | null;
   steps_count: number | null;
   sleep_hours: number | null;

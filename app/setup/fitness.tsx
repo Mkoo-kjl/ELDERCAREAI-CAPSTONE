@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Linking from 'expo-linking';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -12,6 +11,7 @@ import { getFunctionErrorMessage } from '@/src/lib/function-error';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily, typeScale } from '@/src/theme/typography';
 
 const requestedData = [
   ['heart-outline', 'Heart health', 'Heart rate and resting heart-rate measurements'],
@@ -19,6 +19,7 @@ const requestedData = [
   ['moon-outline', 'Sleep', 'Sleep sessions, duration, and stages when available'],
   ['footsteps-outline', 'Activity', 'Steps and activity measurements'],
   ['thermometer-outline', 'Temperature', 'Daily sleep skin-temperature derivations'],
+  ['leaf-outline', 'Heart rate variability', 'RMSSD HRV samples when Google Health provides them'],
 ] as const;
 
 export default function FitnessSetupScreen() {
@@ -101,9 +102,9 @@ export default function FitnessSetupScreen() {
   return (
     <SetupScaffold step={3} title="Connect your watch" subtitle="Link the Google account that receives data from the Fitbit Inspire 3.">
       <View style={styles.hero}>
-        <LinearGradient colors={[palette.accent, palette.accentDark]} style={styles.heroIcon}>
-          <Ionicons name="fitness" size={48} color="#FFFFFF" />
-        </LinearGradient>
+        <View style={styles.heroIcon}>
+          <Ionicons name="fitness-outline" size={40} color={palette.accentDark} />
+        </View>
         <Text style={[styles.heroTitle, { color: theme.text }]}>Google Health API v4</Text>
         <Text style={[styles.heroText, { color: theme.subtitle }]}>Google Health is the current cloud API for supported Fitbit and Pixel devices. You stay in control of every scope.</Text>
       </View>
@@ -123,7 +124,7 @@ export default function FitnessSetupScreen() {
         ))}
         <View style={[styles.note, { backgroundColor: theme.card }]}>
           <Ionicons name="information-circle-outline" size={19} color={theme.subtitle} />
-          <Text style={[styles.noteText, { color: theme.subtitle }]}>Stress is not requested as a nonexistent raw scope. Later insights may derive stress indicators from supported measurements such as heart-rate variability.</Text>
+          <Text style={[styles.noteText, { color: theme.subtitle }]}>ElderCareAI only shows synchronized readings from Google Health. HRV is stored as RMSSD milliseconds when the connected account provides it.</Text>
         </View>
       </View>
 
@@ -152,19 +153,19 @@ export default function FitnessSetupScreen() {
 
 const styles = StyleSheet.create({
   hero: { alignItems: 'center', marginBottom: 22 },
-  heroIcon: { width: 94, height: 94, borderRadius: 30, alignItems: 'center', justifyContent: 'center', marginBottom: 17 },
-  heroTitle: { fontSize: 22, fontWeight: '800', letterSpacing: -0.3 },
+  heroIcon: { width: 82, height: 82, borderRadius: 8, backgroundColor: palette.mintSurface, alignItems: 'center', justifyContent: 'center', marginBottom: 17 },
+  heroTitle: { ...typeScale.sectionTitle },
   heroText: { marginTop: 7, maxWidth: 360, fontSize: 13, lineHeight: 19, textAlign: 'center' },
-  card: { padding: 18, borderRadius: 20, borderWidth: 1 },
-  cardLabel: { marginBottom: 14, fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  card: { padding: 18, borderRadius: 8, borderWidth: 1 },
+  cardLabel: { marginBottom: 14, fontSize: 10, fontFamily: fontFamily.medium },
   featureRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
-  featureIcon: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  featureIcon: { width: 42, height: 42, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
   featureCopy: { flex: 1, marginLeft: 12 },
-  featureTitle: { fontSize: 14, fontWeight: '700' },
+  featureTitle: { ...typeScale.cardTitle },
   featureText: { marginTop: 2, fontSize: 12, lineHeight: 17 },
-  note: { marginTop: 2, padding: 12, borderRadius: 13, flexDirection: 'row', alignItems: 'flex-start', gap: 9 },
+  note: { marginTop: 2, padding: 12, borderRadius: 8, flexDirection: 'row', alignItems: 'flex-start', gap: 9 },
   noteText: { flex: 1, fontSize: 11, lineHeight: 16 },
-  status: { marginTop: 16, padding: 14, borderRadius: 14, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 9 },
+  status: { marginTop: 16, padding: 14, borderRadius: 8, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 9 },
   statusText: { flex: 1, fontSize: 13, fontWeight: '600' },
   error: { marginTop: 10, color: palette.error, fontSize: 12, lineHeight: 17 },
   skipButton: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
