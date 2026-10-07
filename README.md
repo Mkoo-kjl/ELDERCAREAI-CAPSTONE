@@ -1,5 +1,15 @@
 # ElderCareAI
 
+## Unit and component tests
+
+Run all Jest cases with `npm test`; run coverage with `npm run test:coverage`.
+Each test has its own `__tests__/CASE-###.test.tsx` file for evidence capture. For example,
+`npm test -- --runTestsByPath __tests__/CASE-001.test.tsx --verbose` runs the first login case.
+The tests mock Supabase, Google sign-in, Gemini, and notification APIs; they verify
+app logic and React Native component behavior, not live service availability or
+pixel-level device appearance. Capture device UI screenshots separately for the
+relevant screen cases.
+
 Expo SDK 54 / React Native app for caregivers. It includes Supabase Google sign-in, persisted onboarding, real Google Health API v4 authorization/synchronization, foreground-only phone-location consent, a Leaflet last-sync map, health dashboards, data-driven health analysis, SOS/event logging, care-management CRUD, a Gemini-powered caregiver assistant, exports, and settings.
 
 ## Device notifications

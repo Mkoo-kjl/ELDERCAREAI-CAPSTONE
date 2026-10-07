@@ -28,6 +28,7 @@ export function FormField({ label, error, icon, required, editable = true, style
         {icon ? <Ionicons name={icon} size={18} color={theme.subtitle} /> : null}
         <TextInput
           {...props}
+          accessibilityLabel={props.accessibilityLabel ?? label}
           editable={editable}
           placeholderTextColor={theme.subtitle}
           style={[styles.input, { color: theme.text }, style]}

@@ -215,7 +215,7 @@ function medicationToneIcon(tone: MedicationDoseTone): keyof typeof Ionicons.gly
   if (tone === 'as_needed') return 'hand-left-outline';
   return 'notifications-outline';
 }
-function Field({ label, multiline, ...props }: { label: string; multiline?: boolean; value: string; onChangeText: (value: string) => void }) { const theme = getTheme(useColorScheme() === 'dark'); return <View style={styles.field}><Text style={[styles.fieldLabel, { color: theme.subtitle }]}>{label.toUpperCase()}</Text><TextInput {...props} multiline={multiline} placeholderTextColor={theme.subtitle} style={[styles.input, multiline && styles.multiline, { color: theme.text, backgroundColor: theme.card, borderColor: theme.border }]} /></View>; }
+function Field({ label, multiline, ...props }: { label: string; multiline?: boolean; value: string; onChangeText: (value: string) => void }) { const theme = getTheme(useColorScheme() === 'dark'); return <View style={styles.field}><Text style={[styles.fieldLabel, { color: theme.subtitle }]}>{label.toUpperCase()}</Text><TextInput {...props} accessibilityLabel={label} multiline={multiline} placeholderTextColor={theme.subtitle} style={[styles.input, multiline && styles.multiline, { color: theme.text, backgroundColor: theme.card, borderColor: theme.border }]} /></View>; }
 function Action({ icon, label, color, onPress }: { icon: keyof typeof Ionicons.glyphMap; label: string; color: string; onPress: () => void }) { return <Pressable onPress={onPress} style={styles.action}><Ionicons name={icon} size={15} color={color} /><Text style={[styles.actionText, { color }]}>{label}</Text></Pressable>; }
 
 const styles = StyleSheet.create({

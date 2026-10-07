@@ -3,6 +3,7 @@ node_modules/
 dist/
 dist-test/
 web-build/
+coverage/
 .env
 .env.local
 *.jks
