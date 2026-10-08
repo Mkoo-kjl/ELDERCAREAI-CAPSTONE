@@ -2,8 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, useColorScheme, View } from 'react-native';
 
+import { AppText as Text } from '@/src/components/AppText';
 import { GradientButton } from '@/src/components/GradientButton';
 import { SetupScaffold } from '@/src/components/SetupScaffold';
 import { supabase } from '@/src/lib/supabase';
@@ -73,13 +74,13 @@ export default function LocationConsentScreen() {
         <Text style={[styles.heroText, { color: theme.subtitle }]}>This permission does not expose the Fitbit Inspire 3’s live GPS location.</Text>
       </View>
 
-      <View style={[styles.card, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}>
+      <View style={[styles.card, { backgroundColor: theme.cardElevated }]}>
         <ConsentRow icon="navigate-circle-outline" title="When it is recorded" body="Once after a successful wearable connection, and later when you explicitly synchronize health data." />
         <ConsentRow icon="eye-off-outline" title="What we do not do" body="No continuous tracking, no hidden background location, and no claim that the phone is where the older adult or watch is." />
         <ConsentRow icon="shield-checkmark-outline" title="Your control" body="Only foreground permission is requested. You can deny it and still finish setup or use the app." last />
       </View>
 
-      <View style={[styles.disclosure, { backgroundColor: `${palette.warning}12`, borderColor: `${palette.warning}55` }]}>
+      <View style={[styles.disclosure, { backgroundColor: `${palette.warning}12` }]}>
         <Ionicons name="information-circle" size={21} color={palette.warning} />
         <Text style={[styles.disclosureText, { color: theme.text }]}>If permission is granted but the wearable is disconnected, no location is recorded now. A future successful sync may record the phone’s location while the app is open.</Text>
       </View>
@@ -109,17 +110,17 @@ function ConsentRow({ icon, title, body, last }: { icon: keyof typeof Ionicons.g
 
 const styles = StyleSheet.create({
   hero: { alignItems: 'center', marginBottom: 22 },
-  heroIcon: { width: 82, height: 82, borderRadius: 8, backgroundColor: palette.aquaSurface, alignItems: 'center', justifyContent: 'center', marginBottom: 17 },
+  heroIcon: { width: 82, height: 82, borderRadius: 14, backgroundColor: palette.aquaSurface, alignItems: 'center', justifyContent: 'center', marginBottom: 17 },
   heroTitle: { ...typeScale.sectionTitle },
-  heroText: { marginTop: 7, maxWidth: 350, fontSize: 13, lineHeight: 19, textAlign: 'center' },
-  card: { borderRadius: 8, borderWidth: 1, paddingHorizontal: 17 },
+  heroText: { marginTop: 7, maxWidth: 350, ...typeScale.body, textAlign: 'center' },
+  card: { borderRadius: 14, paddingHorizontal: 17 },
   row: { flexDirection: 'row', paddingVertical: 17 },
-  rowIcon: { width: 42, height: 42, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
+  rowIcon: { width: 42, height: 42, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
   rowCopy: { flex: 1, marginLeft: 12 },
   rowTitle: { ...typeScale.cardTitle },
-  rowBody: { marginTop: 3, fontSize: 12, lineHeight: 18 },
-  disclosure: { marginTop: 16, padding: 14, borderRadius: 8, borderWidth: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  disclosureText: { flex: 1, fontSize: 12, lineHeight: 18 },
+  rowBody: { marginTop: 3, ...typeScale.subhead },
+  disclosure: { marginTop: 16, padding: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  disclosureText: { flex: 1, ...typeScale.subhead },
   skipButton: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
-  skipText: { fontSize: 13, fontFamily: fontFamily.medium },
+  skipText: { fontSize: 13, fontFamily: fontFamily.semiBold },
 });

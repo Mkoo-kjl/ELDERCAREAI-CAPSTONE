@@ -1,6 +1,6 @@
 -- Let authenticated caregivers receive RLS-filtered changes when the server
--- writes a new synchronized vital row. The app still retains its one-minute
--- foreground poll as a fallback when realtime is unavailable.
+-- writes a new synchronized vital row. Foreground resume reloads the saved
+-- database snapshot if a Realtime event was missed while disconnected.
 do $$
 begin
   if not exists (

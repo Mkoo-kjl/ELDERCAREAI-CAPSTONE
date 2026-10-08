@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { syncGoogleHealthForUser } from '../_shared/google-health-sync.ts';
 
 function redirect(location: string) {
   return new Response(null, { status: 302, headers: { Location: location } });
@@ -105,6 +106,9 @@ Deno.serve(async (request) => {
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id' });
     if (progressError) throw progressError;
+
+    EdgeRuntime.waitUntil(syncGoogleHealthForUser(admin, oauthState.user_id, clientId, clientSecret)
+      .catch((error) => console.warn('Initial Google Health sync skipped:', error instanceof Error ? error.message : error)));
 
     return redirect(withResult(oauthState.app_redirect_uri, {
       connected: '1',

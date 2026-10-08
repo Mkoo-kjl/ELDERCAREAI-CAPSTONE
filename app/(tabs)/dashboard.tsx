@@ -1,14 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Image, Linking, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, useColorScheme, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Image, Linking, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, useColorScheme, useWindowDimensions, View } from 'react-native';
+
+import { AppText as Text } from '@/src/components/AppText';
+import { CareArtwork } from '@/src/components/CareArtwork';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GradientButton } from '@/src/components/GradientButton';
+import { LocationMapPreview } from '@/src/components/LocationMapPreview';
 import { MetricCard } from '@/src/components/MetricCard';
 import { VitalDetailModal, type VitalMetricKey } from '@/src/components/VitalDetailModal';
+import { useMinuteClock } from '@/src/hooks/useMinuteClock';
 import { medicationDoseStatus, medicationStatusPriority, startOfLocalDay, type MedicationDoseTone, type MedicationLogLike } from '@/src/lib/care-status';
-import { relativeTime } from '@/src/lib/format';
+import { timeAgo } from '@/src/lib/format';
+import { vitalTimeLabel } from '@/src/lib/vital-time';
+import { watchSyncDelayed } from '@/src/lib/watch-sync';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { useHealthData } from '@/src/providers/HealthDataProvider';
@@ -21,6 +29,7 @@ type MedicationPreview = { id: string; medication_name: string; dosage: string |
 type AppointmentPreview = { id: string; title: string; doctor_name: string | null; appointment_at: string; status: string | null };
 type NotePreview = { id: string; title: string | null; content: string; is_pinned: boolean; updated_at: string };
 type MedicationLogPreview = MedicationLogLike;
+type SyncLocationPreview = { latitude: number; longitude: number; recorded_at: string };
 
 function appointmentLabel(value: string) {
   const date = new Date(value);
@@ -28,6 +37,7 @@ function appointmentLabel(value: string) {
 }
 
 export default function DashboardScreen() {
+  useMinuteClock();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width, fontScale } = useWindowDimensions();
@@ -35,22 +45,37 @@ export default function DashboardScreen() {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
   const { session, onboarding } = useAuth();
-  const { elderly, vital, history, refreshing, error, syncState, lastSuccessfulSyncAt, refresh } = useHealthData();
+  const { elderly, vital, history, refreshing, error, syncState, lastSuccessfulSyncAt, watchSync, watchSyncIssue, refresh } = useHealthData();
+  const caregiverId = session?.user.id;
+  const elderlyId = elderly?.elderly_id;
   const connected = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
   const [showPermission, setShowPermission] = useState(!connected);
   const [selectedMetric, setSelectedMetric] = useState<VitalMetricKey | null>(null);
+  const [showSyncHelp, setShowSyncHelp] = useState(false);
   const [doctor, setDoctor] = useState<DoctorContact | null>(null);
   const [caregiverName, setCaregiverName] = useState<string | null>(null);
   const [medications, setMedications] = useState<MedicationPreview[]>([]);
   const [medicationLogs, setMedicationLogs] = useState<MedicationLogPreview[]>([]);
   const [appointments, setAppointments] = useState<AppointmentPreview[]>([]);
   const [notes, setNotes] = useState<NotePreview[]>([]);
+  const [syncLocation, setSyncLocation] = useState<SyncLocationPreview | null>(null);
 
-  const readTime = relativeTime(vital?.synced_at ?? vital?.recorded_at);
-  const healthSyncMessage = error && !vital ? 'Health sync could not load readings yet. Pull down or tap refresh to try again.' : null;
+  const checkedAgo = timeAgo(lastSuccessfulSyncAt);
+  const watchSyncedAgo = timeAgo(watchSync?.lastSyncTime);
+  const watchDelayed = watchSyncDelayed(watchSync?.lastSyncTime, Date.now(), vital?.measurement_times?.heart_rate_bpm);
+  const healthSyncMessage = error ? (vital
+    ? 'Google Health could not be checked. Showing the last saved readings.'
+    : 'Health readings could not be loaded. Tap the sync icon to try again.') : null;
+  const watchIssueMessage = watchSyncIssue === 'permission_required'
+    ? 'Watch sync status needs Google Health permission. Reconnect the account to grant access.'
+    : watchSyncIssue === 'no_tracker'
+      ? 'No paired tracker was found for this Google Health account.'
+      : watchSyncIssue === 'unavailable'
+        ? 'Watch sync status is temporarily unavailable.'
+        : null;
   const hasCarePreview = Boolean(doctor || medications.length || appointments.length || notes.length);
   const pills = [
-    elderly?.age !== null ? `${elderly?.age ?? '--'} yrs` : null,
+    elderly?.age != null ? `${elderly.age} yrs` : null,
     elderly?.gender,
     elderly?.weight_kg ? `${elderly.weight_kg} kg` : null,
     elderly?.height_cm ? `${elderly.height_cm} cm` : null,
@@ -58,66 +83,91 @@ export default function DashboardScreen() {
   ].filter(Boolean);
 
   const loadCarePreview = useCallback(async () => {
-    if (!session || !elderly) {
+    if (!caregiverId || !elderlyId) {
       setDoctor(null);
       setCaregiverName(null);
       setMedications([]);
       setMedicationLogs([]);
       setAppointments([]);
       setNotes([]);
+      setSyncLocation(null);
       return;
     }
     const todayStart = startOfLocalDay().toISOString();
-    const [doctorResult, medicationResult, medicationLogResult, appointmentResult, notesResult, caregiverResult] = await Promise.all([
+    const [doctorResult, medicationResult, medicationLogResult, appointmentResult, notesResult, caregiverResult, locationResult] = await Promise.all([
       supabase.from('doctor_contacts')
         .select('id, full_name, phone, photo_url')
-        .eq('caregiver_id', session.user.id)
-        .eq('elderly_id', elderly.elderly_id)
+        .eq('caregiver_id', caregiverId)
+        .eq('elderly_id', elderlyId)
         .maybeSingle(),
       supabase.from('medication_schedules')
         .select('id, medication_name, dosage, frequency, times_of_day')
-        .eq('caregiver_id', session.user.id)
-        .eq('elderly_id', elderly.elderly_id)
+        .eq('caregiver_id', caregiverId)
+        .eq('elderly_id', elderlyId)
         .eq('is_active', true)
         .order('created_at', { ascending: false })
         .limit(3),
       supabase.from('medication_logs')
         .select('schedule_id, status, scheduled_time, taken_at')
-        .eq('elderly_id', elderly.elderly_id)
+        .eq('elderly_id', elderlyId)
         .gte('scheduled_time', todayStart),
       supabase.from('appointments')
         .select('id, title, doctor_name, appointment_at, status')
-        .eq('caregiver_id', session.user.id)
-        .eq('elderly_id', elderly.elderly_id)
+        .eq('caregiver_id', caregiverId)
+        .eq('elderly_id', elderlyId)
         .gte('appointment_at', new Date().toISOString())
         .order('appointment_at')
         .limit(3),
       supabase.from('caregiver_notes')
         .select('id, title, content, is_pinned, updated_at')
-        .eq('caregiver_id', session.user.id)
-        .eq('elderly_id', elderly.elderly_id)
+        .eq('caregiver_id', caregiverId)
+        .eq('elderly_id', elderlyId)
         .order('is_pinned', { ascending: false })
         .order('updated_at', { ascending: false })
         .limit(3),
-      supabase.from('caregivers').select('full_name').eq('id', session.user.id).maybeSingle(),
+      supabase.from('caregivers').select('full_name').eq('id', caregiverId).maybeSingle(),
+      supabase.from('wearable_sync_locations')
+        .select('latitude, longitude, recorded_at')
+        .eq('user_id', caregiverId)
+        .eq('elderly_id', elderlyId)
+        .order('recorded_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
     if (!caregiverResult.error) setCaregiverName(caregiverResult.data?.full_name ?? null);
-    const loadError = doctorResult.error ?? medicationResult.error ?? medicationLogResult.error ?? appointmentResult.error ?? notesResult.error;
-    if (loadError) {
-      console.warn('Unable to load care preview:', loadError.message);
-      return;
+    if (!locationResult.error) setSyncLocation((locationResult.data as SyncLocationPreview | null) ?? null);
+    else console.warn('Unable to load last sync location:', locationResult.error.message);
+    if (doctorResult.error) console.warn('Unable to load doctor contact:', doctorResult.error.message);
+    else setDoctor((doctorResult.data as DoctorContact | null) ?? null);
+    if (medicationResult.error) console.warn('Unable to load medications:', medicationResult.error.message);
+    else setMedications((medicationResult.data as MedicationPreview[]) ?? []);
+    if (medicationLogResult.error) console.warn('Unable to load medication logs:', medicationLogResult.error.message);
+    else setMedicationLogs((medicationLogResult.data as MedicationLogPreview[]) ?? []);
+    if (notesResult.error) console.warn('Unable to load notes:', notesResult.error.message);
+    else setNotes((notesResult.data as NotePreview[]) ?? []);
+    if (appointmentResult.error) console.warn('Unable to load appointments:', appointmentResult.error.message);
+    else if (appointmentResult.data?.length) setAppointments(appointmentResult.data as AppointmentPreview[]);
+    else {
+      const recent = await supabase.from('appointments')
+        .select('id, title, doctor_name, appointment_at, status')
+        .eq('caregiver_id', caregiverId)
+        .eq('elderly_id', elderlyId)
+        .lt('appointment_at', new Date().toISOString())
+        .order('appointment_at', { ascending: false })
+        .limit(1);
+      if (recent.error) console.warn('Unable to load recent appointment:', recent.error.message);
+      else setAppointments((recent.data as AppointmentPreview[]) ?? []);
     }
-    setDoctor((doctorResult.data as DoctorContact | null) ?? null);
-    setMedications((medicationResult.data as MedicationPreview[]) ?? []);
-    setMedicationLogs((medicationLogResult.data as MedicationLogPreview[]) ?? []);
-    setAppointments((appointmentResult.data as AppointmentPreview[]) ?? []);
-    setNotes((notesResult.data as NotePreview[]) ?? []);
-  }, [elderly, session]);
+  }, [caregiverId, elderlyId]);
 
   useFocusEffect(useCallback(() => {
-    void refresh(false);
+    void refresh(false, true);
     void loadCarePreview();
   }, [loadCarePreview, refresh]));
+
+  useFocusEffect(useCallback(() => {
+    if (syncState === 'success') void loadCarePreview();
+  }, [loadCarePreview, syncState]));
 
   const callDoctor = useCallback(() => {
     if (!doctor?.phone) return;
@@ -170,14 +220,19 @@ export default function DashboardScreen() {
             <View><Text style={[styles.brand, { color: theme.text }]}>ElderCare<Text style={styles.brandAccent}>AI</Text></Text><Text style={[styles.greeting, { color: theme.subtitle }]}>{greeting}{caregiverName ? `, ${caregiverName.split(' ')[0]}` : ''}</Text></View>
             <View style={[styles.headerStatus, { backgroundColor: connected ? `${palette.accent}14` : `${palette.error}10` }]}>
               <View style={[styles.dot, { backgroundColor: connected ? palette.accent : palette.error }]} />
-              <Text style={[styles.headerStatusText, { color: connected ? palette.accentDark : palette.error }]}>{connected ? 'Live sync' : 'Needs sync'}</Text>
+              <Text style={[styles.headerStatusText, { color: connected ? palette.accentDark : palette.error }]}>{connected ? 'Google connected' : 'Needs sync'}</Text>
             </View>
           </View>
           <WeekStrip appointmentDates={appointments.map((item) => item.appointment_at)} />
-          <View style={[styles.patientCard, { backgroundColor: isDark ? theme.cardElevated : palette.aquaSurface, borderColor: theme.border }]}>
-            {elderly?.photo_url ? <Image source={{ uri: elderly.photo_url }} style={styles.profilePhoto} /> : (
-              <View style={[styles.profilePhoto, { backgroundColor: palette.cardElevated }]}><Ionicons name="person-outline" size={30} color={palette.primaryDark} /></View>
+          <View style={[styles.patientCard, { backgroundColor: isDark ? theme.cardElevated : palette.aquaSurface }]}>
+            {elderly?.photo_url ? <Image source={{ uri: elderly.photo_url }} resizeMode="cover" style={styles.profilePhoto} /> : (
+              <View style={[styles.profilePhoto, styles.profilePhotoFallback, { backgroundColor: isDark ? theme.card : palette.mintSurface }]}><Ionicons name="person-outline" size={42} color={palette.primaryDark} /></View>
             )}
+            <LinearGradient
+              colors={isDark ? ['rgba(41,57,54,0)', palette.cardElevatedDark] : ['rgba(235,247,248,0)', palette.aquaSurface]}
+              start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }}
+              style={styles.profilePhotoFade}
+            />
             <View style={styles.patientCopy}>
               <Text style={[styles.eyebrow, { color: palette.primaryDark }]}>{"TODAY'S CARE"}</Text>
               <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78} style={[styles.name, { color: theme.text }]}>{elderly?.full_name ?? 'Older adult'}</Text>
@@ -187,43 +242,97 @@ export default function DashboardScreen() {
         </View>
 
         <View style={styles.content}>
-          <View style={styles.sectionRow}><Text style={[styles.sectionTitle, { color: theme.text }]}>Health vitals</Text><View style={[styles.connectionPill, { backgroundColor: connected ? palette.mintSurface : palette.peachSurface }]}><View style={[styles.dot, { backgroundColor: connected ? palette.accentDark : palette.error }]} /><Text style={[styles.connectionText, { color: connected ? palette.accentDark : palette.error }]}>{connected ? 'Connected' : 'Disconnected'}</Text></View></View>
-          {healthSyncMessage ? <Text style={styles.error}>{healthSyncMessage}</Text> : null}
-          <View style={styles.grid}>
-            <MetricCard fullWidth={stackVitals} icon="heart-outline" title="Heart rate" value={display(vital?.heart_rate_bpm)} unit="bpm" timestamp={readTime} color={palette.error} surface={palette.lemonSurface} onPress={() => setSelectedMetric('heart_rate_bpm')} />
-            <MetricCard fullWidth={stackVitals} icon="water-outline" title="Blood oxygen" value={display(vital?.spo2_percent, 1)} unit="%" timestamp={readTime} color={palette.primaryDark} surface={palette.aquaSurface} onPress={() => setSelectedMetric('spo2_percent')} />
-            <MetricCard fullWidth={stackVitals} icon="moon-outline" title="Sleep" value={display(vital?.sleep_hours, 1)} unit="hours" timestamp={readTime} color={palette.purple} surface={palette.lavenderSurface} onPress={() => setSelectedMetric('sleep_hours')} />
-            <MetricCard fullWidth={stackVitals} icon="footsteps-outline" title="Steps (24h)" value={vital?.steps_count?.toLocaleString() ?? '--'} unit="steps" timestamp={readTime} color={palette.accentDark} surface={palette.mintSurface} onPress={() => setSelectedMetric('steps_count')} />
-            <MetricCard fullWidth={stackVitals} icon="thermometer-outline" title="Overnight skin temp" value={display(vital?.skin_temp_celsius, 1)} unit="°C" timestamp={readTime} color={palette.warning} surface={palette.peachSurface} onPress={() => setSelectedMetric('skin_temp_celsius')} />
-            <MetricCard fullWidth={stackVitals} icon="leaf-outline" title="HRV" value={display(vital?.hrv_rmssd_ms)} unit="ms" timestamp={readTime} color={palette.pink} surface={palette.aquaSurface} onPress={() => setSelectedMetric('hrv_rmssd_ms')} />
+          <View style={styles.sectionRow}>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>Health vitals</Text>
+            <View style={styles.vitalsActions}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Sync now"
+                accessibilityHint={connected ? 'Check Google Health for new patient readings' : 'Connect Google Health to sync patient readings'}
+                disabled={refreshing}
+                onPress={() => connected ? void refresh(true) : router.push('/setup/fitness?mode=edit')}
+                style={[styles.syncButton, { backgroundColor: theme.cardElevated, borderColor: theme.border, opacity: refreshing ? 0.55 : 1 }]}
+              >
+                {refreshing ? <ActivityIndicator size="small" color={palette.primaryDark} /> : <Ionicons name="refresh" size={17} color={palette.primaryDark} />}
+              </Pressable>
+              <View style={[styles.connectionPill, { backgroundColor: connected ? palette.mintSurface : palette.peachSurface }]}><View style={[styles.dot, { backgroundColor: connected ? palette.accentDark : palette.error }]} /><Text style={[styles.connectionText, { color: connected ? palette.accentDark : palette.error }]}>{connected ? 'Connected' : 'Disconnected'}</Text></View>
+            </View>
           </View>
-          {!vital ? <View style={[styles.empty, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}><Ionicons name="analytics-outline" size={26} color={theme.subtitle} /><Text style={[styles.emptyTitle, { color: theme.text }]}>No health readings yet</Text><Text style={[styles.emptyText, { color: theme.subtitle }]}>Connect Google Health and pull down to synchronize real readings.</Text></View> : null}
-          <View style={styles.quickActions}>
-            <Pressable onPress={() => router.push('/location')} style={[styles.quickAction, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}>
-              <View style={styles.quickIcon}><Ionicons name="location" size={18} color={palette.primaryDark} /></View>
-              <View style={styles.quickCopy}><Text style={[styles.quickTitle, { color: theme.text }]}>Last location</Text><Text style={[styles.quickText, { color: theme.subtitle }]}>View sync map</Text></View>
+          {healthSyncMessage ? <Text style={styles.error}>{healthSyncMessage}</Text> : null}
+          {watchDelayed ? (
+            <Pressable accessibilityRole="button" accessibilityLabel="See how to restore automatic watch syncing" onPress={() => setShowSyncHelp(true)} style={[styles.watchNotice, { backgroundColor: isDark ? theme.cardElevated : palette.peachSurface }]}>
+              <Ionicons name="watch-outline" size={19} color={palette.warning} />
+              <View style={styles.watchNoticeCopy}>
+                <Text style={[styles.watchNoticeTitle, { color: theme.text }]}>Watch sync delayed</Text>
+                <Text style={[styles.watchNoticeText, { color: theme.subtitle }]}>{watchSync?.deviceVersion ?? 'Paired watch'} last synced {watchSyncedAgo}. Check its phone connection.</Text>
+              </View>
               <Ionicons name="chevron-forward" size={17} color={theme.subtitle} />
             </Pressable>
-            <Pressable accessibilityLabel="Refresh health readings now" disabled={refreshing} onPress={() => void refresh(true)} style={[styles.quickAction, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}>
-              <View style={[styles.quickIcon, { backgroundColor: `${syncState === 'error' ? palette.warning : palette.accent}14` }]}>{refreshing ? <ActivityIndicator size="small" color={palette.primaryDark} /> : <Ionicons name="refresh" size={18} color={palette.primaryDark} />}</View>
-              <View style={styles.quickCopy}><Text style={[styles.quickTitle, { color: theme.text }]}>{syncState === 'syncing' ? 'Syncing…' : 'Sync now'}</Text><Text style={[styles.quickText, { color: theme.subtitle }]}>{lastSuccessfulSyncAt ? `Checked ${relativeTime(lastSuccessfulSyncAt)}` : 'Refresh vitals'}</Text></View>
+          ) : watchSyncedAgo ? <Text style={[styles.watchFreshText, { color: theme.subtitle }]}>{watchSync?.deviceVersion ?? 'Watch'} last confirmed synced {watchSyncedAgo}</Text> : null}
+          {watchIssueMessage ? (
+            <Pressable accessibilityRole="button" accessibilityLabel="See watch sync details" onPress={() => setShowSyncHelp(true)} style={[styles.watchIssue, { backgroundColor: theme.cardElevated }]}>
+              <Ionicons name="information-circle-outline" size={17} color={palette.primaryDark} />
+              <Text style={[styles.watchIssueText, { color: theme.subtitle }]}>{watchIssueMessage}</Text>
             </Pressable>
+          ) : null}
+          <View style={styles.grid}>
+            <MetricCard fullWidth={stackVitals} icon="heart-outline" title="Heart rate" value={display(vital?.heart_rate_bpm)} unit="bpm" timestamp={vitalTimeLabel(vital, 'heart_rate_bpm')} color={palette.error} surface={palette.lemonSurface} onPress={() => setSelectedMetric('heart_rate_bpm')} />
+            <MetricCard fullWidth={stackVitals} icon="water-outline" title="Blood oxygen" value={display(vital?.spo2_percent, 1)} unit="%" timestamp={vitalTimeLabel(vital, 'spo2_percent')} color={palette.primaryDark} surface={palette.aquaSurface} onPress={() => setSelectedMetric('spo2_percent')} />
+            <MetricCard fullWidth={stackVitals} icon="moon-outline" title="Sleep" value={display(vital?.sleep_hours, 1)} unit="hours" timestamp={vitalTimeLabel(vital, 'sleep_hours')} color={palette.purple} surface={palette.lavenderSurface} onPress={() => setSelectedMetric('sleep_hours')} />
+            <MetricCard fullWidth={stackVitals} icon="footsteps-outline" title="Steps (24h)" value={vital?.steps_count?.toLocaleString() ?? '--'} unit="steps" timestamp={vitalTimeLabel(vital, 'steps_count')} color={palette.accentDark} surface={palette.mintSurface} onPress={() => setSelectedMetric('steps_count')} />
+            <MetricCard fullWidth={stackVitals} icon="thermometer-outline" title="Overnight skin temp" value={display(vital?.skin_temp_celsius, 1)} unit="°C" timestamp={vitalTimeLabel(vital, 'skin_temp_celsius')} color={palette.warning} surface={palette.peachSurface} onPress={() => setSelectedMetric('skin_temp_celsius')} />
+            <MetricCard fullWidth={stackVitals} icon="leaf-outline" title="HRV" value={display(vital?.hrv_rmssd_ms)} unit="ms" timestamp={vitalTimeLabel(vital, 'hrv_rmssd_ms')} color={palette.pink} surface={palette.aquaSurface} onPress={() => setSelectedMetric('hrv_rmssd_ms')} />
           </View>
+          {!vital ? <View style={[styles.empty, { backgroundColor: theme.cardElevated }]}><Ionicons name="analytics-outline" size={26} color={theme.subtitle} /><Text style={[styles.emptyTitle, { color: theme.text }]}>No health readings yet</Text><Text style={[styles.emptyText, { color: theme.subtitle }]}>Connect Google Health. Readings appear after the paired watch syncs.</Text></View> : null}
+          <Pressable accessibilityRole="button" accessibilityLabel="View last sync location" onPress={() => router.push('/location')} style={[styles.locationStrip, { backgroundColor: isDark ? theme.cardElevated : palette.aquaSurface }]}>
+            {syncLocation ? <View pointerEvents="none" style={styles.locationMap}><LocationMapPreview key={`${syncLocation.latitude}:${syncLocation.longitude}`} latitude={syncLocation.latitude} longitude={syncLocation.longitude} /></View> : null}
+            <LinearGradient
+              pointerEvents="none"
+              colors={isDark ? ['rgba(41,57,54,0.98)', 'rgba(41,57,54,0.83)', 'rgba(41,57,54,0.34)'] : ['rgba(235,247,248,0.98)', 'rgba(235,247,248,0.84)', 'rgba(235,247,248,0.24)']}
+              locations={[0, 0.58, 1]}
+              start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }}
+              style={StyleSheet.absoluteFillObject}
+            />
+            <View style={styles.locationContent}>
+              <View style={styles.locationIcon}><CareArtwork kind="location" size={43} /></View>
+              <View style={styles.locationCopy}>
+                <Text style={[styles.locationTitle, { color: theme.text }]}>Last sync location</Text>
+                <Text style={[styles.locationSubtitle, { color: theme.subtitle }]}>{syncLocation ? `Caregiver phone · ${timeAgo(syncLocation.recorded_at)}` : 'No phone sync location yet'}</Text>
+              </View>
+              <Ionicons name="arrow-forward" size={19} color={theme.text} />
+            </View>
+          </Pressable>
           <View style={styles.careSection}>
             <View style={styles.sectionRow}><Text style={[styles.sectionTitle, { color: theme.text }]}>Care plan</Text><Pressable onPress={() => router.push('/care')}><Text style={styles.manageText}>Manage</Text></Pressable></View>
-            {doctor ? <View style={[styles.doctorCard, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}>{doctor.photo_url ? <Image source={{ uri: doctor.photo_url }} style={styles.doctorPhoto} /> : <View style={styles.doctorFallback}><Ionicons name="medical" size={22} color={palette.primaryDark} /></View>}<View style={styles.doctorCopy}><Text numberOfLines={1} style={[styles.doctorTitle, { color: theme.text }]}>{doctor.full_name}</Text><Text numberOfLines={1} style={[styles.doctorBody, { color: theme.subtitle }]}>{doctor.phone}</Text></View><Pressable onPress={callDoctor} style={styles.callButton}><Ionicons name="call" size={15} color="#FFFFFF" /><Text style={styles.callText}>Call Doctor</Text></Pressable></View> : null}
-            {appointments.map((item) => <CarePreviewRow key={item.id} icon="calendar-outline" color={palette.purple} title={item.title} subtitle={`Appointment on ${appointmentLabel(item.appointment_at)}`} />)}
-            {medicationStatuses.map(({ item, status }) => <CarePreviewRow key={item.id} icon="medkit-outline" color={medicationToneColor(status.tone)} title={item.medication_name} subtitle={`${status.label}: ${status.detail}${item.dosage ? ` • ${item.dosage}` : ''}`} />)}
-            {notes.map((item) => <CarePreviewRow key={item.id} icon={item.is_pinned ? 'pin-outline' : 'document-text-outline'} color={item.is_pinned ? palette.warning : palette.accentDark} title={item.title || 'Caregiver note'} subtitle={item.content} />)}
-            {!hasCarePreview ? <View style={[styles.emptyCare, { backgroundColor: theme.card, borderColor: theme.border }]}><Ionicons name="clipboard-outline" size={25} color={theme.subtitle} /><Text style={[styles.emptyText, { color: theme.subtitle }]}>Add a doctor, medications, appointments, or notes to see them here.</Text></View> : null}
+            {appointments.map((item) => <CarePreviewRow key={item.id} kind="appointment" title={item.title} subtitle={`${new Date(item.appointment_at).getTime() >= Date.now() ? 'Appointment on' : 'Previous appointment'} ${appointmentLabel(item.appointment_at)}`} onPress={() => router.push('/care?tab=Appointments')} />)}
+            {medicationStatuses.map(({ item, status }) => <CarePreviewRow key={item.id} kind="medication" title={item.medication_name} subtitle={`${status.label}: ${status.detail}${item.dosage ? ` • ${item.dosage}` : ''}`} onPress={() => router.push('/care?tab=Medications')} />)}
+            {notes.map((item) => <CarePreviewRow key={item.id} kind="note" title={item.title || 'Caregiver note'} subtitle={item.content} onPress={() => router.push('/care?tab=Notes')} />)}
+            {doctor ? <Pressable accessibilityRole="button" accessibilityLabel={`Call ${doctor.full_name}`} onPress={callDoctor} style={[styles.doctorCard, { backgroundColor: isDark ? theme.cardElevated : palette.aquaSurface }]}>
+              {doctor.photo_url ? <Image source={{ uri: doctor.photo_url }} resizeMode="cover" style={styles.doctorPhoto} /> : <View style={styles.doctorFallback}><Ionicons name="medical-outline" size={90} color={palette.primaryDark} /></View>}
+              <LinearGradient
+                pointerEvents="none"
+                colors={isDark ? ['rgba(41,57,54,0.05)', 'rgba(41,57,54,0.72)', palette.cardElevatedDark] : ['rgba(235,247,248,0.05)', 'rgba(235,247,248,0.76)', palette.aquaSurface]}
+                locations={[0, 0.52, 1]}
+                style={StyleSheet.absoluteFillObject}
+              />
+              <View style={styles.doctorCardContent}>
+                <Text style={[styles.doctorEyebrow, { color: isDark ? theme.text : palette.primaryDark, backgroundColor: isDark ? 'rgba(41,57,54,0.86)' : 'rgba(235,247,248,0.86)' }]}>YOUR DOCTOR</Text>
+                <View>
+                  <Text numberOfLines={2} style={[styles.doctorTitle, { color: theme.text }]}>{doctor.full_name}</Text>
+                  <Text numberOfLines={1} style={[styles.doctorBody, { color: theme.subtitle }]}>{doctor.phone}</Text>
+                  <View style={styles.doctorCallRow}><View style={styles.doctorCallIcon}><Ionicons name="call" size={17} color="#FFFFFF" /></View><Text style={[styles.doctorCallText, { color: theme.text }]}>Call Doctor</Text><Ionicons name="arrow-forward" size={18} color={theme.text} /></View>
+                </View>
+              </View>
+            </Pressable> : null}
+            {!hasCarePreview ? <View style={[styles.emptyCare, { backgroundColor: theme.card }]}><Ionicons name="clipboard-outline" size={25} color={theme.subtitle} /><Text style={[styles.emptyText, { color: theme.subtitle }]}>Add a doctor, medications, appointments, or notes to see them here.</Text></View> : null}
           </View>
-          <View style={[styles.summaryCard, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}>
+          <View style={[styles.summaryCard, { backgroundColor: theme.cardElevated }]}>
             <View style={styles.summaryHeader}>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.summaryEyebrow, { color: palette.primaryDark }]}>TODAY SUMMARY</Text>
                 <Text style={[styles.summaryTitle, { color: theme.text }]}>What needs attention</Text>
               </View>
-              <Text style={[styles.summaryTime, { color: theme.subtitle }]}>{lastSuccessfulSyncAt ? relativeTime(lastSuccessfulSyncAt) : 'No sync yet'}</Text>
+              <Text style={[styles.summaryTime, { color: theme.subtitle }]}>{checkedAgo ? `Checked ${checkedAgo}` : 'No sync yet'}</Text>
             </View>
             {todaySummary.map((item) => <SummaryRow key={item.label} icon={item.icon} color={item.color} label={item.label} text={item.text} />)}
           </View>
@@ -231,6 +340,19 @@ export default function DashboardScreen() {
       </ScrollView>
 
       <VitalDetailModal visible={selectedMetric !== null} metric={selectedMetric} history={history} onClose={() => setSelectedMetric(null)} />
+
+      <Modal transparent visible={showSyncHelp} animationType="fade" onRequestClose={() => setShowSyncHelp(false)}>
+        <View style={styles.overlay}><View style={[styles.modal, { backgroundColor: theme.cardElevated, alignItems: 'stretch' }]}>
+          <Text style={[styles.modalTitle, { color: theme.text, marginTop: 0 }]}>Restore automatic watch sync</Text>
+          <Text style={[styles.syncHelpText, { color: theme.subtitle }]}>On the phone paired with the Inspire 3:</Text>
+          <Text style={[styles.syncHelpStep, { color: theme.text }]}>1. Keep Bluetooth on and the watch nearby.</Text>
+          <Text style={[styles.syncHelpStep, { color: theme.text }]}>2. In Android Settings, open Apps → Health → App battery usage. Allow background usage and choose Unrestricted.</Text>
+          <Text style={[styles.syncHelpStep, { color: theme.text }]}>3. In Apps → Health, allow Nearby devices and Background data. Turn off Battery Saver while testing.</Text>
+          <Text style={[styles.syncHelpStep, { color: theme.text }]}>4. If watch status is unavailable, reconnect the same Google account in ElderCareAI and allow the requested Google Health permissions.</Text>
+          <Text style={[styles.syncHelpText, { color: theme.subtitle }]}>New readings reach ElderCareAI automatically after Google Health syncs the watch. You do not need to refresh this app.</Text>
+          <Pressable accessibilityRole="button" onPress={() => setShowSyncHelp(false)} style={styles.syncHelpClose}><Text style={styles.syncHelpCloseText}>Done</Text></Pressable>
+        </View></View>
+      </Modal>
 
       <Modal transparent visible={showPermission && !connected} animationType="fade" onRequestClose={() => setShowPermission(false)}>
         <View style={styles.overlay}><View style={[styles.modal, { backgroundColor: theme.cardElevated }]}>
@@ -245,9 +367,9 @@ export default function DashboardScreen() {
   );
 }
 
-function CarePreviewRow({ icon, color, title, subtitle }: { icon: keyof typeof Ionicons.glyphMap; color: string; title: string; subtitle: string }) {
+function CarePreviewRow({ kind, title, subtitle, onPress }: { kind: 'appointment' | 'medication' | 'note'; title: string; subtitle: string; onPress: () => void }) {
   const theme = getTheme(useColorScheme() === 'dark');
-  return <View style={[styles.careRow, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}><View style={[styles.careIcon, { backgroundColor: `${color}14` }]}><Ionicons name={icon} size={19} color={color} /></View><View style={styles.careCopy}><Text numberOfLines={1} style={[styles.careTitle, { color: theme.text }]}>{title}</Text><Text numberOfLines={2} style={[styles.careText, { color: theme.subtitle }]}>{subtitle}</Text></View></View>;
+  return <Pressable accessibilityRole="button" onPress={onPress} style={[styles.careRow, { backgroundColor: theme.cardElevated }]}><View style={styles.careIcon}><CareArtwork kind={kind} size={42} /></View><View style={styles.careCopy}><Text numberOfLines={1} style={[styles.careTitle, { color: theme.text }]}>{title}</Text><Text numberOfLines={2} style={[styles.careText, { color: theme.subtitle }]}>{subtitle}</Text></View><Ionicons name="chevron-forward" size={17} color={theme.subtitle} /></Pressable>;
 }
 
 function WeekStrip({ appointmentDates }: { appointmentDates: string[] }) {
@@ -285,32 +407,65 @@ function medicationToneColor(tone: MedicationDoseTone) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 }, header: { paddingHorizontal: 18, paddingBottom: 14 }, headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  brand: { fontSize: 17, fontFamily: fontFamily.semiBold }, brandAccent: { color: palette.primaryDark }, greeting: { marginTop: 2, fontSize: 11, fontFamily: fontFamily.regular }, headerStatus: { minHeight: 27, paddingHorizontal: 9, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 6 }, headerStatusText: { fontSize: 10, fontFamily: fontFamily.medium },
-  weekStrip: { flexDirection: 'row', marginTop: 13, paddingVertical: 7, borderRadius: 8 }, weekDay: { flex: 1, alignItems: 'center', gap: 3 }, weekLabel: { fontSize: 9.5, fontFamily: fontFamily.medium }, weekDate: { width: 29, height: 29, borderRadius: 7, alignItems: 'center', justifyContent: 'center' }, weekNumber: { fontSize: 11, fontFamily: fontFamily.medium, fontVariant: ['tabular-nums'] }, weekDot: { width: 4, height: 4, borderRadius: 2 },
-  eyebrow: { fontSize: 10, fontFamily: fontFamily.medium },
-  patientCard: { minHeight: 112, marginTop: 16, padding: 13, borderRadius: 8, borderWidth: 1, flexDirection: 'row', alignItems: 'center' },
-  profilePhoto: { width: 76, height: 76, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
-  patientCopy: { flex: 1, marginLeft: 14 },
-  name: { marginTop: 4, fontSize: 20, lineHeight: 25, fontFamily: fontFamily.semiBold }, pills: { marginTop: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
-  pill: { paddingHorizontal: 7, paddingVertical: 4, borderRadius: 7 }, pillText: { fontSize: 9.5, fontFamily: fontFamily.medium },
+  brand: { fontSize: 18, lineHeight: 24, fontFamily: fontFamily.extraBold }, brandAccent: { color: palette.primaryDark }, greeting: { marginTop: 2, fontSize: 12, fontFamily: fontFamily.regular }, headerStatus: { minHeight: 27, paddingHorizontal: 9, borderRadius: 14, flexDirection: 'row', alignItems: 'center', gap: 6 }, headerStatusText: { fontSize: 10, fontFamily: fontFamily.semiBold },
+  weekStrip: { flexDirection: 'row', marginTop: 13, paddingVertical: 7, borderRadius: 14 }, weekDay: { flex: 1, alignItems: 'center', gap: 3 }, weekLabel: { fontSize: 9.5, fontFamily: fontFamily.medium }, weekDate: { width: 29, height: 29, borderRadius: 11, alignItems: 'center', justifyContent: 'center' }, weekNumber: { fontSize: 11, fontFamily: fontFamily.medium, fontVariant: ['tabular-nums'] }, weekDot: { width: 4, height: 4, borderRadius: 2 },
+  eyebrow: { ...typeScale.eyebrow },
+  patientCard: { minHeight: 150, marginTop: 16, borderRadius: 16, overflow: 'hidden', justifyContent: 'center' },
+  profilePhoto: { position: 'absolute', left: 0, top: 0, bottom: 0, width: '54%', height: '100%' },
+  profilePhotoFallback: { alignItems: 'center', justifyContent: 'center' },
+  profilePhotoFade: { position: 'absolute', left: '20%', top: 0, bottom: 0, width: '34%' },
+  patientCopy: { marginLeft: '43%', paddingRight: 12, paddingVertical: 15 },
+  name: { marginTop: 4, fontSize: 22, lineHeight: 29, fontFamily: fontFamily.bold }, pills: { marginTop: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
+  pill: { paddingHorizontal: 7, paddingVertical: 4, borderRadius: 11 }, pillText: { fontSize: 9.5, fontFamily: fontFamily.medium },
   content: { paddingHorizontal: 18, paddingTop: 5 },
-  quickActions: { flexDirection: 'row', gap: 8, marginTop: 16 }, quickAction: { flex: 1, minHeight: 55, padding: 8, borderRadius: 8, borderWidth: 1, flexDirection: 'row', alignItems: 'center' }, quickIcon: { width: 30, height: 30, borderRadius: 7, backgroundColor: palette.aquaSurface, alignItems: 'center', justifyContent: 'center' }, quickCopy: { flex: 1, marginLeft: 7 }, quickTitle: { fontSize: 11, fontFamily: fontFamily.semiBold }, quickText: { marginTop: 2, fontSize: 9, lineHeight: 12 },
-  summaryCard: { marginTop: 20, marginBottom: 18, padding: 15, borderRadius: 8, borderWidth: 1 },
+  locationStrip: { minHeight: 82, marginTop: 16, borderRadius: 16, overflow: 'hidden', justifyContent: 'center' },
+  locationMap: { ...StyleSheet.absoluteFillObject },
+  locationContent: { minHeight: 82, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 11 },
+  locationIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  locationCopy: { flex: 1 },
+  locationTitle: { fontSize: 13, fontFamily: fontFamily.semiBold },
+  locationSubtitle: { marginTop: 3, fontSize: 11, fontFamily: fontFamily.regular },
+  summaryCard: { marginTop: 20, marginBottom: 18, padding: 15, borderRadius: 14 },
   summaryHeader: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, marginBottom: 12 },
-  summaryEyebrow: { fontSize: 10, fontFamily: fontFamily.medium },
+  summaryEyebrow: { ...typeScale.eyebrow },
   summaryTitle: { marginTop: 3, ...typeScale.sectionTitle },
   summaryTime: { marginTop: 2, fontSize: 10, fontFamily: fontFamily.medium },
   summaryRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 10 },
   summaryIcon: { width: 34, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   summaryCopy: { flex: 1 },
-  summaryLabel: { fontSize: 12.5, fontFamily: fontFamily.semiBold },
-  summaryText: { marginTop: 2, fontSize: 11.2, lineHeight: 15.5 },
-  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11 }, sectionTitle: { ...typeScale.sectionTitle },
-  connectionPill: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20, flexDirection: 'row', alignItems: 'center', gap: 6 }, dot: { width: 7, height: 7, borderRadius: 4 }, connectionText: { fontSize: 11, fontWeight: '700' },
+  summaryLabel: { fontSize: 13, fontFamily: fontFamily.semiBold },
+  summaryText: { marginTop: 2, fontSize: 12, lineHeight: 17 },
+  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 11 }, sectionTitle: { ...typeScale.sectionTitle, flexShrink: 1 },
+  vitalsActions: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  syncButton: { width: 31, height: 31, borderRadius: 11, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  connectionPill: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20, flexDirection: 'row', alignItems: 'center', gap: 6 }, dot: { width: 7, height: 7, borderRadius: 4 }, connectionText: { fontSize: 11, fontFamily: fontFamily.bold },
   error: { marginBottom: 10, color: palette.error, fontSize: 12, lineHeight: 18 }, grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 8 },
-  empty: { marginTop: 16, padding: 22, borderRadius: 18, borderWidth: 1, alignItems: 'center' }, emptyTitle: { marginTop: 9, fontSize: 15, fontWeight: '700' }, emptyText: { marginTop: 5, fontSize: 12, lineHeight: 18, textAlign: 'center' },
-  careSection: { marginTop: 18, gap: 8 }, manageText: { color: palette.primaryDark, fontSize: 11, fontFamily: fontFamily.medium }, doctorCard: { minHeight: 72, borderRadius: 8, borderWidth: 1, padding: 11, flexDirection: 'row', alignItems: 'center' }, doctorPhoto: { width: 45, height: 45, borderRadius: 7, backgroundColor: palette.card }, doctorFallback: { width: 45, height: 45, borderRadius: 7, backgroundColor: palette.aquaSurface, alignItems: 'center', justifyContent: 'center' }, doctorCopy: { flex: 1, minWidth: 0, marginLeft: 11 }, doctorTitle: { ...typeScale.cardTitle }, doctorBody: { marginTop: 3, fontSize: 11 }, callButton: { minHeight: 35, paddingHorizontal: 9, borderRadius: 7, backgroundColor: palette.primaryDark, flexDirection: 'row', alignItems: 'center', gap: 5 }, callText: { color: '#FFFFFF', fontSize: 10, fontFamily: fontFamily.medium }, careRow: { minHeight: 65, borderRadius: 8, borderWidth: 1, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center' }, careIcon: { width: 38, height: 38, borderRadius: 7, alignItems: 'center', justifyContent: 'center' }, careCopy: { flex: 1, marginLeft: 10 }, careTitle: { fontSize: 12.5, fontFamily: fontFamily.semiBold }, careText: { marginTop: 3, fontSize: 11, lineHeight: 15 }, emptyCare: { padding: 16, borderRadius: 8, borderWidth: 1, alignItems: 'center' },
-  overlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.62)', alignItems: 'center', justifyContent: 'center', padding: 24 }, modal: { width: '100%', maxWidth: 390, padding: 22, borderRadius: 8, alignItems: 'center' },
-  modalIcon: { width: 55, height: 55, borderRadius: 8, backgroundColor: palette.aquaSurface, alignItems: 'center', justifyContent: 'center' }, modalTitle: { marginTop: 14, ...typeScale.sectionTitle },
-  modalText: { marginTop: 8, fontSize: 13, lineHeight: 20, textAlign: 'center' }, notNow: { minHeight: 43, justifyContent: 'center' }, notNowText: { fontSize: 13, fontWeight: '600' },
+  watchNotice: { padding: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 11 },
+  watchNoticeCopy: { flex: 1 }, watchNoticeTitle: { fontSize: 12, fontFamily: fontFamily.semiBold },
+  watchNoticeText: { marginTop: 2, fontSize: 11, lineHeight: 15 }, watchFreshText: { marginBottom: 10, fontSize: 11, fontFamily: fontFamily.medium },
+  watchIssue: { padding: 10, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 10 },
+  watchIssueText: { flex: 1, fontSize: 11, lineHeight: 15 },
+  empty: { marginTop: 16, padding: 22, borderRadius: 18, alignItems: 'center' }, emptyTitle: { marginTop: 9, ...typeScale.cardTitle }, emptyText: { marginTop: 5, ...typeScale.subhead, textAlign: 'center' },
+  careSection: { marginTop: 18, gap: 8 },
+  manageText: { color: palette.primaryDark, fontSize: 11, fontFamily: fontFamily.semiBold },
+  doctorCard: { width: '100%', maxWidth: 320, aspectRatio: 1, alignSelf: 'center', borderRadius: 16, overflow: 'hidden' },
+  doctorPhoto: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
+  doctorFallback: { ...StyleSheet.absoluteFillObject, padding: 30, alignItems: 'flex-end', opacity: 0.28 },
+  doctorCardContent: { flex: 1, justifyContent: 'space-between', padding: 18 },
+  doctorEyebrow: { ...typeScale.eyebrow, alignSelf: 'flex-start', paddingHorizontal: 9, paddingVertical: 6, borderRadius: 8, overflow: 'hidden' },
+  doctorTitle: { fontSize: 22, lineHeight: 29, fontFamily: fontFamily.bold },
+  doctorBody: { marginTop: 3, fontSize: 13, fontFamily: fontFamily.medium },
+  doctorCallRow: { marginTop: 18, flexDirection: 'row', alignItems: 'center', gap: 9 },
+  doctorCallIcon: { width: 35, height: 35, borderRadius: 18, backgroundColor: palette.primaryDark, alignItems: 'center', justifyContent: 'center' },
+  doctorCallText: { flex: 1, fontSize: 13, fontFamily: fontFamily.bold },
+  careRow: { minHeight: 65, borderRadius: 14, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center' },
+  careIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  careCopy: { flex: 1, marginLeft: 10 }, careTitle: { fontSize: 13, fontFamily: fontFamily.semiBold }, careText: { marginTop: 3, fontSize: 12, lineHeight: 17 },
+  emptyCare: { padding: 16, borderRadius: 14, alignItems: 'center' },
+  overlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.62)', alignItems: 'center', justifyContent: 'center', padding: 24 }, modal: { width: '100%', maxWidth: 390, padding: 22, borderRadius: 14, alignItems: 'center' },
+  modalIcon: { width: 55, height: 55, borderRadius: 14, backgroundColor: palette.aquaSurface, alignItems: 'center', justifyContent: 'center' }, modalTitle: { marginTop: 14, ...typeScale.sectionTitle },
+  modalText: { marginTop: 8, ...typeScale.body, textAlign: 'center' }, notNow: { minHeight: 43, justifyContent: 'center' }, notNowText: { fontSize: 13, fontFamily: fontFamily.semiBold },
+  syncHelpText: { marginTop: 12, fontSize: 12, lineHeight: 18 }, syncHelpStep: { marginTop: 11, fontSize: 13, lineHeight: 19 },
+  syncHelpClose: { marginTop: 18, minHeight: 43, borderRadius: 12, backgroundColor: palette.primaryDark, alignItems: 'center', justifyContent: 'center' },
+  syncHelpCloseText: { color: '#FFFFFF', fontSize: 13, fontFamily: fontFamily.semiBold },
 });

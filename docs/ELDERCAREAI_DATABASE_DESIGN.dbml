@@ -1,0 +1,299 @@
+// ElderCareAI database design - verified public schema, 8 October 2026
+// Solid references below are declared foreign keys in the public schema or migrations.
+// caregivers.id and google_health_tokens.user_id also map logically to auth.users.id
+// but are not shown as declared foreign keys in the available public metadata.
+Project ElderCareAI {
+  database_type: 'PostgreSQL'
+  Note: '18 public application tables plus a minimal Supabase Auth reference.'
+}
+
+Table auth.users {
+  id uuid [pk, not null]
+  Note: 'Supabase-managed Auth table. Other auth and storage columns are outside the application schema.'
+}
+
+Table caregivers {
+  age integer
+  created_at timestamptz [not null]
+  email text
+  full_name text [not null]
+  id uuid [pk, not null]
+  phone text
+  photo_url text
+  sex text
+  updated_at timestamptz [not null]
+}
+
+Table elderly_profiles {
+  age integer
+  blood_type text
+  caregiver_id uuid [not null]
+  created_at timestamptz [not null]
+  date_of_birth date
+  elderly_id uuid [pk, not null]
+  emergency_contact text
+  emergency_contact_phone text
+  full_name text [not null]
+  gender text
+  height_cm numeric
+  medical_conditions text
+  medications text
+  photo_url text
+  updated_at timestamptz [not null]
+  weight_kg numeric
+}
+
+Table doctor_contacts {
+  caregiver_id uuid [not null]
+  created_at timestamptz [not null]
+  elderly_id uuid [not null]
+  full_name text [not null]
+  id uuid [pk, not null]
+  phone text [not null]
+  photo_url text
+  updated_at timestamptz [not null]
+  indexes {
+    (caregiver_id, elderly_id) [unique]
+  }
+}
+
+Table profiles {
+  avatar_url text
+  created_at timestamptz [not null]
+  email text [not null]
+  full_name text
+  id uuid [pk, not null]
+  updated_at timestamptz [not null]
+}
+
+Table onboarding_progress {
+  caregiver_completed_at timestamptz
+  completed_at timestamptz
+  created_at timestamptz [not null]
+  elderly_completed_at timestamptz
+  intro_completed_at timestamptz
+  location_consent_at timestamptz
+  location_permission text [not null]
+  paired_device_count integer [not null]
+  updated_at timestamptz [not null]
+  user_id uuid [pk, not null]
+  wearable_completed_at timestamptz
+  wearable_status text [not null]
+}
+
+Table google_health_oauth_states {
+  app_redirect_uri text [not null]
+  code_verifier text [not null]
+  created_at timestamptz [not null]
+  expires_at timestamptz [not null]
+  state text [pk, not null]
+  user_id uuid [not null]
+}
+
+Table google_health_tokens {
+  connected_at timestamptz
+  created_at timestamptz
+  google_access_token text [not null]
+  google_health_user_id text
+  google_refresh_token text
+  id uuid [pk, not null]
+  provider text [not null]
+  scopes text
+  token_expires_at timestamptz
+  updated_at timestamptz
+  user_id uuid [unique]
+}
+
+Table wearable_sync_locations {
+  accuracy_m "double precision"
+  elderly_id uuid
+  event_type text [not null]
+  id uuid [pk, not null]
+  latitude "double precision" [not null]
+  longitude "double precision" [not null]
+  recorded_at timestamptz [not null]
+  user_id uuid [not null]
+}
+
+Table vital_sign_logs {
+  active_minutes integer
+  ai_risk_score numeric
+  elderly_id uuid [not null]
+  heart_rate_bpm integer
+  hrv_rmssd_ms numeric
+  id uuid [pk, not null]
+  measurement_times jsonb [not null]
+  overall_status text
+  recorded_at timestamptz [not null]
+  skin_temp_celsius numeric
+  sleep_hours numeric
+  source text
+  steps_count integer
+  stress_score integer
+  synced_at timestamptz
+}
+
+Table health_alerts {
+  ai_generated boolean
+  alert_type text [not null]
+  elderly_id uuid [not null]
+  id uuid [pk, not null]
+  is_read boolean
+  is_resolved boolean
+  message text [not null]
+  metric_unit text
+  metric_value numeric
+  resolved_at timestamptz
+  resolved_by uuid
+  severity text [not null]
+  threshold_value numeric
+  title text [not null]
+  triggered_at timestamptz
+}
+
+Table caregiver_notifications {
+  alert_id uuid
+  body text [not null]
+  caregiver_id uuid [not null]
+  channel text
+  data jsonb
+  delivery_status text
+  elderly_id uuid
+  id uuid [pk, not null]
+  is_read boolean
+  notification_type text [not null]
+  read_at timestamptz
+  sent_at timestamptz
+  title text [not null]
+}
+
+Table emergency_events {
+  description text
+  elderly_id uuid [not null]
+  event_type text [not null]
+  id uuid [pk, not null]
+  is_resolved boolean
+  location text
+  resolution_notes text
+  responded_at timestamptz
+  responded_by uuid
+  response_time_s integer
+  severity text [not null]
+  triggered_at timestamptz
+  vital_snapshot jsonb
+}
+
+Table medication_schedules {
+  caregiver_id uuid [not null]
+  color_tag text
+  created_at timestamptz
+  dosage text
+  elderly_id uuid [not null]
+  end_date date
+  form text
+  frequency text [not null]
+  id uuid [pk, not null]
+  instructions text
+  is_active boolean
+  medication_name text [not null]
+  prescribed_by text
+  reminder_enabled boolean
+  start_date date [not null]
+  times_of_day text[]
+  updated_at timestamptz
+}
+
+Table medication_logs {
+  created_at timestamptz
+  elderly_id uuid [not null]
+  id uuid [pk, not null]
+  notes text
+  recorded_by uuid
+  schedule_id uuid [not null]
+  scheduled_time timestamptz [not null]
+  status text
+  taken_at timestamptz
+}
+
+Table appointments {
+  appointment_at timestamptz [not null]
+  caregiver_id uuid [not null]
+  created_at timestamptz
+  doctor_name text
+  duration_min integer
+  elderly_id uuid [not null]
+  id uuid [pk, not null]
+  location text
+  notes text
+  reminder_sent boolean
+  status text
+  title text [not null]
+  updated_at timestamptz
+}
+
+Table caregiver_notes {
+  caregiver_id uuid [not null]
+  content text [not null]
+  created_at timestamptz
+  elderly_id uuid [not null]
+  id uuid [pk, not null]
+  is_pinned boolean
+  title text
+  updated_at timestamptz
+}
+
+Table ai_chatbot_sessions {
+  caregiver_id uuid [not null]
+  context_type text
+  elderly_id uuid [not null]
+  ended_at timestamptz
+  id uuid [pk, not null]
+  is_active boolean
+  session_title text
+  started_at timestamptz
+  total_messages integer
+}
+
+Table ai_chatbot_messages {
+  content text [not null]
+  created_at timestamptz
+  has_health_data boolean
+  id uuid [pk, not null]
+  is_flagged boolean
+  role text [not null]
+  session_id uuid [not null]
+  tokens_used integer
+}
+
+Ref: ai_chatbot_messages.session_id > ai_chatbot_sessions.id
+Ref: google_health_oauth_states.user_id > auth.users.id
+Ref: onboarding_progress.user_id > auth.users.id
+Ref: profiles.id > auth.users.id
+Ref: wearable_sync_locations.user_id > auth.users.id
+Ref: ai_chatbot_sessions.caregiver_id > caregivers.id
+Ref: appointments.caregiver_id > caregivers.id
+Ref: caregiver_notes.caregiver_id > caregivers.id
+Ref: caregiver_notifications.caregiver_id > caregivers.id
+Ref: doctor_contacts.caregiver_id > caregivers.id
+Ref: elderly_profiles.caregiver_id > caregivers.id
+Ref: emergency_events.responded_by > caregivers.id
+Ref: health_alerts.resolved_by > caregivers.id
+Ref: medication_logs.recorded_by > caregivers.id
+Ref: medication_schedules.caregiver_id > caregivers.id
+Ref: ai_chatbot_sessions.elderly_id > elderly_profiles.elderly_id
+Ref: appointments.elderly_id > elderly_profiles.elderly_id
+Ref: caregiver_notes.elderly_id > elderly_profiles.elderly_id
+Ref: caregiver_notifications.elderly_id > elderly_profiles.elderly_id
+Ref: doctor_contacts.elderly_id > elderly_profiles.elderly_id
+Ref: emergency_events.elderly_id > elderly_profiles.elderly_id
+Ref: health_alerts.elderly_id > elderly_profiles.elderly_id
+Ref: medication_logs.elderly_id > elderly_profiles.elderly_id
+Ref: medication_schedules.elderly_id > elderly_profiles.elderly_id
+Ref: vital_sign_logs.elderly_id > elderly_profiles.elderly_id
+Ref: wearable_sync_locations.elderly_id > elderly_profiles.elderly_id
+Ref: caregiver_notifications.alert_id > health_alerts.id
+Ref: medication_logs.schedule_id > medication_schedules.id
+
+// Logical links (not declared as foreign keys in the available public metadata):
+// caregivers.id -> auth.users.id
+// google_health_tokens.user_id -> auth.users.id

@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
-import { StyleSheet, Text, TextInput, type TextInputProps, useColorScheme, View } from 'react-native';
+import { StyleSheet, TextInput, type TextInputProps, useColorScheme, View } from 'react-native';
 
+import { AppText as Text } from '@/src/components/AppText';
 import { getTheme, palette } from '@/src/theme/colors';
-import { fontFamily } from '@/src/theme/typography';
+import { fontFamily, typeScale } from '@/src/theme/typography';
 
 type FormFieldProps = TextInputProps & {
   label: string;
@@ -41,8 +42,8 @@ export function FormField({ label, error, icon, required, editable = true, style
 
 const styles = StyleSheet.create({
   group: { marginBottom: 16 },
-  label: { marginBottom: 7, fontSize: 12, fontFamily: fontFamily.medium },
-  inputWrap: { minHeight: 50, borderWidth: 1, borderRadius: 8, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  input: { flex: 1, minHeight: 48, paddingVertical: 11, fontSize: 14, fontFamily: fontFamily.regular },
-  error: { marginTop: 5, color: palette.error, fontSize: 12, fontWeight: '500' },
+  label: { marginBottom: 7, fontSize: 13, fontFamily: fontFamily.semiBold },
+  inputWrap: { minHeight: 50, borderWidth: 1, borderRadius: 14, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  input: { flex: 1, minHeight: 48, paddingVertical: 11, ...typeScale.body },
+  error: { marginTop: 5, color: palette.error, fontSize: 12, fontFamily: fontFamily.medium },
 });

@@ -1,7 +1,8 @@
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Alert, StyleSheet, useColorScheme, View } from 'react-native';
 
+import { AppText as Text } from '@/src/components/AppText';
 import { ChoiceChips } from '@/src/components/ChoiceChips';
 import { FormField } from '@/src/components/FormField';
 import { GradientButton } from '@/src/components/GradientButton';
@@ -11,6 +12,7 @@ import { uploadProfilePhoto } from '@/src/lib/profile-photo';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { getTheme } from '@/src/theme/colors';
+import { typeScale } from '@/src/theme/typography';
 
 type Errors = Partial<Record<'fullName' | 'phone' | 'age' | 'sex', string>>;
 
@@ -94,7 +96,7 @@ export default function CaregiverSetupScreen() {
   return (
     <SetupScaffold step={1} title="Tell us about you" subtitle="This helps personalize your caregiver dashboard and emergency actions." canGoBack={mode === 'edit'}>
       <ProfilePhotoPicker value={photo} remoteUrl={remotePhoto} onChange={setPhoto} label="Caregiver photo" />
-      <View style={[styles.section, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}>
+      <View style={[styles.section, { backgroundColor: theme.cardElevated }]}>
         <Text style={[styles.sectionTitle, { color: theme.subtitle }]}>CAREGIVER INFORMATION</Text>
         <FormField label="Full name" required value={fullName} onChangeText={setFullName} error={errors.fullName} icon="person-outline" autoCapitalize="words" />
         <FormField label="Authenticated email" value={session.user.email ?? ''} editable={false} icon="mail-outline" />
@@ -108,6 +110,6 @@ export default function CaregiverSetupScreen() {
 }
 
 const styles = StyleSheet.create({
-  section: { padding: 18, borderRadius: 8, borderWidth: 1, marginBottom: 12 },
-  sectionTitle: { marginBottom: 16, fontSize: 11, fontWeight: '600' },
+  section: { padding: 18, borderRadius: 14, marginBottom: 12 },
+  sectionTitle: { marginBottom: 16, ...typeScale.eyebrow },
 });

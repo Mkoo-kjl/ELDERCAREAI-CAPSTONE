@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.google-health-sync]
 verify_jwt = true
 
+[functions.google-health-webhook]
+verify_jwt = false
+
 [functions.google-health-disconnect]
 verify_jwt = false
 

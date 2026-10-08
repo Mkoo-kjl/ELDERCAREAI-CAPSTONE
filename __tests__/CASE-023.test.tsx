@@ -27,6 +27,7 @@ jest.mock('expo-router', () => {
   };
 });
 jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({ session: { user: { id: 'caregiver-1' } }, refreshOnboarding: jest.fn().mockResolvedValue(null) }) }));
+jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
 jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn() } }));
 jest.mock('@/src/components/SetupScaffold', () => {
   const React = require('react');

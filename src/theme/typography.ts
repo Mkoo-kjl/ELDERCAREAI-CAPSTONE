@@ -1,29 +1,26 @@
 import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  Inter_800ExtraBold,
-  Inter_900Black,
-} from '@expo-google-fonts/inter';
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+  Manrope_800ExtraBold,
+} from '@expo-google-fonts/manrope';
 import type { TextStyle } from 'react-native';
 
-export const interFontAssets = {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  Inter_800ExtraBold,
-  Inter_900Black,
+export const appFontAssets = {
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+  Manrope_800ExtraBold,
 };
 
 export const fontFamily = {
-  regular: 'Inter_400Regular',
-  medium: 'Inter_500Medium',
-  semiBold: 'Inter_600SemiBold',
-  bold: 'Inter_700Bold',
-  extraBold: 'Inter_800ExtraBold',
-  black: 'Inter_900Black',
+  regular: 'Manrope_400Regular',
+  medium: 'Manrope_500Medium',
+  semiBold: 'Manrope_600SemiBold',
+  bold: 'Manrope_700Bold',
+  extraBold: 'Manrope_800ExtraBold',
 } as const;
 
 export const appTextStyle: TextStyle = {
@@ -31,14 +28,19 @@ export const appTextStyle: TextStyle = {
 };
 
 export const typeScale = {
-  screenTitle: { fontFamily: fontFamily.semiBold, fontSize: 24, lineHeight: 30 },
-  sectionTitle: { fontFamily: fontFamily.semiBold, fontSize: 18, lineHeight: 24 },
-  cardTitle: { fontFamily: fontFamily.semiBold, fontSize: 14, lineHeight: 20 },
-  body: { fontFamily: fontFamily.regular, fontSize: 13, lineHeight: 19 },
+  display: { fontFamily: fontFamily.extraBold, fontSize: 34, lineHeight: 40 },
+  screenTitle: { fontFamily: fontFamily.extraBold, fontSize: 28, lineHeight: 35 },
+  sectionTitle: { fontFamily: fontFamily.bold, fontSize: 20, lineHeight: 27 },
+  cardTitle: { fontFamily: fontFamily.bold, fontSize: 15, lineHeight: 21 },
+  body: { fontFamily: fontFamily.regular, fontSize: 14, lineHeight: 21 },
+  subhead: { fontFamily: fontFamily.regular, fontSize: 13, lineHeight: 19 },
   caption: { fontFamily: fontFamily.medium, fontSize: 11, lineHeight: 16 },
+  eyebrow: { fontFamily: fontFamily.bold, fontSize: 10, lineHeight: 15 },
+  metric: { fontFamily: fontFamily.extraBold, fontSize: 28, lineHeight: 35 },
+  button: { fontFamily: fontFamily.bold, fontSize: 14, lineHeight: 20 },
 } as const;
 
-export function interFontForWeight(fontWeight?: TextStyle['fontWeight']) {
+export function appFontForWeight(fontWeight?: TextStyle['fontWeight']) {
   switch (fontWeight) {
     case '500':
       return fontFamily.medium;
@@ -48,9 +50,8 @@ export function interFontForWeight(fontWeight?: TextStyle['fontWeight']) {
     case 'bold':
       return fontFamily.bold;
     case '800':
-      return fontFamily.extraBold;
     case '900':
-      return fontFamily.black;
+      return fontFamily.extraBold;
     default:
       return fontFamily.regular;
   }

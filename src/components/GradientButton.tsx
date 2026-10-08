@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ComponentProps } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 
+import { AppText as Text } from '@/src/components/AppText';
 import { palette } from '@/src/theme/colors';
-import { fontFamily } from '@/src/theme/typography';
+import { typeScale } from '@/src/theme/typography';
 
 type Props = {
   label: string;
@@ -37,8 +38,8 @@ export function GradientButton({ label, onPress, loading, disabled, colors = [pa
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginTop: 8, borderRadius: 8 },
+  wrap: { marginTop: 8, borderRadius: 14 },
   pressed: { opacity: 0.78 },
-  button: { minHeight: 52, borderRadius: 8, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
-  label: { color: '#FFFFFF', fontSize: 14, fontFamily: fontFamily.semiBold },
+  button: { minHeight: 52, borderRadius: 14, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
+  label: { color: '#FFFFFF', ...typeScale.button },
 });

@@ -6,15 +6,15 @@ import {
   Easing,
   Image,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppText as Text } from '@/src/components/AppText';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { getPostAuthRoute } from '@/src/lib/onboarding-route';
 import { palette } from '@/src/theme/colors';
-import { fontFamily } from '@/src/theme/typography';
+import { typeScale } from '@/src/theme/typography';
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   logoStage: { alignItems: 'center', justifyContent: 'center' },
   logo: { width: 180, height: 180 },
   copy: { alignItems: 'center', marginTop: 24 },
-  title: { color: palette.text, fontSize: 32, lineHeight: 39, fontFamily: fontFamily.semiBold },
+  title: { color: palette.text, ...typeScale.display },
   titleAccent: { color: palette.primaryDark },
   dots: { height: 18, marginTop: 36, flexDirection: 'row', alignItems: 'center', gap: 9 },
   dot: { width: 9, height: 9, borderRadius: 5 },

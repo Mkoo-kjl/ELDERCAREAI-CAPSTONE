@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, RefreshControl, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, RefreshControl, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
+
+import { AppText as Text } from '@/src/components/AppText';
 import { WebView } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -85,7 +87,7 @@ export default function LastSyncLocationScreen() {
       </View>
 
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void load(true)} colors={[palette.primary]} />} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
-        <View style={[styles.notice, { backgroundColor: `${palette.primary}12`, borderColor: `${palette.primary}45` }]}>
+        <View style={[styles.notice, { backgroundColor: `${palette.primary}12` }]}>
           <Ionicons name="phone-portrait-outline" size={21} color={palette.primaryDark} />
           <Text style={[styles.noticeText, { color: theme.text }]}>This marker is the caregiver phone’s location when a successful wearable synchronization occurred. It is not the Fitbit’s current location and is not live tracking.</Text>
         </View>
@@ -95,7 +97,7 @@ export default function LastSyncLocationScreen() {
         {!loading && !error && !location ? <View style={styles.state}><Ionicons name="location-outline" size={38} color={theme.subtitle} /><Text style={[styles.stateTitle, { color: theme.text }]}>No sync location yet</Text><Text style={[styles.stateText, { color: theme.subtitle }]}>Grant foreground location consent, then synchronize Google Health while ElderCareAI is open.</Text></View> : null}
 
         {coordinates ? <>
-          <View style={[styles.mapCard, { borderColor: theme.border, backgroundColor: theme.cardElevated }]}>
+          <View style={[styles.mapCard, { backgroundColor: theme.cardElevated }]}>
             {mapError ? <View style={[styles.map, styles.mapFallback]}><Ionicons name="map-outline" size={36} color={theme.subtitle} /><Text style={[styles.stateText, { color: theme.subtitle }]}>Leaflet could not load its map tiles. Check the phone’s internet connection or open the location in OpenStreetMap.</Text></View> : <WebView
               key={`${coordinates.latitude}:${coordinates.longitude}`}
               style={styles.map}
@@ -121,11 +123,11 @@ export default function LastSyncLocationScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 }, header: { minHeight: 74, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', borderBottomWidth: StyleSheet.hairlineWidth },
-  back: { width: 42, height: 42, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }, headerCopy: { flex: 1, marginLeft: 12 },
-  title: { ...typeScale.sectionTitle }, subtitle: { marginTop: 2, fontSize: 11.5 }, content: { padding: 18 },
-  notice: { padding: 14, borderRadius: 8, borderWidth: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 10 }, noticeText: { flex: 1, fontSize: 12, lineHeight: 18 },
-  state: { minHeight: 320, alignItems: 'center', justifyContent: 'center', padding: 30 }, stateTitle: { marginTop: 10, ...typeScale.sectionTitle }, stateText: { marginTop: 7, fontSize: 12.5, lineHeight: 19, textAlign: 'center' },
-  mapCard: { marginTop: 16, borderWidth: 1, borderRadius: 8, overflow: 'hidden' }, map: { width: '100%', height: 360 }, mapFallback: { alignItems: 'center', justifyContent: 'center', padding: 24 }, details: { padding: 16, gap: 14 },
-  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 10 }, detailLabel: { fontSize: 9.5, fontFamily: fontFamily.medium }, detailValue: { marginTop: 2, fontSize: 12.5, fontFamily: fontFamily.medium },
-  openButton: { minHeight: 48, borderRadius: 8, backgroundColor: palette.primaryDark, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, openButtonText: { color: '#FFFFFF', fontSize: 12, fontFamily: fontFamily.semiBold },
+  back: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, headerCopy: { flex: 1, marginLeft: 12 },
+  title: { ...typeScale.sectionTitle }, subtitle: { marginTop: 2, ...typeScale.caption }, content: { padding: 18 },
+  notice: { padding: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 10 }, noticeText: { flex: 1, ...typeScale.subhead },
+  state: { minHeight: 320, alignItems: 'center', justifyContent: 'center', padding: 30 }, stateTitle: { marginTop: 10, ...typeScale.sectionTitle }, stateText: { marginTop: 7, ...typeScale.subhead, textAlign: 'center' },
+  mapCard: { marginTop: 16, borderRadius: 14, overflow: 'hidden' }, map: { width: '100%', height: 360 }, mapFallback: { alignItems: 'center', justifyContent: 'center', padding: 24 }, details: { padding: 16, gap: 14 },
+  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 10 }, detailLabel: { ...typeScale.eyebrow }, detailValue: { marginTop: 2, fontSize: 13, fontFamily: fontFamily.semiBold },
+  openButton: { minHeight: 48, borderRadius: 14, backgroundColor: palette.primaryDark, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, openButtonText: { color: '#FFFFFF', fontSize: 12, fontFamily: fontFamily.semiBold },
 });

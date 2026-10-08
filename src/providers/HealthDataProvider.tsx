@@ -5,7 +5,14 @@ import { AppState } from 'react-native';
 import { getFunctionErrorMessage } from '@/src/lib/function-error';
 import { supabase } from '@/src/lib/supabase';
 import { notifyAbnormalVital } from '@/src/lib/notifications';
+import type { MeasurementTimes } from '@/src/lib/vital-time';
+import type { WatchSyncIssue } from '@/supabase/functions/_shared/google-health-sync';
 import { useAuth } from '@/src/providers/AuthProvider';
+
+export type WatchSyncStatus = {
+  deviceVersion: string | null;
+  lastSyncTime: string | null;
+};
 
 export type ElderlyProfile = {
   elderly_id: string;
@@ -36,6 +43,7 @@ export type VitalLog = {
   source: string | null;
   recorded_at: string;
   synced_at: string | null;
+  measurement_times?: MeasurementTimes | null;
 };
 
 type ContextValue = {
@@ -47,11 +55,16 @@ type ContextValue = {
   error: string | null;
   syncState: 'idle' | 'syncing' | 'success' | 'error';
   lastSuccessfulSyncAt: string | null;
+  watchSync: WatchSyncStatus | null;
+  watchSyncIssue: WatchSyncIssue;
   newReadingAt: string | null;
-  refresh: (sync?: boolean) => Promise<void>;
+  refresh: (sync?: boolean, silent?: boolean) => Promise<void>;
 };
 
 const HealthDataContext = createContext<ContextValue | null>(null);
+const AUTOMATIC_SYNC_INTERVAL_MS = 15 * 60 * 1000;
+const AUTOMATIC_SYNC_RETRY_MS = 2 * 60 * 1000;
+const SYNC_SCHEDULE_TICK_MS = 60 * 1000;
 
 export function HealthDataProvider({ children }: PropsWithChildren) {
   const { session, onboarding } = useAuth();
@@ -63,17 +76,22 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
   const [error, setError] = useState<string | null>(null);
   const [syncState, setSyncState] = useState<ContextValue['syncState']>('idle');
   const [lastSuccessfulSyncAt, setLastSuccessfulSyncAt] = useState<string | null>(null);
+  const [watchSync, setWatchSync] = useState<WatchSyncStatus | null>(null);
+  const [watchSyncIssue, setWatchSyncIssue] = useState<WatchSyncIssue>(null);
   const [newReadingAt, setNewReadingAt] = useState<string | null>(null);
   const syncInFlight = useRef(false);
-  const refreshRef = useRef<(sync?: boolean) => Promise<void>>(async () => undefined);
+  const lastSyncAttemptAt = useRef(0);
+  const lastSuccessfulSyncAtRef = useRef<string | null>(null);
   const realtimeInstanceId = useRef(`${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const realtimeGeneration = useRef(0);
+  const realtimeRevision = useRef(0);
 
   const load = useCallback(async () => {
-    if (!session) return;
+    if (!userId) return;
+    const revisionAtStart = realtimeRevision.current;
     const { data: profile, error: profileError } = await supabase.from('elderly_profiles')
       .select('elderly_id, full_name, age, gender, weight_kg, height_cm, blood_type, medical_conditions, medications, emergency_contact, emergency_contact_phone, photo_url')
-      .eq('caregiver_id', session.user.id).order('created_at').limit(1).maybeSingle();
+      .eq('caregiver_id', userId).order('created_at').limit(1).maybeSingle();
     if (profileError) throw profileError;
     setElderly(profile as ElderlyProfile | null);
     if (!profile) {
@@ -81,20 +99,20 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
       return;
     }
     const { data: logs, error: logsError } = await supabase.from('vital_sign_logs')
-      .select('*').eq('elderly_id', profile.elderly_id).order('recorded_at', { ascending: false }).limit(30);
+      .select('*').eq('elderly_id', profile.elderly_id).order('synced_at', { ascending: false, nullsFirst: false }).order('recorded_at', { ascending: false }).limit(30);
     if (logsError) throw logsError;
     const typedLogs = (logs as VitalLog[]) ?? [];
-    setHistory(typedLogs);
+    if (revisionAtStart === realtimeRevision.current) setHistory(typedLogs);
     if (typedLogs[0]) setLastSuccessfulSyncAt((current) => current ?? typedLogs[0].synced_at ?? typedLogs[0].recorded_at);
-  }, [session]);
+  }, [userId]);
 
   const recordSyncLocation = useCallback(async () => {
-    if (!session || !elderly || onboarding?.location_permission !== 'granted') return;
+    if (!userId || !elderly?.elderly_id || onboarding?.location_permission !== 'granted') return;
     const permission = await Location.getForegroundPermissionsAsync();
     if (!permission.granted) return;
     const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
     await supabase.from('wearable_sync_locations').insert({
-      user_id: session.user.id,
+      user_id: userId,
       elderly_id: elderly.elderly_id,
       event_type: 'health_sync',
       latitude: position.coords.latitude,
@@ -102,41 +120,53 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
       accuracy_m: position.coords.accuracy,
       recorded_at: new Date(position.timestamp).toISOString(),
     });
-  }, [elderly, onboarding?.location_permission, session]);
+  }, [elderly?.elderly_id, onboarding?.location_permission, userId]);
 
-  const refresh = useCallback(async (sync = false) => {
+  const refresh = useCallback(async (sync = false, silent = false) => {
     const authorized = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
     if (sync && authorized && syncInFlight.current) return;
     let startedSync = false;
-    setRefreshing(true);
-    if (sync && authorized) setSyncState('syncing');
-    setError(null);
+    if (!silent) {
+      setRefreshing(true);
+      if (sync && authorized) setSyncState('syncing');
+      setError(null);
+    }
     try {
       if (sync && authorized) {
         syncInFlight.current = true;
         startedSync = true;
-        const { data: syncData, error: syncError } = await supabase.functions.invoke<{ vital?: VitalLog }>('google-health-sync');
+        lastSyncAttemptAt.current = Date.now();
+        const { data: syncData, error: syncError } = await supabase.functions.invoke<{ vital?: VitalLog; changed?: boolean; checkedAt?: string; watchSync?: WatchSyncStatus | null; watchSyncIssue?: WatchSyncIssue }>('google-health-sync');
         if (syncError) throw syncError;
-        if (syncData?.vital && elderly) await notifyAbnormalVital(syncData.vital, elderly.full_name);
-        await recordSyncLocation();
-        const completedAt = new Date().toISOString();
-        setLastSuccessfulSyncAt(completedAt);
-        setSyncState('success');
+        if (syncData?.changed && syncData.vital && elderly?.full_name) await notifyAbnormalVital(syncData.vital, elderly.full_name);
+        if (!silent) await recordSyncLocation();
+        setLastSuccessfulSyncAt(syncData?.checkedAt ?? new Date().toISOString());
+        setWatchSync(syncData?.watchSync ?? null);
+        setWatchSyncIssue(syncData?.watchSyncIssue ?? null);
+        if (!silent) setSyncState('success');
       }
       await load();
+      setError(null);
     } catch (caught) {
       setError(await getFunctionErrorMessage(caught, 'Unable to refresh health data.'));
-      if (sync) setSyncState('error');
+      if (sync && !silent) setSyncState('error');
     } finally {
       if (startedSync) syncInFlight.current = false;
       setLoading(false);
-      setRefreshing(false);
+      if (!silent) setRefreshing(false);
     }
-  }, [elderly, load, onboarding?.wearable_status, recordSyncLocation]);
+  }, [elderly?.full_name, load, onboarding?.wearable_status, recordSyncLocation]);
+  const refreshRef = useRef(refresh);
+  useEffect(() => { refreshRef.current = refresh; }, [refresh]);
+  useEffect(() => { lastSuccessfulSyncAtRef.current = lastSuccessfulSyncAt; }, [lastSuccessfulSyncAt]);
 
   useEffect(() => {
-    refreshRef.current = refresh;
-  }, [refresh]);
+    setWatchSync(null);
+    setWatchSyncIssue(null);
+    setLastSuccessfulSyncAt(null);
+    lastSuccessfulSyncAtRef.current = null;
+    lastSyncAttemptAt.current = 0;
+  }, [userId]);
 
   useEffect(() => {
     setLoading(true);
@@ -159,16 +189,26 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
         .on('postgres_changes', {
           event: '*', schema: 'public', table: 'vital_sign_logs', filter: `elderly_id=eq.${elderly.elderly_id}`,
         }, (payload) => {
+          realtimeRevision.current += 1;
+          if (payload.eventType === 'DELETE') {
+            void load();
+            return;
+          }
+          const incoming = payload.new as VitalLog;
+          if (!incoming?.id) return;
+          setHistory((current) => [incoming, ...current.filter((row) => row.id !== incoming.id)]
+            .sort((left, right) => new Date(right.synced_at ?? right.recorded_at).getTime() - new Date(left.synced_at ?? left.recorded_at).getTime())
+            .slice(0, 30));
           setNewReadingAt(new Date().toISOString());
-          if (payload.eventType !== 'DELETE') setLastSuccessfulSyncAt(new Date().toISOString());
-          void load();
+          if (incoming.synced_at) setLastSuccessfulSyncAt(incoming.synced_at);
         })
         .subscribe((status, subscriptionError) => {
           if (subscriptionError) console.warn(`Vital-sign Realtime ${status}:`, subscriptionError.message);
+          if (status === 'SUBSCRIBED') void load();
         });
     } catch (subscriptionError) {
-      // Polling and manual synchronization remain available if Realtime cannot
-      // start, so a socket problem must not interrupt Google Health OAuth/sync.
+      // A foreground database reload and manual sync remain available if the
+      // Realtime socket cannot start.
       console.warn('Unable to start vital-sign Realtime:', subscriptionError);
     }
     return () => {
@@ -179,24 +219,33 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
   }, [elderly?.elderly_id, load, userId]);
 
   useEffect(() => {
+    if (!userId) return;
     const authorized = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
-    if (!session || !authorized) return;
     let active = AppState.currentState === 'active';
-    const synchronize = () => { if (active) void refreshRef.current(true); };
-    synchronize();
-    const timer = setInterval(synchronize, 60_000);
+    if (authorized) void refreshRef.current(true, true);
+    const timer = setInterval(() => {
+      const now = Date.now();
+      const lastChecked = Date.parse(lastSuccessfulSyncAtRef.current ?? '');
+      const checkDue = !Number.isFinite(lastChecked) || now - lastChecked >= AUTOMATIC_SYNC_INTERVAL_MS;
+      const retryDue = now - lastSyncAttemptAt.current >= AUTOMATIC_SYNC_RETRY_MS;
+      if (authorized && checkDue && retryDue) {
+        void refreshRef.current(true, true);
+      }
+    }, SYNC_SCHEDULE_TICK_MS);
     const subscription = AppState.addEventListener('change', (state) => {
       const wasActive = active;
       active = state === 'active';
-      if (active && !wasActive) synchronize();
+      if (active && !wasActive) {
+        if (authorized) void refreshRef.current(true, true);
+        else void load().catch((caught) => {
+          setError(caught instanceof Error ? caught.message : 'Unable to load health data.');
+        });
+      }
     });
-    return () => {
-      clearInterval(timer);
-      subscription.remove();
-    };
-  }, [onboarding?.wearable_status, session]);
+    return () => { clearInterval(timer); subscription.remove(); };
+  }, [load, onboarding?.wearable_status, userId]);
 
-  const value = useMemo(() => ({ elderly, vital: history[0] ?? null, history, loading, refreshing, error, syncState, lastSuccessfulSyncAt, newReadingAt, refresh }), [elderly, error, history, lastSuccessfulSyncAt, loading, newReadingAt, refresh, refreshing, syncState]);
+  const value = useMemo(() => ({ elderly, vital: history[0] ?? null, history, loading, refreshing, error, syncState, lastSuccessfulSyncAt, watchSync, watchSyncIssue, newReadingAt, refresh }), [elderly, error, history, lastSuccessfulSyncAt, loading, newReadingAt, refresh, refreshing, syncState, watchSync, watchSyncIssue]);
   return <HealthDataContext.Provider value={value}>{children}</HealthDataContext.Provider>;
 }
 

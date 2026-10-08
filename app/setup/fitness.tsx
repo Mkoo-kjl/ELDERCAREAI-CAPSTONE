@@ -3,8 +3,9 @@ import * as Linking from 'expo-linking';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, useColorScheme, View } from 'react-native';
 
+import { AppText as Text } from '@/src/components/AppText';
 import { GradientButton } from '@/src/components/GradientButton';
 import { SetupScaffold } from '@/src/components/SetupScaffold';
 import { getFunctionErrorMessage } from '@/src/lib/function-error';
@@ -109,7 +110,7 @@ export default function FitnessSetupScreen() {
         <Text style={[styles.heroText, { color: theme.subtitle }]}>Google Health is the current cloud API for supported Fitbit and Pixel devices. You stay in control of every scope.</Text>
       </View>
 
-      <View style={[styles.card, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}>
+      <View style={[styles.card, { backgroundColor: theme.cardElevated }]}>
         <Text style={[styles.cardLabel, { color: theme.subtitle }]}>READ-ONLY DATA REQUESTED</Text>
         {requestedData.map(([icon, title, description]) => (
           <View key={title} style={styles.featureRow}>
@@ -129,14 +130,14 @@ export default function FitnessSetupScreen() {
       </View>
 
       {authorized ? (
-        <View style={[styles.status, { backgroundColor: `${palette.accent}12`, borderColor: palette.accent }]}>
+        <View style={[styles.status, { backgroundColor: `${palette.accent}12` }]}>
           <Ionicons name={deviceCount > 0 ? 'checkmark-circle' : 'information-circle'} size={22} color={deviceCount > 0 ? palette.accent : palette.warning} />
           <Text style={[styles.statusText, { color: theme.text }]}>
             {deviceCount > 0 ? `Google Health connected • ${deviceCount} paired device(s)` : 'Google Health authorized • no paired wearable found'}
           </Text>
         </View>
       ) : (
-        <View style={[styles.status, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View style={[styles.status, { backgroundColor: theme.card }]}>
           <Ionicons name="cloud-offline-outline" size={22} color={theme.subtitle} />
           <Text style={[styles.statusText, { color: theme.subtitle }]}>Disconnected — no health readings will be fabricated.</Text>
         </View>
@@ -153,21 +154,21 @@ export default function FitnessSetupScreen() {
 
 const styles = StyleSheet.create({
   hero: { alignItems: 'center', marginBottom: 22 },
-  heroIcon: { width: 82, height: 82, borderRadius: 8, backgroundColor: palette.mintSurface, alignItems: 'center', justifyContent: 'center', marginBottom: 17 },
+  heroIcon: { width: 82, height: 82, borderRadius: 14, backgroundColor: palette.mintSurface, alignItems: 'center', justifyContent: 'center', marginBottom: 17 },
   heroTitle: { ...typeScale.sectionTitle },
-  heroText: { marginTop: 7, maxWidth: 360, fontSize: 13, lineHeight: 19, textAlign: 'center' },
-  card: { padding: 18, borderRadius: 8, borderWidth: 1 },
-  cardLabel: { marginBottom: 14, fontSize: 10, fontFamily: fontFamily.medium },
+  heroText: { marginTop: 7, maxWidth: 360, ...typeScale.body, textAlign: 'center' },
+  card: { padding: 18, borderRadius: 14 },
+  cardLabel: { marginBottom: 14, ...typeScale.eyebrow },
   featureRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
-  featureIcon: { width: 42, height: 42, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
+  featureIcon: { width: 42, height: 42, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
   featureCopy: { flex: 1, marginLeft: 12 },
   featureTitle: { ...typeScale.cardTitle },
-  featureText: { marginTop: 2, fontSize: 12, lineHeight: 17 },
-  note: { marginTop: 2, padding: 12, borderRadius: 8, flexDirection: 'row', alignItems: 'flex-start', gap: 9 },
-  noteText: { flex: 1, fontSize: 11, lineHeight: 16 },
-  status: { marginTop: 16, padding: 14, borderRadius: 8, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 9 },
-  statusText: { flex: 1, fontSize: 13, fontWeight: '600' },
+  featureText: { marginTop: 2, ...typeScale.subhead },
+  note: { marginTop: 2, padding: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 9 },
+  noteText: { flex: 1, ...typeScale.caption },
+  status: { marginTop: 16, padding: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'center', gap: 9 },
+  statusText: { flex: 1, fontSize: 13, fontFamily: fontFamily.semiBold },
   error: { marginTop: 10, color: palette.error, fontSize: 12, lineHeight: 17 },
   skipButton: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
-  skipText: { fontSize: 14, fontWeight: '600' },
+  skipText: { ...typeScale.button },
 });

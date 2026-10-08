@@ -1,6 +1,6 @@
 # Unit test evidence
 
-Date tested: 2026-10-07 (Asia/Manila). Proponent: enter your own name.
+Use the [unit testing table](UNIT_TEST_TABLE.md) for the case descriptions and results. Enter the proponent and date tested in the final report.
 
 ## Capture one test case at a time
 

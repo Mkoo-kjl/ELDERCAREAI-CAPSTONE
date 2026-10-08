@@ -3,35 +3,13 @@ import { useFonts } from 'expo-font';
 import { router, Stack, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { Text, TextInput, useColorScheme, type StyleProp, type TextStyle } from 'react-native';
+import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider } from '@/src/providers/AuthProvider';
 import { ThemePreferenceProvider } from '@/src/providers/ThemePreferenceProvider';
 import { initializeNotifications } from '@/src/lib/notifications';
-import { appTextStyle, interFontAssets } from '@/src/theme/typography';
-
-type TextComponentWithDefaults = {
-  defaultProps?: {
-    style?: StyleProp<TextStyle>;
-  };
-};
-
-let defaultTypographyApplied = false;
-
-function applyDefaultTypography() {
-  if (defaultTypographyApplied) return;
-
-  for (const component of [Text, TextInput] as TextComponentWithDefaults[]) {
-    const existingStyle = component.defaultProps?.style;
-    component.defaultProps = {
-      ...(component.defaultProps ?? {}),
-      style: existingStyle ? [appTextStyle, existingStyle] : appTextStyle,
-    };
-  }
-
-  defaultTypographyApplied = true;
-}
+import { appFontAssets } from '@/src/theme/typography';
 
 function NotificationObserver() {
   useEffect(() => {
@@ -53,11 +31,7 @@ function NotificationObserver() {
 
 export default function RootLayout() {
   const isDark = useColorScheme() === 'dark';
-  const [fontsLoaded, fontError] = useFonts(interFontAssets);
-
-  if (fontsLoaded) {
-    applyDefaultTypography();
-  }
+  const [fontsLoaded, fontError] = useFonts(appFontAssets);
 
   if (!fontsLoaded && !fontError) {
     return null;

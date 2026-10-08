@@ -1,8 +1,10 @@
 import { Redirect } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, useColorScheme, View } from 'react-native';
 
+import { AppText as Text } from '@/src/components/AppText';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily } from '@/src/theme/typography';
 
 export default function AuthCallbackScreen() {
   const isDark = useColorScheme() === 'dark';
@@ -22,5 +24,5 @@ export default function AuthCallbackScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14 },
-  text: { fontSize: 14, fontWeight: '600' },
+  text: { fontSize: 14, fontFamily: fontFamily.semiBold },
 });

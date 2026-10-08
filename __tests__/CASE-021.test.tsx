@@ -27,6 +27,7 @@ jest.mock('expo-router', () => {
   };
 });
 jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({ session: { user: { id: 'caregiver-1' } }, refreshOnboarding: jest.fn().mockResolvedValue(null) }) }));
+jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
 jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn() } }));
 jest.mock('@/src/components/SetupScaffold', () => {
   const React = require('react');
@@ -59,13 +60,16 @@ async function fillValidPatient() {
 }
 
 describe('Older-adult profile setup', () => {
-  test('CASE-021 future birth date is rejected', async () => {
+  test('CASE-021 birth date is selected from the calendar and determines age', async () => {
     await render(<ElderlySetupScreen />);
     await fillValidPatient();
-    await fireEvent.changeText(screen.getByLabelText('Age'), '');
-    await fireEvent.changeText(screen.getByLabelText('Date of birth'), '2099-01-01');
+    await fireEvent.press(screen.getByLabelText('Choose date of birth'));
+    const chosen = new Date(new Date().getFullYear() - 75, new Date().getMonth(), 1);
+    const label = chosen.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    await fireEvent.press(screen.getByLabelText(label));
+    await fireEvent.press(screen.getByLabelText('Done choosing date and time'));
     await fireEvent.press(screen.getByText('Save profile'));
-    expect(screen.getAllByText('Enter a valid date of birth or age.').length).toBeGreaterThan(0);
-    expect(mockInsert).not.toHaveBeenCalled();
+    const dateOfBirth = `${chosen.getFullYear()}-${String(chosen.getMonth() + 1).padStart(2, '0')}-01`;
+    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ date_of_birth: dateOfBirth, age: 75 }));
   });
 });

@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, Image, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, useColorScheme, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Image, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useColorScheme, useWindowDimensions, View } from 'react-native';
+
+import { AppText as Text } from '@/src/components/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { supabase } from '@/src/lib/supabase';
@@ -181,13 +183,13 @@ function CareHero({ slide, index }: { slide: IntroSlide; index: number }) {
 
   return (
     <View style={styles.heroWrap}>
-      <View style={[styles.summaryPanel, { backgroundColor: theme.cardElevated, borderColor: theme.border }]}>
+      <View style={[styles.summaryPanel, { backgroundColor: theme.cardElevated }]}>
         <View style={[styles.panelIcon, { backgroundColor: `${slide.color}16` }]}>
           <Ionicons name={slide.icon} size={29} color={slide.color} />
         </View>
         <View style={styles.panelGrid}>
           {items.map(([icon, label]) => (
-            <View key={label} style={[styles.panelItem, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <View key={label} style={[styles.panelItem, { backgroundColor: theme.card }]}>
               <Ionicons name={icon} size={18} color={slide.color} />
               <Text style={[styles.panelText, { color: theme.text }]}>{label}</Text>
             </View>
@@ -204,31 +206,31 @@ const styles = StyleSheet.create({
   brand: { ...typeScale.sectionTitle },
   brandAccent: { color: palette.primaryDark },
   brandSub: { marginTop: 2, fontSize: 11, fontFamily: fontFamily.medium },
-  skip: { minWidth: 70, minHeight: 38, paddingHorizontal: 16, borderRadius: 8, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  skip: { minWidth: 70, minHeight: 38, paddingHorizontal: 16, borderRadius: 14, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   skipText: { fontSize: 12, fontFamily: fontFamily.medium },
   pager: { flex: 1 },
   slide: { flex: 1, paddingHorizontal: 22, justifyContent: 'center' },
   heroWrap: { minHeight: 320, alignItems: 'center', justifyContent: 'center' },
   deviceStage: { width: 250, height: 250, alignItems: 'center', justifyContent: 'center' },
   deviceImage: { width: 218, height: 218 },
-  deviceBadge: { marginTop: -15, minHeight: 37, paddingHorizontal: 13, borderRadius: 8, backgroundColor: palette.mintSurface, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  deviceBadge: { marginTop: -15, minHeight: 37, paddingHorizontal: 13, borderRadius: 14, backgroundColor: palette.mintSurface, flexDirection: 'row', alignItems: 'center', gap: 8 },
   liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: palette.accentDark },
   deviceBadgeText: { color: palette.text, fontSize: 11, fontFamily: fontFamily.medium },
-  summaryPanel: { width: '100%', maxWidth: 340, borderRadius: 8, borderWidth: 1, padding: 18 },
-  panelIcon: { alignSelf: 'center', width: 58, height: 58, borderRadius: 8, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  summaryPanel: { width: '100%', maxWidth: 340, borderRadius: 14, padding: 18 },
+  panelIcon: { alignSelf: 'center', width: 58, height: 58, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
   panelGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  panelItem: { width: '48%', minHeight: 72, borderRadius: 8, borderWidth: 1, padding: 12, justifyContent: 'space-between' },
+  panelItem: { width: '48%', minHeight: 72, borderRadius: 14, padding: 12, justifyContent: 'space-between' },
   panelText: { fontSize: 12, fontFamily: fontFamily.medium },
   copy: { alignItems: 'center', paddingHorizontal: 4 },
-  eyebrowPill: { minHeight: 32, paddingHorizontal: 12, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  eyebrow: { fontSize: 10, fontFamily: fontFamily.medium },
-  title: { marginTop: 18, maxWidth: 380, textAlign: 'center', fontSize: 26, lineHeight: 33, fontFamily: fontFamily.semiBold },
-  body: { marginTop: 11, maxWidth: 370, textAlign: 'center', fontSize: 13, lineHeight: 20 },
+  eyebrowPill: { minHeight: 32, paddingHorizontal: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', gap: 6 },
+  eyebrow: { ...typeScale.eyebrow },
+  title: { marginTop: 18, maxWidth: 380, textAlign: 'center', ...typeScale.screenTitle },
+  body: { marginTop: 11, maxWidth: 370, textAlign: 'center', ...typeScale.body },
   footer: { paddingHorizontal: 22, gap: 13 },
   dots: { height: 12, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 7 },
   dot: { height: 8, borderRadius: 4 },
   error: { color: palette.error, fontSize: 12, lineHeight: 17, textAlign: 'center' },
-  primaryButton: { borderRadius: 8 },
-  primaryGradient: { minHeight: 52, borderRadius: 8, backgroundColor: palette.primaryDark, paddingHorizontal: 22, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
-  primaryText: { color: '#FFFFFF', fontSize: 14, fontFamily: fontFamily.semiBold },
+  primaryButton: { borderRadius: 14 },
+  primaryGradient: { minHeight: 52, borderRadius: 14, backgroundColor: palette.primaryDark, paddingHorizontal: 22, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
+  primaryText: { color: '#FFFFFF', ...typeScale.button },
 });

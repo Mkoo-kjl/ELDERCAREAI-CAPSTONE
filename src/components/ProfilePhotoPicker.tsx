@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { Alert, Image, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Alert, Image, Pressable, StyleSheet, useColorScheme, View } from 'react-native';
 
+import { AppText as Text } from '@/src/components/AppText';
 import { getTheme, palette } from '@/src/theme/colors';
+import { fontFamily } from '@/src/theme/typography';
 
 export type LocalPhoto = { uri: string; mimeType?: string | null };
 
@@ -74,8 +76,8 @@ export function ProfilePhotoPicker({ value, remoteUrl, onChange, label = 'Add pr
 const styles = StyleSheet.create({
   container: { alignItems: 'center', marginBottom: 24 },
   photoButton: { width: 112, height: 112 },
-  photo: { width: 112, height: 112, borderRadius: 8 },
-  placeholder: { width: 112, height: 112, borderRadius: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.aquaSurface },
+  photo: { width: 112, height: 112, borderRadius: 14 },
+  placeholder: { width: 112, height: 112, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.aquaSurface },
   cameraBadge: { position: 'absolute', right: -6, bottom: -6, width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.primaryDark, borderWidth: 2, borderColor: '#FFFFFF' },
-  label: { marginTop: 10, fontSize: 12, fontWeight: '600' },
+  label: { marginTop: 10, fontSize: 12, fontFamily: fontFamily.semiBold },
 });

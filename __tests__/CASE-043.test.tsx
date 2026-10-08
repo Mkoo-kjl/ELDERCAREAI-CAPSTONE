@@ -17,19 +17,24 @@ jest.mock('@/src/lib/notifications', () => ({
   scheduleMedicationNotifications: jest.fn(),
   secondDailyTime: jest.fn(),
 }));
-jest.mock('@/src/components/PickerModal', () => ({ PickerModal: () => null }));
+jest.mock('@/src/components/PickerModal', () => {
+  const React = require('react');
+  const { Pressable, Text } = require('react-native');
+  return { PickerModal: ({ visible, mode, onChange }: { visible: boolean; mode: string; onChange: (date: Date) => void }) => visible && mode === 'time'
+    ? React.createElement(Pressable, { onPress: () => { const selected = new Date(); selected.setHours(17, 30); onChange(selected); } }, React.createElement(Text, null, 'Pick 5:30 PM'))
+    : null };
+});
 
 beforeEach(() => { jest.spyOn(Alert, 'alert').mockImplementation(() => undefined); });
 afterEach(() => jest.restoreAllMocks());
 
 describe('Care plan screen', () => {
-  test('CASE-043 malformed medication time is rejected before saving', async () => {
+  test('CASE-043 medication time is set with a time picker', async () => {
     await render(<CareScreen />);
     await fireEvent.press(screen.getByLabelText('Add Medication'));
-    await fireEvent.changeText(screen.getByLabelText('Medication name'), 'Losartan');
-    await fireEvent.changeText(screen.getByLabelText('Reminder time (24-hour HH:MM)'), '25:00');
-    await fireEvent.press(screen.getByText('Save'));
-    expect(Alert.alert).toHaveBeenCalledWith('Invalid reminder time', expect.stringContaining('HH:MM'));
+    await fireEvent.press(screen.getByLabelText('Choose medication reminder time'));
+    await fireEvent.press(screen.getByText('Pick 5:30 PM'));
+    expect(screen.getAllByText(/5:30\s*PM/i).length).toBeGreaterThan(0);
     expect(supabase.from).not.toHaveBeenCalled();
   });
 });

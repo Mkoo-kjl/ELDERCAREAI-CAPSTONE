@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import type { PropsWithChildren } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
+
+import { AppText as Text } from '@/src/components/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getTheme, palette } from '@/src/theme/colors';
-import { fontFamily, typeScale } from '@/src/theme/typography';
+import { typeScale } from '@/src/theme/typography';
 
 type Props = PropsWithChildren<{
   step: number;
@@ -55,12 +57,12 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   header: { paddingHorizontal: 22, paddingBottom: 20 },
   navRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  back: { width: 40, height: 40, borderRadius: 8, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  back: { width: 40, height: 40, borderRadius: 14, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   backPlaceholder: { width: 40 },
-  stepText: { fontSize: 10, fontFamily: fontFamily.medium },
+  stepText: { ...typeScale.eyebrow },
   progressTrack: { height: 4, marginTop: 10, marginBottom: 22, overflow: 'hidden', borderRadius: 2, backgroundColor: palette.border },
   progressFill: { height: '100%', borderRadius: 2, backgroundColor: palette.primaryDark },
   title: { ...typeScale.screenTitle },
-  subtitle: { marginTop: 7, maxWidth: 390, fontSize: 13, lineHeight: 20 },
+  subtitle: { marginTop: 7, maxWidth: 390, ...typeScale.body },
   content: { paddingHorizontal: 22, paddingTop: 22 },
 });
