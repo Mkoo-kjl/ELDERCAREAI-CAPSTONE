@@ -1,11 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useRef, useState } from 'react';
 import type { ImageSourcePropType } from 'react-native';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
+import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 
 import { AppText as Text } from '@/src/components/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { vitalTimeLabel } from '@/src/lib/vital-time';
+import { sleepDurationScore } from '@/src/lib/sleep-score';
+import { supabase } from '@/src/lib/supabase';
 import type { VitalLog } from '@/src/providers/HealthDataProvider';
 import { getTheme, palette } from '@/src/theme/colors';
 import { fontFamily, typeScale } from '@/src/theme/typography';
@@ -38,6 +41,8 @@ const elleImages: Record<'happy' | 'neutral' | 'worried', ImageSourcePropType> =
   worried: require('../../assets/images/elle-worried.png'),
 };
 
+type VitalInsightResponse = { reply?: string; content?: string };
+
 function valueFor(row: VitalLog, metric: VitalMetricKey) {
   const value = row[metric];
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
@@ -56,6 +61,7 @@ function isConcerning(metric: VitalMetricKey, value: number | null) {
 export function VitalDetailModal({ visible, metric, history, onClose }: { visible: boolean; metric: VitalMetricKey | null; history: VitalLog[]; onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const theme = getTheme(useColorScheme() === 'dark');
+  const insightCache = useRef(new Map<string, string>());
   if (!metric) return null;
   const config = configs[metric];
   const latestRow = history[0] ?? null;
@@ -67,7 +73,7 @@ export function VitalDetailModal({ visible, metric, history, onClose }: { visibl
   const range = maximum - minimum || 1;
   const concerning = isConcerning(metric, latest);
   const emotion = latest === null ? 'neutral' : concerning ? 'worried' : 'happy';
-  const elleMessage = latest === null ? `I’m waiting for a synchronized ${config.shortTitle} reading.` : concerning ? `This ${config.shortTitle} reading crosses an ElderCareAI review threshold. Please consider context, repeat the measurement, and respond appropriately to symptoms.` : `I’ve added this ${config.shortTitle} reading to the recent history. Trends are usually more useful than one isolated value.`;
+  const sleepScore = metric === 'sleep_hours' ? sleepDurationScore(latest) : null;
 
   return <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
     <View style={styles.overlay}><Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
@@ -75,9 +81,9 @@ export function VitalDetailModal({ visible, metric, history, onClose }: { visibl
         <View style={styles.handle} />
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
           <View style={styles.header}><View style={[styles.heroIcon, { backgroundColor: `${config.color}16` }]}><Ionicons name={config.icon} size={29} color={config.color} /></View><View style={styles.headerCopy}><Text style={[styles.eyebrow, { color: config.color }]}>VITAL DETAILS</Text><Text style={[styles.title, { color: theme.text }]}>{config.title}</Text></View><Pressable accessibilityLabel="Close details" onPress={onClose} style={[styles.close, { backgroundColor: theme.card }]}><Ionicons name="close" size={22} color={theme.text} /></Pressable></View>
-          <View style={[styles.readingCard, { backgroundColor: theme.card }]}><Text style={[styles.readingLabel, { color: theme.subtitle }]}>LATEST SYNCHRONIZED READING</Text><View style={styles.readingRow}><Text style={[styles.reading, { color: theme.text }]}>{formatValue(latest, config)}</Text><Text style={[styles.unit, { color: theme.subtitle }]}>{config.unit}</Text></View><Text style={[styles.time, { color: theme.subtitle }]}>{vitalTimeLabel(latestRow, metric)}</Text></View>
+          <View style={[styles.readingCard, { backgroundColor: theme.card }]}><Text style={[styles.readingLabel, { color: theme.subtitle }]}>LATEST SYNCHRONIZED READING</Text><View style={styles.readingRow}><Text style={[styles.reading, { color: theme.text }]}>{formatValue(latest, config)}</Text><Text style={[styles.unit, { color: theme.subtitle }]}>{config.unit}</Text></View><Text style={[styles.time, { color: theme.subtitle }]}>{vitalTimeLabel(latestRow, metric)}</Text>{sleepScore ? <View style={styles.sleepScore}><Text style={[styles.sleepScoreValue, { color: palette.purple }]}>Sleep score {sleepScore.score} - {sleepScore.label}</Text><Text style={[styles.sleepScoreNote, { color: theme.subtitle }]}>Duration-only estimate based on a 7-8 hour older-adult guide. It does not measure sleep quality.</Text></View> : null}</View>
 
-          <View style={[styles.elleCard, { backgroundColor: concerning ? `${palette.warning}12` : `${palette.primary}10` }]}><Image source={elleImages[emotion]} style={styles.elle} resizeMode="cover" /><View style={styles.elleCopy}><Text style={[styles.elleName, { color: theme.text }]}>Elle says</Text><Text style={[styles.elleText, { color: theme.subtitle }]}>{elleMessage}</Text></View></View>
+          <VitalInsight key={`${metric}:${latestRow?.id ?? 'none'}:${latest ?? 'none'}`} metric={metric} row={latestRow} value={latest} config={config} emotion={emotion} cache={insightCache.current} />
 
           <Text style={[styles.sectionTitle, { color: theme.text }]}>Recent readings</Text>
           {recent.length ? <View style={[styles.chartCard, { backgroundColor: theme.card }]}><View style={styles.bars}>{recent.map((item, index) => { const height = 18 + ((item.value - minimum) / range) * 54; return <View key={`${item.at}:${index}`} style={styles.barColumn}><Text numberOfLines={1} style={[styles.barValue, { color: theme.subtitle }]}>{metricNumber(item.value, config.digits)}</Text><View style={[styles.bar, { height, backgroundColor: config.color }]} /><Text style={[styles.barDate, { color: theme.subtitle }]}>{new Date(item.at).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}</Text></View>; })}</View><Text style={[styles.chartNote, { color: theme.subtitle }]}>Up to seven most recent synchronized values</Text></View> : <View style={[styles.emptyChart, { backgroundColor: theme.card }]}><Text style={[styles.chartNote, { color: theme.subtitle }]}>No recent values are available for this metric.</Text></View>}
@@ -91,13 +97,50 @@ export function VitalDetailModal({ visible, metric, history, onClose }: { visibl
   </Modal>;
 }
 
+function VitalInsight({ metric, row, value, config, emotion, cache }: { metric: VitalMetricKey; row: VitalLog | null; value: number | null; config: MetricConfig; emotion: 'happy' | 'neutral' | 'worried'; cache: Map<string, string> }) {
+  const theme = getTheme(useColorScheme() === 'dark');
+  const [attempt, setAttempt] = useState(0);
+  const [insight, setInsight] = useState<{ status: 'empty' | 'loading' | 'ready' | 'error'; text: string }>({ status: 'empty', text: '' });
+  const cacheKey = `${row?.elderly_id ?? 'none'}:${metric}:${row?.id ?? 'none'}:${value ?? 'none'}`;
+
+  useEffect(() => {
+    if (value === null) {
+      setInsight({ status: 'empty', text: '' });
+      return;
+    }
+    const saved = cache.get(cacheKey);
+    if (saved) {
+      setInsight({ status: 'ready', text: saved });
+      return;
+    }
+    let active = true;
+    setInsight({ status: 'loading', text: '' });
+    const question = `The caregiver opened the patient's ${config.title} card, showing ${metricNumber(value, config.digits)} ${config.unit} in the latest synchronized record. Give a concise 1-2 sentence insight grounded in the database snapshot. Compare recent readings only if available. Refer to the patient, not the caregiver. Do not diagnose or invent data.`;
+    void supabase.functions.invoke<VitalInsightResponse>('ai-care-assistant', {
+      body: { message: question, clientNow: new Date().toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    }).then(({ data, error }) => {
+      if (error) throw error;
+      const text = (data?.reply ?? data?.content ?? '').trim();
+      if (!text) throw new Error('Elle returned an empty insight.');
+      cache.set(cacheKey, text);
+      if (active) setInsight({ status: 'ready', text });
+    }).catch((error: unknown) => {
+      console.warn('Vital insight failed:', error instanceof Error ? error.message : error);
+      if (active) setInsight({ status: 'error', text: '' });
+    });
+    return () => { active = false; };
+  }, [attempt, cache, cacheKey, config, value]);
+
+  return <View style={[styles.elleCard, { backgroundColor: emotion === 'worried' ? `${palette.warning}12` : `${palette.primary}10` }]}><Image source={elleImages[emotion]} style={styles.elle} resizeMode="cover" /><View style={styles.elleCopy}><Text style={[styles.elleName, { color: theme.text }]}>Elle insight</Text>{insight.status === 'loading' ? <View style={styles.insightLoading}><ActivityIndicator size="small" color={palette.primaryDark} /><Text style={[styles.elleText, { color: theme.subtitle }]}>Reviewing recent readings...</Text></View> : <Text style={[styles.elleText, { color: theme.subtitle }]}>{insight.status === 'ready' ? insight.text : insight.status === 'empty' ? `A synchronized ${config.shortTitle} reading is needed for an insight.` : 'Insight is unavailable right now.'}</Text>}{insight.status === 'error' ? <Pressable accessibilityRole="button" onPress={() => setAttempt((current) => current + 1)} style={styles.insightRetry}><Ionicons name="refresh" size={14} color={palette.primaryDark} /><Text style={styles.retryText}>Retry insight</Text></Pressable> : null}<Text style={[styles.insightNote, { color: theme.subtitle }]}>Informational only. Not a medical assessment.</Text></View></View>;
+}
+
 function InfoSection({ title, body, color, subtitle }: { title: string; body: string; color: string; subtitle: string }) { return <View style={styles.infoSection}><Text style={[styles.sectionTitle, { color }]}>{title}</Text><Text style={[styles.body, { color: subtitle }]}>{body}</Text></View>; }
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(15,23,42,0.58)' }, sheet: { maxHeight: '91%', borderTopLeftRadius: 20, borderTopRightRadius: 20 }, handle: { alignSelf: 'center', width: 46, height: 5, borderRadius: 3, backgroundColor: palette.border, marginTop: 9 }, content: { padding: 19, paddingTop: 12 },
   header: { flexDirection: 'row', alignItems: 'center' }, heroIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, headerCopy: { flex: 1, marginLeft: 11 }, eyebrow: { fontSize: 9.5, fontFamily: fontFamily.medium }, title: { marginTop: 2, ...typeScale.sectionTitle }, close: { width: 38, height: 38, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  readingCard: { marginTop: 17, padding: 16, borderRadius: 14 }, readingLabel: { ...typeScale.eyebrow }, readingRow: { marginTop: 5, flexDirection: 'row', alignItems: 'baseline', gap: 6 }, reading: { ...typeScale.display, fontVariant: ['tabular-nums'] }, unit: { fontSize: 12, fontFamily: fontFamily.medium }, time: { marginTop: 2, ...typeScale.caption },
-  elleCard: { marginTop: 13, minHeight: 90, padding: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center' }, elle: { width: 65, height: 58, borderRadius: 11 }, elleCopy: { flex: 1, marginLeft: 11 }, elleName: { ...typeScale.cardTitle }, elleText: { marginTop: 3, fontSize: 11.5, lineHeight: 17 },
+  readingCard: { marginTop: 17, padding: 16, borderRadius: 14 }, readingLabel: { ...typeScale.eyebrow }, readingRow: { marginTop: 5, flexDirection: 'row', alignItems: 'baseline', gap: 6 }, reading: { ...typeScale.display, fontVariant: ['tabular-nums'] }, unit: { fontSize: 12, fontFamily: fontFamily.medium }, time: { marginTop: 2, ...typeScale.caption }, sleepScore: { marginTop: 13, gap: 3 }, sleepScoreValue: { fontSize: 14, fontFamily: fontFamily.bold }, sleepScoreNote: { fontSize: 10.5, lineHeight: 15 },
+  elleCard: { marginTop: 13, minHeight: 90, padding: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center' }, elle: { width: 65, height: 58, borderRadius: 11 }, elleCopy: { flex: 1, marginLeft: 11 }, elleName: { ...typeScale.cardTitle }, elleText: { marginTop: 3, fontSize: 11.5, lineHeight: 17 }, insightLoading: { flexDirection: 'row', alignItems: 'center', gap: 7 }, insightNote: { marginTop: 6, fontSize: 10, lineHeight: 14 }, insightRetry: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 5 }, retryText: { color: palette.primaryDark, fontSize: 11, fontFamily: fontFamily.semiBold },
   sectionTitle: { marginTop: 19, marginBottom: 8, ...typeScale.cardTitle }, chartCard: { padding: 14, borderRadius: 14 }, bars: { height: 108, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', gap: 5 }, barColumn: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' }, barValue: { fontSize: 8.5, marginBottom: 4 }, bar: { width: '62%', minWidth: 9, maxWidth: 24, borderRadius: 4 }, barDate: { marginTop: 4, fontSize: 8 }, chartNote: { marginTop: 8, fontSize: 10.5, textAlign: 'center' }, emptyChart: { padding: 18, borderRadius: 14 },
   infoSection: { marginTop: 2 }, body: { ...typeScale.body }, caution: { marginTop: 18, padding: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 9 }, cautionText: { flex: 1, ...typeScale.subhead },
 });

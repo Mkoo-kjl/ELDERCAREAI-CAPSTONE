@@ -50,9 +50,9 @@ const first: VitalLog = {
 };
 
 function ReadingProbe() {
-  const { vital, refreshing, error, watchSync, refresh } = useHealthData();
+  const { vital, refreshing, error, watchSync, lastGoogleHealthCheckAt, refresh } = useHealthData();
   latestRefresh = refresh;
-  return <><Text>{vital?.heart_rate_bpm ?? '--'} bpm</Text><Text>{refreshing ? 'Refreshing' : 'Quiet'}</Text><Text>{error ?? 'No error'}</Text><Text>{watchSync?.deviceVersion ?? 'No watch status'}</Text></>;
+  return <><Text>{vital?.heart_rate_bpm ?? '--'} bpm</Text><Text>{refreshing ? 'Refreshing' : 'Quiet'}</Text><Text>{error ?? 'No error'}</Text><Text>{watchSync?.deviceVersion ?? 'No watch status'}</Text><Text>{lastGoogleHealthCheckAt ? `Checked ${lastGoogleHealthCheckAt}` : 'No Google Health check'}</Text></>;
 }
 
 beforeEach(() => {
@@ -114,20 +114,20 @@ test('returning to the foreground reconciles Google Health without a pull gestur
   expect(screen.getByText('Quiet')).toBeTruthy();
 });
 
-test('automatic sync follows the displayed check age and retries after a failed check', async () => {
+test('automatic sync starts when the displayed BPM is 15 minutes old and retries a failed check', async () => {
   let now = Date.parse(first.synced_at!);
   let tick: (() => void) | undefined;
   const actualSetInterval = global.setInterval;
   jest.spyOn(Date, 'now').mockImplementation(() => now);
   invoke.mockImplementation(async () => ({ data: { changed: false, checkedAt: new Date(now).toISOString() }, error: null }));
   jest.spyOn(global, 'setInterval').mockImplementation((handler, timeout, ...args) => {
-    if (timeout === 60 * 1000) tick = handler as () => void;
+    if (timeout === 15 * 1000) tick = handler as () => void;
     return actualSetInterval(handler, timeout, ...args);
   });
   render(<HealthDataProvider><ReadingProbe /></HealthDataProvider>);
   await waitFor(() => expect(invoke).toHaveBeenCalledTimes(1));
 
-  now += 14 * 60 * 1000;
+  now += 13 * 60 * 1000;
   await act(async () => { tick?.(); });
   expect(invoke).toHaveBeenCalledTimes(1);
   invoke.mockResolvedValueOnce({ data: null, error: new Error('temporary sync failure') });
@@ -141,7 +141,8 @@ test('automatic sync follows the displayed check age and retries after a failed 
   expect(invoke).toHaveBeenCalledTimes(2);
 
   mockDatabaseRows = [{ ...first, id: 'vital-2', heart_rate_bpm: 78,
-    recorded_at: '2026-10-08T09:17:00.000Z', synced_at: '2026-10-08T09:18:00.000Z' }];
+    recorded_at: '2026-10-08T09:16:00.000Z', synced_at: '2026-10-08T09:17:00.000Z',
+    measurement_times: { heart_rate_bpm: '2026-10-08T09:16:00.000Z' } }];
   now += 60 * 1000;
   await act(async () => { tick?.(); });
   expect(invoke).toHaveBeenCalledTimes(3);
@@ -151,6 +152,84 @@ test('automatic sync follows the displayed check age and retries after a failed 
   now += 15 * 60 * 1000;
   await act(async () => { tick?.(); });
   expect(invoke).toHaveBeenCalledTimes(4);
+});
+
+test('automatic sync starts when Inspire last confirmed sync reaches 15 minutes', async () => {
+  let now = Date.parse('2026-10-08T09:11:00Z');
+  let tick: (() => void) | undefined;
+  const actualSetInterval = global.setInterval;
+  mockDatabaseRows = [{ ...first, heart_rate_bpm: 80,
+    measurement_times: { heart_rate_bpm: '2026-10-08T09:10:00Z' } }];
+  jest.spyOn(Date, 'now').mockImplementation(() => now);
+  invoke.mockImplementation(async () => ({ data: { changed: false, checkedAt: new Date(now).toISOString(),
+    watchSync: { deviceVersion: 'Inspire 3', lastSyncTime: '2026-10-08T09:00:00Z' } }, error: null }));
+  jest.spyOn(global, 'setInterval').mockImplementation((handler, timeout, ...args) => {
+    if (timeout === 15 * 1000) tick = handler as () => void;
+    return actualSetInterval(handler, timeout, ...args);
+  });
+  await render(<HealthDataProvider><ReadingProbe /></HealthDataProvider>);
+  await waitFor(() => expect(invoke).toHaveBeenCalledTimes(1));
+  expect(screen.getByText('Inspire 3')).toBeTruthy();
+
+  now = Date.parse('2026-10-08T09:14:59Z');
+  await act(async () => { tick?.(); });
+  expect(invoke).toHaveBeenCalledTimes(1);
+  now = Date.parse('2026-10-08T09:15:00Z');
+  await act(async () => { tick?.(); });
+  expect(invoke).toHaveBeenCalledTimes(2);
+  await waitFor(() => expect(screen.getByText('Checked 2026-10-08T09:15:00.000Z')).toBeTruthy());
+});
+
+test('an automatic recheck displays a newly available BPM without a manual refresh', async () => {
+  let now = Date.parse(first.synced_at!);
+  let tick: (() => void) | undefined;
+  const actualSetInterval = global.setInterval;
+  jest.spyOn(Date, 'now').mockImplementation(() => now);
+  invoke.mockImplementation(async () => ({ data: { changed: mockDatabaseRows[0].id !== first.id,
+    vital: mockDatabaseRows[0], checkedAt: new Date(now).toISOString() }, error: null }));
+  jest.spyOn(global, 'setInterval').mockImplementation((handler, timeout, ...args) => {
+    if (timeout === 15 * 1000) tick = handler as () => void;
+    return actualSetInterval(handler, timeout, ...args);
+  });
+  await render(<HealthDataProvider><ReadingProbe /></HealthDataProvider>);
+  await waitFor(() => expect(invoke).toHaveBeenCalledTimes(1));
+
+  now = Date.parse('2026-10-08T09:15:00Z');
+  await act(async () => { tick?.(); });
+  expect(invoke).toHaveBeenCalledTimes(2);
+  expect(screen.getByText('81 bpm')).toBeTruthy();
+
+  mockDatabaseRows = [{ ...first, id: 'vital-2', heart_rate_bpm: 76,
+    recorded_at: '2026-10-08T09:15:30Z', synced_at: '2026-10-08T09:15:30Z',
+    measurement_times: { heart_rate_bpm: '2026-10-08T09:15:30Z' } }];
+  now = Date.parse('2026-10-08T09:16:00Z');
+  await act(async () => { tick?.(); });
+  await waitFor(() => expect(screen.getByText('76 bpm')).toBeTruthy());
+  expect(invoke).toHaveBeenCalledTimes(3);
+
+  now = Date.parse('2026-10-08T09:17:00Z');
+  await act(async () => { tick?.(); });
+  expect(invoke).toHaveBeenCalledTimes(3);
+});
+
+test('an unknown Android startup state still runs the displayed-age sync', async () => {
+  Object.defineProperty(AppState, 'currentState', { configurable: true, value: 'unknown' });
+  let now = Date.parse('2026-10-08T09:01:00Z');
+  let tick: (() => void) | undefined;
+  const actualSetInterval = global.setInterval;
+  jest.spyOn(Date, 'now').mockImplementation(() => now);
+  invoke.mockImplementation(async () => ({ data: { changed: false, checkedAt: new Date(now).toISOString() }, error: null }));
+  jest.spyOn(global, 'setInterval').mockImplementation((handler, timeout, ...args) => {
+    if (timeout === 15 * 1000) tick = handler as () => void;
+    return actualSetInterval(handler, timeout, ...args);
+  });
+  await render(<HealthDataProvider><ReadingProbe /></HealthDataProvider>);
+  await waitFor(() => expect(invoke).toHaveBeenCalledTimes(1));
+
+  now = Date.parse('2026-10-08T09:15:00Z');
+  await act(async () => { tick?.(); });
+  expect(invoke).toHaveBeenCalledTimes(2);
+  await waitFor(() => expect(screen.getByText('Checked 2026-10-08T09:15:00.000Z')).toBeTruthy());
 });
 
 test('a foreground sync exposes the watch status while a webhook still updates the reading', async () => {

@@ -6,9 +6,9 @@ import { AppText as Text } from '@/src/components/AppText';
 import { getTheme } from '@/src/theme/colors';
 import { fontFamily, typeScale } from '@/src/theme/typography';
 
-type Props = { icon: ComponentProps<typeof Ionicons>['name']; title: string; value: string; unit: string; timestamp: string; color: string; surface?: string; fullWidth?: boolean; onPress?: () => void };
+type Props = { icon: ComponentProps<typeof Ionicons>['name']; title: string; value: string; unit: string; timestamp: string; color: string; surface?: string; fullWidth?: boolean; annotation?: string; onPress?: () => void };
 
-export function MetricCard({ icon, title, value, unit, timestamp, color, surface, fullWidth, onPress }: Props) {
+export function MetricCard({ icon, title, value, unit, timestamp, color, surface, fullWidth, annotation, onPress }: Props) {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
   return (
@@ -19,6 +19,7 @@ export function MetricCard({ icon, title, value, unit, timestamp, color, surface
       </View>
       <Text numberOfLines={2} style={[styles.title, { color: theme.text }]}>{title}</Text>
       <View style={styles.valueRow}><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.62} style={[styles.value, { color: theme.text }]}>{value}</Text><Text numberOfLines={1} style={[styles.unit, { color: theme.subtitle }]}>{unit}</Text></View>
+      {annotation ? <Text numberOfLines={1} style={[styles.annotation, { color }]}>{annotation}</Text> : null}
       <Text numberOfLines={1} style={[styles.timestamp, { color: theme.subtitle }]}>{timestamp}</Text>
     </Pressable>
   );
@@ -29,6 +30,6 @@ const styles = StyleSheet.create({
   half: { width: '48%', minHeight: 148 }, full: { width: '100%', minHeight: 128 }, topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { minHeight: 36, fontSize: 13, lineHeight: 18, fontFamily: fontFamily.semiBold },
   valueRow: { flexDirection: 'row', alignItems: 'baseline', gap: 4, minWidth: 0 }, value: { flexShrink: 1, ...typeScale.metric, fontVariant: ['tabular-nums'] },
-  unit: { flexShrink: 0, fontSize: 12, fontFamily: fontFamily.medium }, timestamp: { ...typeScale.caption },
+  unit: { flexShrink: 0, fontSize: 12, fontFamily: fontFamily.medium }, annotation: { fontSize: 10.5, fontFamily: fontFamily.semiBold }, timestamp: { ...typeScale.caption },
   pressed: { opacity: 0.8 },
 });

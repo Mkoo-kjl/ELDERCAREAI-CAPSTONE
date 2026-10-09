@@ -15,6 +15,7 @@ import { VitalDetailModal, type VitalMetricKey } from '@/src/components/VitalDet
 import { useMinuteClock } from '@/src/hooks/useMinuteClock';
 import { medicationDoseStatus, medicationStatusPriority, startOfLocalDay, type MedicationDoseTone, type MedicationLogLike } from '@/src/lib/care-status';
 import { timeAgo } from '@/src/lib/format';
+import { sleepDurationScore } from '@/src/lib/sleep-score';
 import { vitalTimeLabel } from '@/src/lib/vital-time';
 import { watchSyncDelayed } from '@/src/lib/watch-sync';
 import { supabase } from '@/src/lib/supabase';
@@ -45,7 +46,7 @@ export default function DashboardScreen() {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
   const { session, onboarding } = useAuth();
-  const { elderly, vital, history, refreshing, error, syncState, lastSuccessfulSyncAt, watchSync, watchSyncIssue, refresh } = useHealthData();
+  const { elderly, vital, history, refreshing, error, syncState, lastGoogleHealthCheckAt, watchSync, watchSyncIssue, refresh } = useHealthData();
   const caregiverId = session?.user.id;
   const elderlyId = elderly?.elderly_id;
   const connected = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
@@ -60,7 +61,7 @@ export default function DashboardScreen() {
   const [notes, setNotes] = useState<NotePreview[]>([]);
   const [syncLocation, setSyncLocation] = useState<SyncLocationPreview | null>(null);
 
-  const checkedAgo = timeAgo(lastSuccessfulSyncAt);
+  const checkedAgo = timeAgo(lastGoogleHealthCheckAt);
   const watchSyncedAgo = timeAgo(watchSync?.lastSyncTime);
   const watchDelayed = watchSyncDelayed(watchSync?.lastSyncTime, Date.now(), vital?.measurement_times?.heart_rate_bpm);
   const healthSyncMessage = error ? (vital
@@ -174,6 +175,7 @@ export default function DashboardScreen() {
     void Linking.openURL(`tel:${doctor.phone.replace(/[^+\d]/g, '')}`);
   }, [doctor?.phone]);
   const patientName = elderly?.full_name ?? 'The patient';
+  const sleepScore = sleepDurationScore(vital?.sleep_hours);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const medicationStatuses = medications
@@ -278,7 +280,7 @@ export default function DashboardScreen() {
           <View style={styles.grid}>
             <MetricCard fullWidth={stackVitals} icon="heart-outline" title="Heart rate" value={display(vital?.heart_rate_bpm)} unit="bpm" timestamp={vitalTimeLabel(vital, 'heart_rate_bpm')} color={palette.error} surface={palette.lemonSurface} onPress={() => setSelectedMetric('heart_rate_bpm')} />
             <MetricCard fullWidth={stackVitals} icon="water-outline" title="Blood oxygen" value={display(vital?.spo2_percent, 1)} unit="%" timestamp={vitalTimeLabel(vital, 'spo2_percent')} color={palette.primaryDark} surface={palette.aquaSurface} onPress={() => setSelectedMetric('spo2_percent')} />
-            <MetricCard fullWidth={stackVitals} icon="moon-outline" title="Sleep" value={display(vital?.sleep_hours, 1)} unit="hours" timestamp={vitalTimeLabel(vital, 'sleep_hours')} color={palette.purple} surface={palette.lavenderSurface} onPress={() => setSelectedMetric('sleep_hours')} />
+            <MetricCard fullWidth={stackVitals} icon="moon-outline" title="Sleep" value={display(vital?.sleep_hours, 1)} unit="hours" annotation={sleepScore ? `Sleep score ${sleepScore.score} - ${sleepScore.label}` : undefined} timestamp={vitalTimeLabel(vital, 'sleep_hours')} color={palette.purple} surface={palette.lavenderSurface} onPress={() => setSelectedMetric('sleep_hours')} />
             <MetricCard fullWidth={stackVitals} icon="footsteps-outline" title="Steps (24h)" value={vital?.steps_count?.toLocaleString() ?? '--'} unit="steps" timestamp={vitalTimeLabel(vital, 'steps_count')} color={palette.accentDark} surface={palette.mintSurface} onPress={() => setSelectedMetric('steps_count')} />
             <MetricCard fullWidth={stackVitals} icon="thermometer-outline" title="Overnight skin temp" value={display(vital?.skin_temp_celsius, 1)} unit="°C" timestamp={vitalTimeLabel(vital, 'skin_temp_celsius')} color={palette.warning} surface={palette.peachSurface} onPress={() => setSelectedMetric('skin_temp_celsius')} />
             <MetricCard fullWidth={stackVitals} icon="leaf-outline" title="HRV" value={display(vital?.hrv_rmssd_ms)} unit="ms" timestamp={vitalTimeLabel(vital, 'hrv_rmssd_ms')} color={palette.pink} surface={palette.aquaSurface} onPress={() => setSelectedMetric('hrv_rmssd_ms')} />

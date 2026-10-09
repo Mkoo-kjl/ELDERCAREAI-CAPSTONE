@@ -1,8 +1,8 @@
-export function timeAgo(value?: string | null) {
+export function timeAgo(value?: string | null, now = Date.now()) {
   if (!value) return null;
   const timestamp = new Date(value).getTime();
   if (!Number.isFinite(timestamp)) return null;
-  const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+  const seconds = Math.max(0, Math.floor((now - timestamp) / 1000));
   if (seconds < 60) return 'just now';
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes}m ago`;

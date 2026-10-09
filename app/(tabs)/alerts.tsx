@@ -31,6 +31,7 @@ export default function AlertsScreen() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [emergencies, setEmergencies] = useState<Emergency[]>([]);
   const [loadingSos, setLoadingSos] = useState(false);
+  const [clearingNotification, setClearingNotification] = useState<string | null>(null);
   const sosPlayer = useAudioPlayer(require('@/assets/sounds/sos_alert.wav'));
   const scale = useRef(new Animated.Value(1)).current;
 
@@ -92,6 +93,35 @@ export default function AlertsScreen() {
   const updateAlert = async (id: string, values: Partial<HealthAlert>) => { await supabase.from('health_alerts').update(values).eq('id', id); await load(); };
   const resolveEmergency = async (id: string) => { await supabase.from('emergency_events').update({ is_resolved: true, responded_by: session?.user.id, responded_at: new Date().toISOString() }).eq('id', id); await load(); };
   const markNotification = async (id: string) => { await supabase.from('caregiver_notifications').update({ is_read: true, read_at: new Date().toISOString() }).eq('id', id); await load(); };
+  const clearNotification = async (id: string) => {
+    if (!session || clearingNotification) return;
+    setClearingNotification(id);
+    try {
+      const { error } = await supabase.from('caregiver_notifications').delete().eq('id', id).eq('caregiver_id', session.user.id);
+      if (error) throw error;
+      setNotifications((current) => current.filter((item) => item.id !== id));
+    } catch {
+      Alert.alert('Could not clear notification', 'Please try again.');
+    } finally {
+      setClearingNotification(null);
+    }
+  };
+  const clearAllNotifications = () => Alert.alert('Clear all notifications?', 'This removes saved notifications from the list. Health alerts and emergency history stay available.', [
+    { text: 'Cancel', style: 'cancel' },
+    { text: 'Clear all', style: 'destructive', onPress: () => void (async () => {
+      if (!session || clearingNotification) return;
+      setClearingNotification('all');
+      try {
+        const { error } = await supabase.from('caregiver_notifications').delete().eq('caregiver_id', session.user.id);
+        if (error) throw error;
+        setNotifications([]);
+      } catch {
+        Alert.alert('Could not clear notifications', 'Please try again.');
+      } finally {
+        setClearingNotification(null);
+      }
+    })() },
+  ]);
 
   return <View style={[styles.screen, { backgroundColor: theme.background, paddingTop: insets.top }]}> 
     <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 90 }}>
@@ -100,7 +130,7 @@ export default function AlertsScreen() {
       <View style={styles.tabs}>{(['Alerts', 'Notifications', 'Emergency'] as ViewTab[]).map((item) => <Pressable key={item} onPress={() => setTab(item)} style={[styles.tab, { backgroundColor: tab === item ? palette.aquaSurface : theme.cardElevated, borderColor: tab === item ? palette.aquaSurface : theme.border }]}><Text style={[styles.tabText, { color: tab === item ? palette.text : theme.subtitle }]}>{item}</Text>{item === 'Notifications' && notifications.some((n) => !n.is_read) ? <View style={styles.unreadDot} /> : null}</Pressable>)}</View>
       <View style={styles.content}>
         {tab === 'Alerts' ? <><View style={styles.actionRow}><Text style={[styles.count, { color: theme.subtitle }]}>{alerts.length} alerts</Text>{alerts.length ? <Pressable onPress={() => void Promise.all(alerts.filter((a) => !a.is_read).map((a) => supabase.from('health_alerts').update({ is_read: true }).eq('id', a.id))).then(load)}><Text style={styles.clear}>Mark all read</Text></Pressable> : null}</View>{alerts.map((item) => <AlertCard key={item.id} item={item} onRead={() => void updateAlert(item.id, { is_read: true })} onResolve={() => void updateAlert(item.id, { is_resolved: true, resolved_at: new Date().toISOString(), resolved_by: session?.user.id } as Partial<HealthAlert>)} />)}{!alerts.length ? <Empty text="No health alerts" /> : null}</> : null}
-        {tab === 'Notifications' ? notifications.map((item) => <Pressable key={item.id} onPress={() => void markNotification(item.id)} style={[styles.card, { backgroundColor: theme.cardElevated }]}>{!item.is_read ? <View style={styles.cardUnread} /> : null}<Text style={[styles.cardTitle, { color: theme.text }]}>{item.title}</Text><Text style={[styles.cardBody, { color: theme.subtitle }]}>{item.body}</Text><Text style={[styles.time, { color: theme.subtitle }]}>{formatDateTime(item.sent_at)}</Text></Pressable>) : null}
+        {tab === 'Notifications' ? <><View style={styles.actionRow}><Text style={[styles.count, { color: theme.subtitle }]}>{notifications.length} notifications</Text>{notifications.length ? <Pressable accessibilityRole="button" accessibilityLabel="Clear all notifications" disabled={clearingNotification !== null} onPress={clearAllNotifications} style={styles.clearAll}><Ionicons name="trash-outline" size={15} color={palette.primaryDark} /><Text style={styles.clear}>Clear all</Text></Pressable> : null}</View>{notifications.map((item) => <View key={item.id} style={[styles.card, styles.notificationRow, { backgroundColor: theme.cardElevated }]}><Pressable accessibilityRole="button" accessibilityLabel={`Read ${item.title}`} onPress={() => void markNotification(item.id)} style={styles.notificationCopy}>{!item.is_read ? <View style={styles.cardUnread} /> : null}<Text style={[styles.cardTitle, { color: theme.text }]}>{item.title}</Text><Text style={[styles.cardBody, { color: theme.subtitle }]}>{item.body}</Text><Text style={[styles.time, { color: theme.subtitle }]}>{formatDateTime(item.sent_at)}</Text></Pressable><Pressable accessibilityRole="button" accessibilityLabel={`Clear ${item.title}`} disabled={clearingNotification !== null} onPress={() => void clearNotification(item.id)} hitSlop={8} style={styles.clearOne}><Ionicons name="close" size={19} color={theme.subtitle} /></Pressable></View>)}{!notifications.length ? <Empty text="No notifications" /> : null}</> : null}
         {tab === 'Emergency' ? emergencies.map((item) => <View key={item.id} style={[styles.card, { backgroundColor: theme.cardElevated }]}><View style={styles.cardHeader}><Text style={[styles.cardTitle, { color: theme.text }]}>SOS Emergency</Text><Badge label={item.is_resolved ? 'RESOLVED' : 'ACTIVE'} color={item.is_resolved ? palette.accent : palette.error} /></View><Text style={[styles.cardBody, { color: theme.subtitle }]}>{item.description ?? 'Emergency event'}</Text><Text style={[styles.time, { color: theme.subtitle }]}>{formatDateTime(item.triggered_at)}</Text>{!item.is_resolved ? <Pressable onPress={() => void resolveEmergency(item.id)} style={styles.resolve}><Text style={styles.resolveText}>Mark Resolved</Text></Pressable> : null}</View>) : null}
       </View>
     </ScrollView>
@@ -116,7 +146,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1 }, header: { padding: 18, paddingBottom: 10 }, title: { ...typeScale.screenTitle }, subtitle: { marginTop: 3, ...typeScale.subhead }, sosArea: { alignItems: 'center', paddingVertical: 15 },
   sos: { width: 120, height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center', shadowColor: palette.error, shadowOpacity: 0.35, shadowRadius: 18, elevation: 8 }, sosText: { marginTop: 3, color: '#FFFFFF', fontSize: 24, fontFamily: fontFamily.extraBold }, sosHelp: { marginTop: 12, paddingHorizontal: 34, ...typeScale.subhead, textAlign: 'center' },
   tabs: { paddingHorizontal: 18, flexDirection: 'row', gap: 7 }, tab: { flex: 1, height: 36, borderRadius: 14, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 5 }, tabText: { fontSize: 10.5, fontFamily: fontFamily.medium }, unreadDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: palette.error },
-  content: { padding: 18 }, actionRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }, count: { fontSize: 12 }, clear: { color: palette.primaryDark, fontSize: 12, fontFamily: fontFamily.medium }, card: { marginBottom: 8, padding: 14, borderRadius: 14 }, cardUnread: { position: 'absolute', right: 13, top: 13, width: 8, height: 8, borderRadius: 4, backgroundColor: palette.primaryDark },
+  content: { padding: 18 }, actionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }, count: { fontSize: 12 }, clearAll: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 30 }, clear: { color: palette.primaryDark, fontSize: 12, fontFamily: fontFamily.medium }, card: { marginBottom: 8, padding: 14, borderRadius: 14 }, notificationRow: { flexDirection: 'row', alignItems: 'flex-start', padding: 0 }, notificationCopy: { flex: 1, padding: 14 }, clearOne: { width: 40, height: 44, alignItems: 'center', justifyContent: 'center' }, cardUnread: { position: 'absolute', right: 13, top: 13, width: 8, height: 8, borderRadius: 4, backgroundColor: palette.primaryDark },
   cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }, cardTitle: { flex: 1, ...typeScale.cardTitle }, cardBody: { marginTop: 6, ...typeScale.subhead }, time: { marginTop: 8, ...typeScale.caption }, badge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 11 }, badgeText: { fontSize: 9, fontFamily: fontFamily.medium }, buttons: { marginTop: 12, flexDirection: 'row', gap: 8 },
   resolve: { marginTop: 12, alignSelf: 'flex-start', paddingHorizontal: 13, paddingVertical: 8, borderRadius: 10, backgroundColor: `${palette.accent}18` }, resolveText: { color: palette.accentDark, fontSize: 11, fontFamily: fontFamily.bold }, secondary: { paddingHorizontal: 13, paddingVertical: 8, borderRadius: 10, backgroundColor: `${palette.primary}18` }, secondaryText: { color: palette.primaryDark, fontSize: 11, fontFamily: fontFamily.bold }, empty: { alignItems: 'center', padding: 35 }, emptyText: { marginTop: 9, ...typeScale.subhead },
 });

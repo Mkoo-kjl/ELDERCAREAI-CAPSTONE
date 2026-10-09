@@ -2,6 +2,7 @@ import * as Location from 'expo-location';
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 
+import { automaticHealthSyncDue } from '@/src/lib/automatic-health-sync';
 import { getFunctionErrorMessage } from '@/src/lib/function-error';
 import { supabase } from '@/src/lib/supabase';
 import { notifyAbnormalVital } from '@/src/lib/notifications';
@@ -55,6 +56,7 @@ type ContextValue = {
   error: string | null;
   syncState: 'idle' | 'syncing' | 'success' | 'error';
   lastSuccessfulSyncAt: string | null;
+  lastGoogleHealthCheckAt: string | null;
   watchSync: WatchSyncStatus | null;
   watchSyncIssue: WatchSyncIssue;
   newReadingAt: string | null;
@@ -62,9 +64,7 @@ type ContextValue = {
 };
 
 const HealthDataContext = createContext<ContextValue | null>(null);
-const AUTOMATIC_SYNC_INTERVAL_MS = 15 * 60 * 1000;
-const AUTOMATIC_SYNC_RETRY_MS = 2 * 60 * 1000;
-const SYNC_SCHEDULE_TICK_MS = 60 * 1000;
+const SYNC_SCHEDULE_TICK_MS = 15 * 1000;
 
 export function HealthDataProvider({ children }: PropsWithChildren) {
   const { session, onboarding } = useAuth();
@@ -76,12 +76,16 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
   const [error, setError] = useState<string | null>(null);
   const [syncState, setSyncState] = useState<ContextValue['syncState']>('idle');
   const [lastSuccessfulSyncAt, setLastSuccessfulSyncAt] = useState<string | null>(null);
+  const [lastGoogleHealthCheckAt, setLastGoogleHealthCheckAt] = useState<string | null>(null);
   const [watchSync, setWatchSync] = useState<WatchSyncStatus | null>(null);
   const [watchSyncIssue, setWatchSyncIssue] = useState<WatchSyncIssue>(null);
   const [newReadingAt, setNewReadingAt] = useState<string | null>(null);
   const syncInFlight = useRef(false);
   const lastSyncAttemptAt = useRef(0);
+  const lastSyncAttemptFailed = useRef(false);
   const lastSuccessfulSyncAtRef = useRef<string | null>(null);
+  const watchLastSyncAtRef = useRef<string | null>(null);
+  const heartMeasuredAtRef = useRef<string | null>(null);
   const realtimeInstanceId = useRef(`${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const realtimeGeneration = useRef(0);
   const realtimeRevision = useRef(0);
@@ -138,16 +142,26 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
         lastSyncAttemptAt.current = Date.now();
         const { data: syncData, error: syncError } = await supabase.functions.invoke<{ vital?: VitalLog; changed?: boolean; checkedAt?: string; watchSync?: WatchSyncStatus | null; watchSyncIssue?: WatchSyncIssue }>('google-health-sync');
         if (syncError) throw syncError;
-        if (syncData?.changed && syncData.vital && elderly?.full_name) await notifyAbnormalVital(syncData.vital, elderly.full_name);
+        if (syncData?.changed && syncData.vital && elderly?.full_name) {
+          void notifyAbnormalVital(syncData.vital, elderly.full_name).catch((notificationError) => {
+            console.warn('Unable to show health-reading notification:', notificationError);
+          });
+        }
         if (!silent) await recordSyncLocation();
-        setLastSuccessfulSyncAt(syncData?.checkedAt ?? new Date().toISOString());
+        const checkedAt = syncData?.checkedAt ?? new Date().toISOString();
+        lastSuccessfulSyncAtRef.current = checkedAt;
+        watchLastSyncAtRef.current = syncData?.watchSync?.lastSyncTime ?? null;
+        setLastSuccessfulSyncAt(checkedAt);
+        setLastGoogleHealthCheckAt(checkedAt);
         setWatchSync(syncData?.watchSync ?? null);
         setWatchSyncIssue(syncData?.watchSyncIssue ?? null);
         if (!silent) setSyncState('success');
       }
       await load();
+      if (startedSync) lastSyncAttemptFailed.current = false;
       setError(null);
     } catch (caught) {
+      if (startedSync) lastSyncAttemptFailed.current = true;
       setError(await getFunctionErrorMessage(caught, 'Unable to refresh health data.'));
       if (sync && !silent) setSyncState('error');
     } finally {
@@ -159,13 +173,19 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
   const refreshRef = useRef(refresh);
   useEffect(() => { refreshRef.current = refresh; }, [refresh]);
   useEffect(() => { lastSuccessfulSyncAtRef.current = lastSuccessfulSyncAt; }, [lastSuccessfulSyncAt]);
+  useEffect(() => { watchLastSyncAtRef.current = watchSync?.lastSyncTime ?? null; }, [watchSync?.lastSyncTime]);
+  useEffect(() => { heartMeasuredAtRef.current = history[0]?.measurement_times?.heart_rate_bpm ?? null; }, [history]);
 
   useEffect(() => {
     setWatchSync(null);
     setWatchSyncIssue(null);
     setLastSuccessfulSyncAt(null);
+    setLastGoogleHealthCheckAt(null);
     lastSuccessfulSyncAtRef.current = null;
+    watchLastSyncAtRef.current = null;
+    heartMeasuredAtRef.current = null;
     lastSyncAttemptAt.current = 0;
+    lastSyncAttemptFailed.current = false;
   }, [userId]);
 
   useEffect(() => {
@@ -224,14 +244,17 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!userId) return;
     const authorized = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
-    let active = AppState.currentState === 'active';
+    let active = AppState.currentState !== 'background' && AppState.currentState !== 'inactive';
     if (authorized) void refreshRef.current(true, true);
     const timer = setInterval(() => {
-      const now = Date.now();
-      const lastChecked = Date.parse(lastSuccessfulSyncAtRef.current ?? '');
-      const checkDue = !Number.isFinite(lastChecked) || now - lastChecked >= AUTOMATIC_SYNC_INTERVAL_MS;
-      const retryDue = now - lastSyncAttemptAt.current >= AUTOMATIC_SYNC_RETRY_MS;
-      if (authorized && checkDue && retryDue) {
+      if (authorized && automaticHealthSyncDue({
+        now: Date.now(),
+        watchLastSyncAt: watchLastSyncAtRef.current,
+        heartMeasuredAt: heartMeasuredAtRef.current,
+        lastCheckedAt: lastSuccessfulSyncAtRef.current,
+        lastAttemptAt: lastSyncAttemptAt.current,
+        lastAttemptFailed: lastSyncAttemptFailed.current,
+      })) {
         void refreshRef.current(true, true);
       }
     }, SYNC_SCHEDULE_TICK_MS);
@@ -248,7 +271,7 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
     return () => { clearInterval(timer); subscription.remove(); };
   }, [load, onboarding?.wearable_status, userId]);
 
-  const value = useMemo(() => ({ elderly, vital: history[0] ?? null, history, loading, refreshing, error, syncState, lastSuccessfulSyncAt, watchSync, watchSyncIssue, newReadingAt, refresh }), [elderly, error, history, lastSuccessfulSyncAt, loading, newReadingAt, refresh, refreshing, syncState, watchSync, watchSyncIssue]);
+  const value = useMemo(() => ({ elderly, vital: history[0] ?? null, history, loading, refreshing, error, syncState, lastSuccessfulSyncAt, lastGoogleHealthCheckAt, watchSync, watchSyncIssue, newReadingAt, refresh }), [elderly, error, history, lastSuccessfulSyncAt, lastGoogleHealthCheckAt, loading, newReadingAt, refresh, refreshing, syncState, watchSync, watchSyncIssue]);
   return <HealthDataContext.Provider value={value}>{children}</HealthDataContext.Provider>;
 }
 

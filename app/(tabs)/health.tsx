@@ -3,10 +3,12 @@ import { useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 
 import { AppText as Text } from '@/src/components/AppText';
+import { VitalDetailModal, type VitalMetricKey } from '@/src/components/VitalDetailModal';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMinuteClock } from '@/src/hooks/useMinuteClock';
 
 import { vitalTimeLabel } from '@/src/lib/vital-time';
+import { sleepDurationScore } from '@/src/lib/sleep-score';
 import { buildHealthAnomalies, buildHealthInsights, buildHealthPredictions, type AnalysisMetric, type AnalysisResult } from '@/src/lib/health-analysis';
 import { useHealthData, type VitalLog } from '@/src/providers/HealthDataProvider';
 import { getTheme, palette } from '@/src/theme/colors';
@@ -21,17 +23,19 @@ export default function HealthScreen() {
   const theme = getTheme(useColorScheme() === 'dark');
   const { vital, history, refreshing, refresh } = useHealthData();
   const [tab, setTab] = useState<TabName>('Vitals');
+  const [selectedMetric, setSelectedMetric] = useState<VitalMetricKey | null>(null);
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background, paddingTop: insets.top }]}>
       <View style={styles.header}><Text style={[styles.title, { color: theme.text }]}>Health</Text><Text style={[styles.subtitle, { color: theme.subtitle }]}>Synced readings and trends</Text></View>
       <View style={{ height: 46 }}><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>{tabs.map((item) => <Pressable key={item} onPress={() => setTab(item)} style={[styles.tab, { backgroundColor: tab === item ? palette.aquaSurface : theme.cardElevated, borderColor: tab === item ? palette.aquaSurface : theme.border }]}><Text style={[styles.tabText, { color: tab === item ? palette.text : theme.subtitle }]}>{item}</Text></Pressable>)}</ScrollView></View>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void refresh(true)} colors={[palette.primary]} />} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 90 }]}>
-        {tab === 'Vitals' ? <Vitals vital={vital} /> : null}
+        {tab === 'Vitals' ? <Vitals vital={vital} onSelect={setSelectedMetric} /> : null}
         {tab === 'AI Insights' ? <Insights history={history} /> : null}
         {tab === 'Predictions' ? <Predictions history={history} /> : null}
         {tab === 'Anomalies' ? <Anomalies history={history} /> : null}
       </ScrollView>
+      <VitalDetailModal visible={selectedMetric !== null} metric={selectedMetric} history={history} onClose={() => setSelectedMetric(null)} />
     </View>
   );
 }
@@ -42,11 +46,20 @@ const metricDefinitions = [
   ['moon', 'Sleep', 'sleep_hours', 'hours', palette.purple], ['footsteps', 'Steps', 'steps_count', 'steps', palette.accentDark],
 ] as const;
 
-function Vitals({ vital }: { vital: VitalLog | null }) {
+function Vitals({ vital, onSelect }: { vital: VitalLog | null; onSelect: (metric: VitalMetricKey) => void }) {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
   const surfaces = [palette.lemonSurface, palette.aquaSurface, palette.peachSurface, palette.lavenderSurface, palette.lavenderSurface, palette.mintSurface];
-  return <View style={styles.list}>{metricDefinitions.map(([icon, label, key, unit, color], index) => { const raw = vital?.[key]; const value = typeof raw === 'number' ? (key === 'steps_count' ? raw.toLocaleString() : raw.toFixed(key === 'spo2_percent' || key === 'skin_temp_celsius' || key === 'sleep_hours' ? 1 : 0)) : '--'; return <View key={label} style={[styles.metricRow, { backgroundColor: isDark ? theme.cardElevated : surfaces[index] }]}><View style={[styles.metricIcon, { backgroundColor: theme.cardElevated }]}><Ionicons name={icon} size={19} color={color} /></View><View style={styles.metricCopy}><Text style={[styles.metricLabel, { color: theme.text }]}>{label}</Text><Text style={[styles.metricTime, { color: theme.subtitle }]}>{vitalTimeLabel(vital, key)}</Text></View><Text style={[styles.metricValue, { color: theme.text }]}>{value} <Text style={[styles.metricUnit, { color: theme.subtitle }]}>{unit}</Text></Text></View>; })}</View>;
+  return <View style={styles.list}>{metricDefinitions.map(([icon, label, key, unit, color], index) => {
+    const raw = vital?.[key];
+    const value = typeof raw === 'number' ? (key === 'steps_count' ? raw.toLocaleString() : raw.toFixed(key === 'spo2_percent' || key === 'skin_temp_celsius' || key === 'sleep_hours' ? 1 : 0)) : '--';
+    const sleepScore = key === 'sleep_hours' ? sleepDurationScore(vital?.sleep_hours) : null;
+    return <Pressable key={label} accessibilityRole="button" accessibilityLabel={`${label} details`} onPress={() => onSelect(key)} style={[styles.metricRow, { backgroundColor: isDark ? theme.cardElevated : surfaces[index] }]}>
+      <View style={[styles.metricIcon, { backgroundColor: theme.cardElevated }]}><Ionicons name={icon} size={19} color={color} /></View>
+      <View style={styles.metricCopy}><Text style={[styles.metricLabel, { color: theme.text }]}>{label}</Text><Text style={[styles.metricTime, { color: theme.subtitle }]}>{vitalTimeLabel(vital, key)}</Text>{sleepScore ? <Text style={[styles.scoreCaption, { color }]}>Sleep score {sleepScore.score} - {sleepScore.label}</Text> : null}</View>
+      <Text style={[styles.metricValue, { color: theme.text }]}>{value} <Text style={[styles.metricUnit, { color: theme.subtitle }]}>{unit}</Text></Text>
+    </Pressable>;
+  })}</View>;
 }
 
 function Insights({ history }: { history: VitalLog[] }) {
@@ -76,6 +89,6 @@ function AnalysisCard({ item }: { item: AnalysisResult }) { const theme = getThe
 const styles = StyleSheet.create({
   screen: { flex: 1 }, header: { paddingHorizontal: 18, paddingTop: 16, paddingBottom: 14 }, title: { ...typeScale.screenTitle }, subtitle: { marginTop: 3, ...typeScale.subhead },
   tabs: { paddingHorizontal: 18, gap: 7 }, tab: { height: 35, paddingHorizontal: 12, borderRadius: 14, borderWidth: 1, alignItems: 'center', justifyContent: 'center' }, tabText: { fontSize: 11, fontFamily: fontFamily.medium },
-  content: { padding: 18 }, list: { gap: 8 }, metricRow: { minHeight: 72, borderRadius: 14, padding: 12, flexDirection: 'row', alignItems: 'center' }, metricIcon: { width: 38, height: 38, borderRadius: 11, alignItems: 'center', justifyContent: 'center' }, metricCopy: { flex: 1, marginLeft: 11 }, metricLabel: { fontSize: 13, fontFamily: fontFamily.semiBold }, metricTime: { marginTop: 3, ...typeScale.caption }, metricValue: { fontSize: 19, fontFamily: fontFamily.bold, fontVariant: ['tabular-nums'] }, metricUnit: { fontSize: 11, fontFamily: fontFamily.medium },
+  content: { padding: 18 }, list: { gap: 8 }, metricRow: { minHeight: 72, borderRadius: 14, padding: 12, flexDirection: 'row', alignItems: 'center' }, metricIcon: { width: 38, height: 38, borderRadius: 11, alignItems: 'center', justifyContent: 'center' }, metricCopy: { flex: 1, marginLeft: 11 }, metricLabel: { fontSize: 13, fontFamily: fontFamily.semiBold }, metricTime: { marginTop: 3, ...typeScale.caption }, scoreCaption: { marginTop: 4, fontSize: 10.5, fontFamily: fontFamily.semiBold }, metricValue: { fontSize: 19, fontFamily: fontFamily.bold, fontVariant: ['tabular-nums'] }, metricUnit: { fontSize: 11, fontFamily: fontFamily.medium },
   disclaimer: { marginBottom: 13, padding: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 9 }, disclaimerText: { flex: 1, ...typeScale.subhead }, insight: { marginBottom: 8, padding: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'flex-start' }, insightIcon: { width: 39, height: 39, borderRadius: 11, alignItems: 'center', justifyContent: 'center' }, insightCopy: { flex: 1, marginLeft: 11 }, insightTitleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 7 }, insightTitle: { flex: 1, ...typeScale.cardTitle }, insightBody: { marginTop: 5, ...typeScale.subhead }, confidence: { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 11, overflow: 'hidden', fontSize: 9, fontFamily: fontFamily.medium },
 });
