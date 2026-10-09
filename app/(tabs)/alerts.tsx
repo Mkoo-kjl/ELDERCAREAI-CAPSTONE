@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useAudioPlayer } from 'expo-audio';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -30,6 +31,7 @@ export default function AlertsScreen() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [emergencies, setEmergencies] = useState<Emergency[]>([]);
   const [loadingSos, setLoadingSos] = useState(false);
+  const sosPlayer = useAudioPlayer(require('@/assets/sounds/sos_alert.wav'));
   const scale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -59,6 +61,7 @@ export default function AlertsScreen() {
     if (!elderly || !session) return;
     setLoadingSos(true);
     Vibration.vibrate([0, 250, 120, 250]);
+    void sosPlayer.seekTo(0).then(() => sosPlayer.play()).catch(() => undefined);
     animateSos();
     try {
       const snapshot = vital ? { heart_rate_bpm: vital.heart_rate_bpm, spo2_percent: vital.spo2_percent, hrv_rmssd_ms: vital.hrv_rmssd_ms, recorded_at: vital.recorded_at } : null;

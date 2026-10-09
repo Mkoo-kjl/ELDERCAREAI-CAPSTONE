@@ -201,6 +201,9 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
             .slice(0, 30));
           setNewReadingAt(new Date().toISOString());
           if (incoming.synced_at) setLastSuccessfulSyncAt(incoming.synced_at);
+          void notifyAbnormalVital(incoming, elderly.full_name).catch((notificationError) => {
+            console.warn('Unable to show health-reading notification:', notificationError);
+          });
         })
         .subscribe((status, subscriptionError) => {
           if (subscriptionError) console.warn(`Vital-sign Realtime ${status}:`, subscriptionError.message);
@@ -216,7 +219,7 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
         console.warn('Unable to remove vital-sign Realtime channel:', removalError);
       });
     };
-  }, [elderly?.elderly_id, load, userId]);
+  }, [elderly?.elderly_id, elderly?.full_name, load, userId]);
 
   useEffect(() => {
     if (!userId) return;

@@ -3,8 +3,15 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 const CHANNEL_ID = 'care-reminders';
+const MEDICATION_CHANNEL_ID = 'medication-reminders-v1';
+const APPOINTMENT_CHANNEL_ID = 'appointment-reminders-v1';
+const HEALTH_CHANNEL_ID = 'health-warnings-v1';
+const MEDICATION_SOUND = 'medication_reminder.wav';
+const APPOINTMENT_SOUND = 'appointment_reminder.wav';
+const HEALTH_SOUND = 'health_warning.wav';
 const STORAGE_PREFIX = 'eldercare-notification';
 const HEALTH_COOLDOWN_KEY = `${STORAGE_PREFIX}:health-warning`;
+const healthWarningsInFlight = new Set<string>();
 
 export type CareNotificationKind = 'appointment' | 'medication';
 
@@ -21,11 +28,38 @@ export async function initializeNotifications() {
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
       name: 'Care reminders',
-      description: 'Medication, appointment, and health notifications from ElderCareAI.',
+      description: 'Health notifications from ElderCareAI.',
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 180, 250],
       lightColor: '#38BDF8',
       sound: 'default',
+      enableVibrate: true,
+    });
+    await Notifications.setNotificationChannelAsync(MEDICATION_CHANNEL_ID, {
+      name: 'Medication reminders',
+      description: 'Reminders for scheduled medication.',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 180, 250],
+      lightColor: '#38BDF8',
+      sound: MEDICATION_SOUND,
+      enableVibrate: true,
+    });
+    await Notifications.setNotificationChannelAsync(APPOINTMENT_CHANNEL_ID, {
+      name: 'Appointment reminders',
+      description: 'Reminders for scheduled appointments.',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 180, 250],
+      lightColor: '#38BDF8',
+      sound: APPOINTMENT_SOUND,
+      enableVibrate: true,
+    });
+    await Notifications.setNotificationChannelAsync(HEALTH_CHANNEL_ID, {
+      name: 'Health reading warnings',
+      description: 'New readings that need caregiver attention.',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 180, 250],
+      lightColor: '#38BDF8',
+      sound: HEALTH_SOUND,
       enableVibrate: true,
     });
   }
@@ -74,6 +108,7 @@ export async function scheduleAppointmentNotification(input: {
   await cancelCareNotifications('appointment', input.id);
   const allowed = requestPermission ? await ensureNotificationPermission() : await hasNotificationPermission();
   if (!allowed) return false;
+  await initializeNotifications();
   const date = new Date(input.appointmentAt);
   if (Number.isNaN(date.getTime()) || date.getTime() <= Date.now()) return false;
   const details = [input.doctorName, input.location].filter(Boolean).join(' • ');
@@ -81,13 +116,13 @@ export async function scheduleAppointmentNotification(input: {
     content: {
       title: `Appointment now: ${input.title}`,
       body: `${input.elderlyName}${details ? ` • ${details}` : ''}`,
-      sound: 'default',
+      sound: APPOINTMENT_SOUND,
       data: { url: '/care?tab=Appointments', entityId: input.id },
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DATE,
       date,
-      channelId: CHANNEL_ID,
+      channelId: APPOINTMENT_CHANNEL_ID,
     },
   });
   await saveIdentifiers('appointment', input.id, [identifier]);
@@ -126,6 +161,7 @@ export async function scheduleMedicationNotifications(input: {
   if (input.frequency.toLowerCase() === 'as needed' || !input.timesOfDay.length) return true;
   const allowed = requestPermission ? await ensureNotificationPermission() : await hasNotificationPermission();
   if (!allowed) return false;
+  await initializeNotifications();
   const identifiers: string[] = [];
   const weekly = input.frequency.toLowerCase() === 'weekly';
   const weekday = (input.startDate ? new Date(`${input.startDate}T12:00:00`) : new Date()).getDay() + 1;
@@ -133,13 +169,13 @@ export async function scheduleMedicationNotifications(input: {
     const time = parseTime(value);
     if (!time) continue;
     const trigger = weekly
-      ? { type: Notifications.SchedulableTriggerInputTypes.WEEKLY, weekday, hour: time.hour, minute: time.minute, channelId: CHANNEL_ID } as const
-      : { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: time.hour, minute: time.minute, channelId: CHANNEL_ID } as const;
+      ? { type: Notifications.SchedulableTriggerInputTypes.WEEKLY, weekday, hour: time.hour, minute: time.minute, channelId: MEDICATION_CHANNEL_ID } as const
+      : { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: time.hour, minute: time.minute, channelId: MEDICATION_CHANNEL_ID } as const;
     const identifier = await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Medication reminder',
         body: `${input.elderlyName}: Time for ${input.medicationName}${input.dosage ? ` (${input.dosage})` : ''}.`,
-        sound: 'default',
+        sound: MEDICATION_SOUND,
         data: { url: '/care?tab=Medications', entityId: input.id },
       },
       trigger,
@@ -157,20 +193,26 @@ export async function notifyAbnormalVital(vital: { heart_rate_bpm?: number | nul
   if (vital.spo2_percent != null && vital.spo2_percent < 95) warnings.push(`SpO₂ ${vital.spo2_percent.toFixed(1)}%`);
   if (!warnings.length) return;
   const signature = warnings.join('|');
-  const previous = await AsyncStorage.getItem(HEALTH_COOLDOWN_KEY);
-  if (previous) {
-    const parsed = JSON.parse(previous) as { signature: string; at: number };
-    if (parsed.signature === signature && Date.now() - parsed.at < 60 * 60 * 1000) return;
+  if (healthWarningsInFlight.has(signature)) return;
+  healthWarningsInFlight.add(signature);
+  try {
+    const previous = await AsyncStorage.getItem(HEALTH_COOLDOWN_KEY);
+    if (previous) {
+      const parsed = JSON.parse(previous) as { signature: string; at: number };
+      if (parsed.signature === signature && Date.now() - parsed.at < 60 * 60 * 1000) return;
+    }
+    await initializeNotifications();
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Health reading needs attention',
+        body: `${elderlyName}: ${warnings.join(' and ')}. Confirm the reading and seek qualified guidance when appropriate.`,
+        sound: HEALTH_SOUND,
+        data: { url: '/alerts?tab=Alerts' },
+      },
+      trigger: { channelId: HEALTH_CHANNEL_ID },
+    });
+    await AsyncStorage.setItem(HEALTH_COOLDOWN_KEY, JSON.stringify({ signature, at: Date.now() }));
+  } finally {
+    healthWarningsInFlight.delete(signature);
   }
-  await initializeNotifications();
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Health reading needs attention',
-      body: `${elderlyName}: ${warnings.join(' and ')}. Confirm the reading and seek qualified guidance when appropriate.`,
-      sound: 'default',
-      data: { url: '/alerts?tab=Alerts' },
-    },
-    trigger: null,
-  });
-  await AsyncStorage.setItem(HEALTH_COOLDOWN_KEY, JSON.stringify({ signature, at: Date.now() }));
 }

@@ -38,7 +38,12 @@
         "expo-notifications",
         {
           "color": "#38BDF8",
-          "defaultChannel": "care-reminders"
+          "defaultChannel": "care-reminders",
+          "sounds": [
+            "./assets/sounds/medication_reminder.wav",
+            "./assets/sounds/appointment_reminder.wav",
+            "./assets/sounds/health_warning.wav"
+          ]
         }
       ],
       [
@@ -70,7 +75,14 @@
           "isAndroidForegroundServiceEnabled": false
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

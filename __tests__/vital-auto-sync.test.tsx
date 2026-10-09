@@ -4,6 +4,7 @@ import { AppState, Text } from 'react-native';
 import { buildHealthSnapshot, snapshotChanged, type HealthResults } from '@/supabase/functions/_shared/health-snapshot';
 import { matchesWebhookSecret, webhookHealthUsers } from '@/supabase/functions/_shared/health-webhook';
 import { verifyHealthSignature } from '@/supabase/functions/_shared/health-signature';
+import { notifyAbnormalVital } from '@/src/lib/notifications';
 import { supabase } from '@/src/lib/supabase';
 import { vitalTimeLabel } from '@/src/lib/vital-time';
 import { watchSyncDelayed } from '@/src/lib/watch-sync';
@@ -12,7 +13,7 @@ import { HealthDataProvider, useHealthData, type VitalLog } from '@/src/provider
 jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({
   session: { user: { id: 'caregiver-1' } }, onboarding: { wearable_status: 'connected' },
 }) }));
-jest.mock('@/src/lib/notifications', () => ({ notifyAbnormalVital: jest.fn() }));
+jest.mock('@/src/lib/notifications', () => ({ notifyAbnormalVital: jest.fn().mockResolvedValue(undefined) }));
 
 let mockReceiveVital: ((payload: { eventType: string; new: VitalLog }) => void) | undefined;
 let mockAppStateChange: ((state: string) => void) | undefined;
@@ -82,6 +83,20 @@ test('a webhook-created row appears through Realtime without another API call or
   await act(async () => { mockReceiveVital?.({ eventType: 'INSERT', new: next }); });
   expect(screen.getByText('78 bpm')).toBeTruthy();
   expect(screen.getByText('Quiet')).toBeTruthy();
+  expect(invoke).toHaveBeenCalledTimes(1);
+});
+
+test('a newly received out-of-range reading requests a health warning without manual sync', async () => {
+  render(<HealthDataProvider><ReadingProbe /></HealthDataProvider>);
+  await waitFor(() => expect(screen.getByText('81 bpm')).toBeTruthy());
+  expect(notifyAbnormalVital).not.toHaveBeenCalled();
+
+  const incoming = { ...first, id: 'vital-high', heart_rate_bpm: 112,
+    recorded_at: '2026-10-08T09:05:00.000Z', synced_at: '2026-10-08T09:06:00.000Z' };
+  await act(async () => { mockReceiveVital?.({ eventType: 'INSERT', new: incoming }); });
+
+  expect(screen.getByText('112 bpm')).toBeTruthy();
+  expect(notifyAbnormalVital).toHaveBeenCalledWith(incoming, 'Maria');
   expect(invoke).toHaveBeenCalledTimes(1);
 });
 
