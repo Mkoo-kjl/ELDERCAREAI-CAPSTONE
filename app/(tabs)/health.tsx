@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMinuteClock } from '@/src/hooks/useMinuteClock';
 
 import { vitalTimeLabel } from '@/src/lib/vital-time';
-import { sleepDurationScore } from '@/src/lib/sleep-score';
+import { sleepDurationContext } from '@/src/lib/sleep-score';
 import { buildHealthAnomalies, buildHealthInsights, buildHealthPredictions, type AnalysisMetric, type AnalysisResult } from '@/src/lib/health-analysis';
 import { useHealthData, type VitalLog } from '@/src/providers/HealthDataProvider';
 import { getTheme, palette } from '@/src/theme/colors';
@@ -21,7 +21,7 @@ export default function HealthScreen() {
   useMinuteClock();
   const insets = useSafeAreaInsets();
   const theme = getTheme(useColorScheme() === 'dark');
-  const { vital, history, refreshing, refresh } = useHealthData();
+  const { vital, history, sleepSessions, refreshing, refresh } = useHealthData();
   const [tab, setTab] = useState<TabName>('Vitals');
   const [selectedMetric, setSelectedMetric] = useState<VitalMetricKey | null>(null);
 
@@ -35,7 +35,7 @@ export default function HealthScreen() {
         {tab === 'Predictions' ? <Predictions history={history} /> : null}
         {tab === 'Anomalies' ? <Anomalies history={history} /> : null}
       </ScrollView>
-      <VitalDetailModal visible={selectedMetric !== null} metric={selectedMetric} history={history} onClose={() => setSelectedMetric(null)} />
+      <VitalDetailModal visible={selectedMetric !== null} metric={selectedMetric} history={history} sleepSessions={sleepSessions} onClose={() => setSelectedMetric(null)} />
     </View>
   );
 }
@@ -53,10 +53,10 @@ function Vitals({ vital, onSelect }: { vital: VitalLog | null; onSelect: (metric
   return <View style={styles.list}>{metricDefinitions.map(([icon, label, key, unit, color], index) => {
     const raw = vital?.[key];
     const value = typeof raw === 'number' ? (key === 'steps_count' ? raw.toLocaleString() : raw.toFixed(key === 'spo2_percent' || key === 'skin_temp_celsius' || key === 'sleep_hours' ? 1 : 0)) : '--';
-    const sleepScore = key === 'sleep_hours' ? sleepDurationScore(vital?.sleep_hours) : null;
+    const sleepContext = key === 'sleep_hours' ? sleepDurationContext(vital?.sleep_hours) : null;
     return <Pressable key={label} accessibilityRole="button" accessibilityLabel={`${label} details`} onPress={() => onSelect(key)} style={[styles.metricRow, { backgroundColor: isDark ? theme.cardElevated : surfaces[index] }]}>
       <View style={[styles.metricIcon, { backgroundColor: theme.cardElevated }]}><Ionicons name={icon} size={19} color={color} /></View>
-      <View style={styles.metricCopy}><Text style={[styles.metricLabel, { color: theme.text }]}>{label}</Text><Text style={[styles.metricTime, { color: theme.subtitle }]}>{vitalTimeLabel(vital, key)}</Text>{sleepScore ? <Text style={[styles.scoreCaption, { color }]}>Sleep score {sleepScore.score} - {sleepScore.label}</Text> : null}</View>
+      <View style={styles.metricCopy}><Text style={[styles.metricLabel, { color: theme.text }]}>{label}</Text><Text style={[styles.metricTime, { color: theme.subtitle }]}>{vitalTimeLabel(vital, key)}</Text>{sleepContext ? <Text style={[styles.scoreCaption, { color }]}>{sleepContext.label}</Text> : null}</View>
       <Text style={[styles.metricValue, { color: theme.text }]}>{value} <Text style={[styles.metricUnit, { color: theme.subtitle }]}>{unit}</Text></Text>
     </Pressable>;
   })}</View>;

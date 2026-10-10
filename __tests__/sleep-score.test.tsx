@@ -1,24 +1,26 @@
 import { render, screen } from '@testing-library/react-native';
 
 import { MetricCard } from '@/src/components/MetricCard';
-import { sleepDurationScore } from '@/src/lib/sleep-score';
+import { formatSleepDuration, sleepDurationContext } from '@/src/lib/sleep-score';
 
-describe('duration-only sleep score', () => {
-  it('scores a seven-hour session as Good', () => {
-    expect(sleepDurationScore(7)).toEqual({ score: 90, label: 'Good' });
-    expect(sleepDurationScore(7.5)).toEqual({ score: 100, label: 'Excellent' });
+describe('sleep duration context', () => {
+  it('does not grade 9.4 hours of sleep as Fair', () => {
+    expect(sleepDurationContext(9.4)?.label).toBe('Above the 7-8h guide');
+    expect(sleepDurationContext(9.4)?.note).toContain('not, by itself, poor sleep');
+    expect(sleepDurationContext(7.5)?.label).toBe('Within the 7-8h guide');
   });
 
-  it('scores short sleep lower and does not invent a missing score', () => {
-    expect(sleepDurationScore(5)).toEqual({ score: 50, label: 'Low' });
-    expect(sleepDurationScore(null)).toBeNull();
-    expect(sleepDurationScore(Number.NaN)).toBeNull();
-    expect(sleepDurationScore(25)).toBeNull();
+  it('does not invent missing values or scores', () => {
+    expect(sleepDurationContext(5)?.label).toBe('Below the 7-8h guide');
+    expect(sleepDurationContext(null)).toBeNull();
+    expect(sleepDurationContext(Number.NaN)).toBeNull();
+    expect(sleepDurationContext(25)).toBeNull();
+    expect(formatSleepDuration(564)).toBe('9h 24m');
   });
 
-  it('shows the recorded duration and its score together on a sleep card', async () => {
-    await render(<MetricCard icon="moon-outline" title="Sleep" value="7.0" unit="hours" timestamp="Measured today" color="#8763a4" annotation="Sleep score 90 - Good" />);
-    expect(screen.getByText('7.0')).toBeTruthy();
-    expect(screen.getByText('Sleep score 90 - Good')).toBeTruthy();
+  it('shows duration context on the card', async () => {
+    await render(<MetricCard icon="moon-outline" title="Sleep" value="9.4" unit="hours" timestamp="Measured today" color="#8763a4" annotation="Above the 7-8h guide" />);
+    expect(screen.getByText('9.4')).toBeTruthy();
+    expect(screen.getByText('Above the 7-8h guide')).toBeTruthy();
   });
 });

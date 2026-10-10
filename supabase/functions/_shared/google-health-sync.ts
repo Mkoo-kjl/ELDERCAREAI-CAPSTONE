@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-import { buildHealthSnapshot, snapshotChanged, type HealthResults } from './health-snapshot.ts';
+import { buildHealthSnapshot, sleepSessionRows, snapshotChanged, type HealthResults } from './health-snapshot.ts';
 
 type Row = Record<string, any>;
 
@@ -143,11 +143,14 @@ export async function syncGoogleHealthForUser(admin: SupabaseClient, userId: str
     .maybeSingle();
   if (latestError) throw latestError;
 
-  const changed = snapshotChanged(latest, snapshot);
+  const sleepHistory = sleep.warning && Array.isArray(latest?.sleep_history)
+    ? latest.sleep_history : sleepSessionRows(sleep.dataPoints ?? []);
+  const changed = snapshotChanged(latest, snapshot)
+    || JSON.stringify(latest?.sleep_history ?? []) !== JSON.stringify(sleepHistory);
   let vital = latest;
   if (changed) {
     const { hasData: _hasData, sleepDiagnostics: _sleepDiagnostics, ...values } = snapshot;
-    const log = { ...values, elderly_id: elderly.elderly_id, source: 'google_health_v4' };
+    const log = { ...values, sleep_history: sleepHistory, elderly_id: elderly.elderly_id, source: 'google_health_v4' };
     const saveQuery = latest && Date.parse(snapshot.recorded_at) <= Date.parse(latest.recorded_at)
       ? admin.from('vital_sign_logs').update(log).eq('id', latest.id)
       : admin.from('vital_sign_logs').insert(log);

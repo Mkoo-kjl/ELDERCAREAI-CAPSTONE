@@ -7,9 +7,10 @@ import { AppText as Text } from '@/src/components/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { vitalTimeLabel } from '@/src/lib/vital-time';
-import { sleepDurationScore } from '@/src/lib/sleep-score';
+import { recentNightlySleep, sleepDateLabel, sleepEfficiency } from '@/src/lib/sleep-history';
+import { formatSleepDuration, sleepDurationContext } from '@/src/lib/sleep-score';
 import { supabase } from '@/src/lib/supabase';
-import type { VitalLog } from '@/src/providers/HealthDataProvider';
+import type { SleepSession, VitalLog } from '@/src/providers/HealthDataProvider';
 import { getTheme, palette } from '@/src/theme/colors';
 import { fontFamily, typeScale } from '@/src/theme/typography';
 
@@ -58,7 +59,7 @@ function isConcerning(metric: VitalMetricKey, value: number | null) {
   return false;
 }
 
-export function VitalDetailModal({ visible, metric, history, onClose }: { visible: boolean; metric: VitalMetricKey | null; history: VitalLog[]; onClose: () => void }) {
+export function VitalDetailModal({ visible, metric, history, sleepSessions = [], onClose }: { visible: boolean; metric: VitalMetricKey | null; history: VitalLog[]; sleepSessions?: SleepSession[]; onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const theme = getTheme(useColorScheme() === 'dark');
   const insightCache = useRef(new Map<string, string>());
@@ -73,7 +74,17 @@ export function VitalDetailModal({ visible, metric, history, onClose }: { visibl
   const range = maximum - minimum || 1;
   const concerning = isConcerning(metric, latest);
   const emotion = latest === null ? 'neutral' : concerning ? 'worried' : 'happy';
-  const sleepScore = metric === 'sleep_hours' ? sleepDurationScore(latest) : null;
+  const sleepContext = metric === 'sleep_hours' ? sleepDurationContext(latest) : null;
+  const savedSleep = sleepSessions.length ? sleepSessions : history.flatMap((row) => {
+    const end = row.measurement_times?.sleep_hours;
+    return end && Number.isFinite(Date.parse(end)) && row.sleep_hours != null ? [{
+      source_key: row.id, session_end_at: end,
+      session_start_at: new Date(Date.parse(end) - row.sleep_hours * 3_600_000).toISOString(),
+      minutes_asleep: Math.round(row.sleep_hours * 60), minutes_in_sleep_period: null,
+      is_main_sleep: true, is_processed: false,
+    }] : [];
+  });
+  const sleepNights = metric === 'sleep_hours' ? recentNightlySleep(savedSleep) : [];
 
   return <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
     <View style={styles.overlay}><Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
@@ -81,12 +92,11 @@ export function VitalDetailModal({ visible, metric, history, onClose }: { visibl
         <View style={styles.handle} />
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
           <View style={styles.header}><View style={[styles.heroIcon, { backgroundColor: `${config.color}16` }]}><Ionicons name={config.icon} size={29} color={config.color} /></View><View style={styles.headerCopy}><Text style={[styles.eyebrow, { color: config.color }]}>VITAL DETAILS</Text><Text style={[styles.title, { color: theme.text }]}>{config.title}</Text></View><Pressable accessibilityLabel="Close details" onPress={onClose} style={[styles.close, { backgroundColor: theme.card }]}><Ionicons name="close" size={22} color={theme.text} /></Pressable></View>
-          <View style={[styles.readingCard, { backgroundColor: theme.card }]}><Text style={[styles.readingLabel, { color: theme.subtitle }]}>LATEST SYNCHRONIZED READING</Text><View style={styles.readingRow}><Text style={[styles.reading, { color: theme.text }]}>{formatValue(latest, config)}</Text><Text style={[styles.unit, { color: theme.subtitle }]}>{config.unit}</Text></View><Text style={[styles.time, { color: theme.subtitle }]}>{vitalTimeLabel(latestRow, metric)}</Text>{sleepScore ? <View style={styles.sleepScore}><Text style={[styles.sleepScoreValue, { color: palette.purple }]}>Sleep score {sleepScore.score} - {sleepScore.label}</Text><Text style={[styles.sleepScoreNote, { color: theme.subtitle }]}>Duration-only estimate based on a 7-8 hour older-adult guide. It does not measure sleep quality.</Text></View> : null}</View>
+          <View style={[styles.readingCard, { backgroundColor: theme.card }]}><Text style={[styles.readingLabel, { color: theme.subtitle }]}>LATEST SYNCHRONIZED READING</Text><View style={styles.readingRow}><Text style={[styles.reading, { color: theme.text }]}>{formatValue(latest, config)}</Text><Text style={[styles.unit, { color: theme.subtitle }]}>{config.unit}</Text></View><Text style={[styles.time, { color: theme.subtitle }]}>{vitalTimeLabel(latestRow, metric)}</Text>{sleepContext ? <View style={styles.sleepScore}><Text style={[styles.sleepScoreValue, { color: palette.purple }]}>{sleepContext.label}</Text><Text style={[styles.sleepScoreNote, { color: theme.subtitle }]}>{sleepContext.note}</Text></View> : null}</View>
 
           <VitalInsight key={`${metric}:${latestRow?.id ?? 'none'}:${latest ?? 'none'}`} metric={metric} row={latestRow} value={latest} config={config} emotion={emotion} cache={insightCache.current} />
 
-          <Text style={[styles.sectionTitle, { color: theme.text }]}>Recent readings</Text>
-          {recent.length ? <View style={[styles.chartCard, { backgroundColor: theme.card }]}><View style={styles.bars}>{recent.map((item, index) => { const height = 18 + ((item.value - minimum) / range) * 54; return <View key={`${item.at}:${index}`} style={styles.barColumn}><Text numberOfLines={1} style={[styles.barValue, { color: theme.subtitle }]}>{metricNumber(item.value, config.digits)}</Text><View style={[styles.bar, { height, backgroundColor: config.color }]} /><Text style={[styles.barDate, { color: theme.subtitle }]}>{new Date(item.at).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}</Text></View>; })}</View><Text style={[styles.chartNote, { color: theme.subtitle }]}>Up to seven most recent synchronized values</Text></View> : <View style={[styles.emptyChart, { backgroundColor: theme.card }]}><Text style={[styles.chartNote, { color: theme.subtitle }]}>No recent values are available for this metric.</Text></View>}
+          {metric === 'sleep_hours' ? <><Text style={[styles.sectionTitle, { color: theme.text }]}>Last 7 days</Text>{sleepNights.length ? <View style={styles.sleepHistory}>{sleepNights.map((session) => { const efficiency = sleepEfficiency(session); return <View key={session.source_key} style={[styles.sleepNight, { backgroundColor: theme.card }]}><Text style={[styles.sleepNightDate, { color: theme.text }]}>{sleepDateLabel(session.session_end_at)}</Text><View style={styles.sleepNightReading}><Text style={[styles.sleepNightDuration, { color: theme.text }]}>{formatSleepDuration(session.minutes_asleep)}</Text><Text style={[styles.sleepNightCaption, { color: theme.subtitle }]}>{efficiency === null ? 'Recorded sleep duration' : `Sleep efficiency ${efficiency}%`}</Text></View></View>; })}</View> : <View style={[styles.emptyChart, { backgroundColor: theme.card }]}><Text style={[styles.chartNote, { color: theme.subtitle }]}>No nightly sleep sessions are available for the last seven days.</Text></View>}</> : <><Text style={[styles.sectionTitle, { color: theme.text }]}>Recent readings</Text>{recent.length ? <View style={[styles.chartCard, { backgroundColor: theme.card }]}><View style={styles.bars}>{recent.map((item, index) => { const height = 18 + ((item.value - minimum) / range) * 54; return <View key={`${item.at}:${index}`} style={styles.barColumn}><Text numberOfLines={1} style={[styles.barValue, { color: theme.subtitle }]}>{metricNumber(item.value, config.digits)}</Text><View style={[styles.bar, { height, backgroundColor: config.color }]} /><Text style={[styles.barDate, { color: theme.subtitle }]}>{new Date(item.at).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}</Text></View>; })}</View><Text style={[styles.chartNote, { color: theme.subtitle }]}>Up to seven most recent synchronized values</Text></View> : <View style={[styles.emptyChart, { backgroundColor: theme.card }]}><Text style={[styles.chartNote, { color: theme.subtitle }]}>No recent values are available for this metric.</Text></View>}</>}
 
           <InfoSection title="What it means" body={config.about} color={theme.text} subtitle={theme.subtitle} />
           <InfoSection title="Where this value comes from" body={config.source} color={theme.text} subtitle={theme.subtitle} />
@@ -101,7 +111,7 @@ function VitalInsight({ metric, row, value, config, emotion, cache }: { metric: 
   const theme = getTheme(useColorScheme() === 'dark');
   const [attempt, setAttempt] = useState(0);
   const [insight, setInsight] = useState<{ status: 'empty' | 'loading' | 'ready' | 'error'; text: string }>({ status: 'empty', text: '' });
-  const cacheKey = `${row?.elderly_id ?? 'none'}:${metric}:${row?.id ?? 'none'}:${value ?? 'none'}`;
+  const cacheKey = `${row?.elderly_id ?? 'none'}:${metric}:${row?.id ?? 'none'}:${row?.measurement_times?.[metric] ?? 'none'}:${value ?? 'none'}`;
 
   useEffect(() => {
     if (value === null) {
@@ -115,9 +125,9 @@ function VitalInsight({ metric, row, value, config, emotion, cache }: { metric: 
     }
     let active = true;
     setInsight({ status: 'loading', text: '' });
-    const question = `The caregiver opened the patient's ${config.title} card, showing ${metricNumber(value, config.digits)} ${config.unit} in the latest synchronized record. Give a concise 1-2 sentence insight grounded in the database snapshot. Compare recent readings only if available. Refer to the patient, not the caregiver. Do not diagnose or invent data.`;
+    const question = `The caregiver opened the patient's ${config.title} card. Give a concise, friendly 1-2 sentence observation about this specific recorded ${config.shortTitle} reading (${metricNumber(value, config.digits)} ${config.unit}). Start by stating the actual value and what it represents for the patient. Add useful context or a real trend only if supported by the database. Do not give a generic compliment, infer sleep quality from duration, diagnose, or invent conditions, symptoms, or prior readings. Refer to the patient, not the caregiver.`;
     void supabase.functions.invoke<VitalInsightResponse>('ai-care-assistant', {
-      body: { message: question, clientNow: new Date().toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+      body: { message: question, insightMetric: metric, clientNow: new Date().toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
     }).then(({ data, error }) => {
       if (error) throw error;
       const text = (data?.reply ?? data?.content ?? '').trim();
@@ -129,7 +139,7 @@ function VitalInsight({ metric, row, value, config, emotion, cache }: { metric: 
       if (active) setInsight({ status: 'error', text: '' });
     });
     return () => { active = false; };
-  }, [attempt, cache, cacheKey, config, value]);
+  }, [attempt, cache, cacheKey, config, metric, value]);
 
   return <View style={[styles.elleCard, { backgroundColor: emotion === 'worried' ? `${palette.warning}12` : `${palette.primary}10` }]}><Image source={elleImages[emotion]} style={styles.elle} resizeMode="cover" /><View style={styles.elleCopy}><Text style={[styles.elleName, { color: theme.text }]}>Elle insight</Text>{insight.status === 'loading' ? <View style={styles.insightLoading}><ActivityIndicator size="small" color={palette.primaryDark} /><Text style={[styles.elleText, { color: theme.subtitle }]}>Reviewing recent readings...</Text></View> : <Text style={[styles.elleText, { color: theme.subtitle }]}>{insight.status === 'ready' ? insight.text : insight.status === 'empty' ? `A synchronized ${config.shortTitle} reading is needed for an insight.` : 'Insight is unavailable right now.'}</Text>}{insight.status === 'error' ? <Pressable accessibilityRole="button" onPress={() => setAttempt((current) => current + 1)} style={styles.insightRetry}><Ionicons name="refresh" size={14} color={palette.primaryDark} /><Text style={styles.retryText}>Retry insight</Text></Pressable> : null}<Text style={[styles.insightNote, { color: theme.subtitle }]}>Informational only. Not a medical assessment.</Text></View></View>;
 }
@@ -142,5 +152,6 @@ const styles = StyleSheet.create({
   readingCard: { marginTop: 17, padding: 16, borderRadius: 14 }, readingLabel: { ...typeScale.eyebrow }, readingRow: { marginTop: 5, flexDirection: 'row', alignItems: 'baseline', gap: 6 }, reading: { ...typeScale.display, fontVariant: ['tabular-nums'] }, unit: { fontSize: 12, fontFamily: fontFamily.medium }, time: { marginTop: 2, ...typeScale.caption }, sleepScore: { marginTop: 13, gap: 3 }, sleepScoreValue: { fontSize: 14, fontFamily: fontFamily.bold }, sleepScoreNote: { fontSize: 10.5, lineHeight: 15 },
   elleCard: { marginTop: 13, minHeight: 90, padding: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center' }, elle: { width: 65, height: 58, borderRadius: 11 }, elleCopy: { flex: 1, marginLeft: 11 }, elleName: { ...typeScale.cardTitle }, elleText: { marginTop: 3, fontSize: 11.5, lineHeight: 17 }, insightLoading: { flexDirection: 'row', alignItems: 'center', gap: 7 }, insightNote: { marginTop: 6, fontSize: 10, lineHeight: 14 }, insightRetry: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 5 }, retryText: { color: palette.primaryDark, fontSize: 11, fontFamily: fontFamily.semiBold },
   sectionTitle: { marginTop: 19, marginBottom: 8, ...typeScale.cardTitle }, chartCard: { padding: 14, borderRadius: 14 }, bars: { height: 108, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', gap: 5 }, barColumn: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' }, barValue: { fontSize: 8.5, marginBottom: 4 }, bar: { width: '62%', minWidth: 9, maxWidth: 24, borderRadius: 4 }, barDate: { marginTop: 4, fontSize: 8 }, chartNote: { marginTop: 8, fontSize: 10.5, textAlign: 'center' }, emptyChart: { padding: 18, borderRadius: 14 },
+  sleepHistory: { gap: 8 }, sleepNight: { minHeight: 76, paddingHorizontal: 16, paddingVertical: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }, sleepNightDate: { ...typeScale.cardTitle, flex: 1 }, sleepNightReading: { alignItems: 'flex-end', flexShrink: 1 }, sleepNightDuration: { fontSize: 21, fontFamily: fontFamily.bold, fontVariant: ['tabular-nums'] }, sleepNightCaption: { marginTop: 2, fontSize: 10.5, textAlign: 'right' },
   infoSection: { marginTop: 2 }, body: { ...typeScale.body }, caution: { marginTop: 18, padding: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 9 }, cautionText: { flex: 1, ...typeScale.subhead },
 });

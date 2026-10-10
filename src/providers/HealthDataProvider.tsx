@@ -45,12 +45,24 @@ export type VitalLog = {
   recorded_at: string;
   synced_at: string | null;
   measurement_times?: MeasurementTimes | null;
+  sleep_history?: SleepSession[] | null;
+};
+
+export type SleepSession = {
+  source_key: string;
+  session_start_at: string;
+  session_end_at: string;
+  minutes_asleep: number;
+  minutes_in_sleep_period: number | null;
+  is_main_sleep: boolean;
+  is_processed: boolean;
 };
 
 type ContextValue = {
   elderly: ElderlyProfile | null;
   vital: VitalLog | null;
   history: VitalLog[];
+  sleepSessions: SleepSession[];
   loading: boolean;
   refreshing: boolean;
   error: string | null;
@@ -71,6 +83,7 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
   const userId = session?.user.id;
   const [elderly, setElderly] = useState<ElderlyProfile | null>(null);
   const [history, setHistory] = useState<VitalLog[]>([]);
+  const [sleepSessions, setSleepSessions] = useState<SleepSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,6 +113,7 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
     setElderly(profile as ElderlyProfile | null);
     if (!profile) {
       setHistory([]);
+      setSleepSessions([]);
       return;
     }
     const { data: logs, error: logsError } = await supabase.from('vital_sign_logs')
@@ -108,6 +122,8 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
     const typedLogs = (logs as VitalLog[]) ?? [];
     if (revisionAtStart === realtimeRevision.current) setHistory(typedLogs);
     if (typedLogs[0]) setLastSuccessfulSyncAt((current) => current ?? typedLogs[0].synced_at ?? typedLogs[0].recorded_at);
+    const savedSleep = typedLogs.find((row) => row.source === 'google_health_v4' && Array.isArray(row.sleep_history))?.sleep_history;
+    if (revisionAtStart === realtimeRevision.current) setSleepSessions(savedSleep ?? []);
   }, [userId]);
 
   const recordSyncLocation = useCallback(async () => {
@@ -177,6 +193,7 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
   useEffect(() => { heartMeasuredAtRef.current = history[0]?.measurement_times?.heart_rate_bpm ?? null; }, [history]);
 
   useEffect(() => {
+    setSleepSessions([]);
     setWatchSync(null);
     setWatchSyncIssue(null);
     setLastSuccessfulSyncAt(null);
@@ -219,6 +236,7 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
           setHistory((current) => [incoming, ...current.filter((row) => row.id !== incoming.id)]
             .sort((left, right) => new Date(right.synced_at ?? right.recorded_at).getTime() - new Date(left.synced_at ?? left.recorded_at).getTime())
             .slice(0, 30));
+          if (incoming.source === 'google_health_v4' && Array.isArray(incoming.sleep_history)) setSleepSessions(incoming.sleep_history);
           setNewReadingAt(new Date().toISOString());
           if (incoming.synced_at) setLastSuccessfulSyncAt(incoming.synced_at);
           void notifyAbnormalVital(incoming, elderly.full_name).catch((notificationError) => {
@@ -271,7 +289,7 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
     return () => { clearInterval(timer); subscription.remove(); };
   }, [load, onboarding?.wearable_status, userId]);
 
-  const value = useMemo(() => ({ elderly, vital: history[0] ?? null, history, loading, refreshing, error, syncState, lastSuccessfulSyncAt, lastGoogleHealthCheckAt, watchSync, watchSyncIssue, newReadingAt, refresh }), [elderly, error, history, lastSuccessfulSyncAt, lastGoogleHealthCheckAt, loading, newReadingAt, refresh, refreshing, syncState, watchSync, watchSyncIssue]);
+  const value = useMemo(() => ({ elderly, vital: history[0] ?? null, history, sleepSessions, loading, refreshing, error, syncState, lastSuccessfulSyncAt, lastGoogleHealthCheckAt, watchSync, watchSyncIssue, newReadingAt, refresh }), [elderly, error, history, sleepSessions, lastSuccessfulSyncAt, lastGoogleHealthCheckAt, loading, newReadingAt, refresh, refreshing, syncState, watchSync, watchSyncIssue]);
   return <HealthDataContext.Provider value={value}>{children}</HealthDataContext.Provider>;
 }
 

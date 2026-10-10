@@ -11,6 +11,7 @@ type GeminiResponse = {
 
 const DEFAULT_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.8-flash'];
 const MAX_HISTORY_MESSAGES = 8;
+const INSIGHT_METRICS = ['heart_rate_bpm', 'spo2_percent', 'sleep_hours', 'steps_count', 'skin_temp_celsius', 'hrv_rmssd_ms'] as const;
 
 function clip(value: unknown, limit = 260) {
   if (value === null || value === undefined) return null;
@@ -269,6 +270,7 @@ Deno.serve(async (request) => {
   const payload = await request.json().catch(() => ({})) as Json;
   const message = typeof payload.message === 'string' ? payload.message.trim() : '';
   const sessionId = typeof payload.sessionId === 'string' ? payload.sessionId : null;
+  const insightMetric = INSIGHT_METRICS.find((key) => key === payload.insightMetric) ?? null;
   const timeZone = typeof payload.timeZone === 'string' && payload.timeZone.trim() ? payload.timeZone.trim() : 'UTC';
   const clientNow = typeof payload.clientNow === 'string' ? payload.clientNow : new Date().toISOString();
   if (!message) return json({ error: 'Message is required.' }, 400);
@@ -337,6 +339,13 @@ Deno.serve(async (request) => {
     if (firstError) throw firstError;
 
     const vitalRows = (vitalsResult.data as Json[]) ?? [];
+    const metricReadings = insightMetric ? vitalRows.reduce<{ value: number; measured_at: string }[]>((readings, row) => {
+      const value = row[insightMetric];
+      const measuredAt = row.measurement_times?.[insightMetric] ?? row.recorded_at;
+      if (typeof value === 'number' && Number.isFinite(value) && typeof measuredAt === 'string'
+        && !readings.some((item) => item.measured_at === measuredAt)) readings.push({ value, measured_at: measuredAt });
+      return readings;
+    }, []).sort((left, right) => Date.parse(right.measured_at) - Date.parse(left.measured_at)).slice(0, 3) : [];
     const localToday = localDateKey(clientNow, timeZone) ?? new Date().toISOString().slice(0, 10);
     const todayVitals = vitalRows.filter((row) => localDateKey(row.recorded_at, timeZone) === localToday);
     const caregiverName = clip(caregiver?.full_name ?? profile?.full_name ?? userData.user.email?.split('@')[0] ?? 'Caregiver', 120);
@@ -362,6 +371,7 @@ Deno.serve(async (request) => {
       latest_vitals: vitalRows[0] ? summarizeVital(vitalRows[0], timeZone) : null,
       today_vitals: todayVitals.map((row) => summarizeVital(row, timeZone)),
       recent_vitals: vitalRows.slice(0, 5).map((row) => summarizeVital(row, timeZone)),
+      metric_insight: insightMetric ? { metric: insightMetric, readings: metricReadings } : null,
       active_medications: ((medicationResult.data as Json[]) ?? []).map((item) => ({
         name: clip(item.medication_name, 160),
         dosage: clip(item.dosage, 120),
@@ -417,8 +427,9 @@ Do not invent missing data. If today's sleep or vitals are absent, say that toda
 For urgent symptoms, severe distress, falls, chest pain, breathing trouble, very low oxygen, or immediate danger, tell the caregiver to call local emergency services now.
 Do not diagnose, prescribe, change doses, or tell the caregiver to stop/start medication. For medication questions, summarize schedules and advise following the prescriber's instructions.
 Keep responses concise, warm, and practical: usually 1 to 4 short sentences.`;
+    const insightInstruction = insightMetric ? `\nFor this vital-card insight, answer in 1-2 sentences about metric_insight.metric. State the patient's actual latest reading first, then give meaningful context or a trend only when the distinct readings support it. Do not flatter generically or call any single reading "very good" without evidence. A sleep duration is not a sleep-quality score; do not infer sleep quality from hours alone. If metric_insight.readings is empty, say the reading is unavailable instead of trusting a value in the user's request.` : '';
 
-    const { reply, model: answeredByModel } = await callGeminiWithFallback(geminiKey, geminiModels, systemInstruction, contents);
+    const { reply, model: answeredByModel } = await callGeminiWithFallback(geminiKey, geminiModels, systemInstruction + insightInstruction, contents);
     return json({
       reply,
       emotion: inferEmotion(message, reply),

@@ -50,6 +50,29 @@ test('a new Google Health heart-rate sample is written to the database', async (
   expect(update).not.toHaveBeenCalled();
 });
 
+test('sync stores distinct Google Health sleep sessions in the vital log', async () => {
+  const sleepPoint = (id: string, start: string, end: string, minutes: string) => ({
+    name: `users/me/dataTypes/sleep/dataPoints/${id}`,
+    sleep: { interval: { startTime: start, endTime: end }, summary: { minutesAsleep: minutes, minutesInSleepPeriod: '600' }, metadata: { mainSleep: true, processed: true } },
+  });
+  globalThis.fetch = jest.fn(async (input: string | URL | Request) => new Response(JSON.stringify({
+    dataPoints: String(input).includes('/sleep/dataPoints') ? [
+      sleepPoint('night-1', '2026-10-08T21:00:00Z', '2026-10-09T07:00:00Z', '564'),
+      sleepPoint('night-2', '2026-10-07T21:00:00Z', '2026-10-08T07:00:00Z', '520'),
+    ] : String(input).includes('/heart-rate/dataPoints') ? [heartPoint] : [],
+  }), { status: 200 })) as typeof fetch;
+  const { admin, insert } = database();
+
+  await syncGoogleHealthForUser(admin, 'caregiver-1', 'client-id', 'client-secret');
+
+  expect(insert).toHaveBeenCalledWith(expect.objectContaining({
+    sleep_history: [
+      expect.objectContaining({ source_key: 'users/me/dataTypes/sleep/dataPoints/night-1', minutes_asleep: 564 }),
+      expect.objectContaining({ source_key: 'users/me/dataTypes/sleep/dataPoints/night-2', minutes_asleep: 520 }),
+    ],
+  }));
+});
+
 test('sync reports the paired tracker last-sync time without exposing device identifiers', async () => {
   globalThis.fetch = jest.fn(async (input: string | URL | Request) => new Response(JSON.stringify(
     String(input).includes('/pairedDevices')

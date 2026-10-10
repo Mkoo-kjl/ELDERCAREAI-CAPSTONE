@@ -48,11 +48,26 @@ function sleepMinutesFromPoint(point: Point | undefined) {
     0,
   );
   if (stageMinutes > 0) return stageMinutes;
+  return null;
+}
 
-  const start = Date.parse(sleep.interval?.startTime ?? '');
-  const end = Date.parse(sleep.interval?.endTime ?? '');
-  const intervalMinutes = (end - start) / 60000;
-  return Number.isFinite(intervalMinutes) && intervalMinutes > 0 ? intervalMinutes : null;
+export function sleepSessionRows(points: Point[]) {
+  return points.flatMap((point) => {
+    const start = instant(point.sleep?.interval?.startTime);
+    const end = instant(point.sleep?.interval?.endTime);
+    const minutes = sleepMinutesFromPoint(point);
+    if (!start || !end || Date.parse(end) <= Date.parse(start) || minutes === null) return [];
+    const period = positiveNumber(point.sleep?.summary?.minutesInSleepPeriod);
+    return [{
+      source_key: typeof point.name === 'string' && point.name ? point.name : start,
+      session_start_at: start,
+      session_end_at: end,
+      minutes_asleep: Math.round(minutes),
+      minutes_in_sleep_period: period === null ? null : Math.round(period),
+      is_main_sleep: point.sleep?.metadata?.mainSleep === true,
+      is_processed: point.sleep?.metadata?.processed === true,
+    }];
+  }).sort((left, right) => Date.parse(right.session_end_at) - Date.parse(left.session_end_at) || left.source_key.localeCompare(right.source_key));
 }
 
 export function buildHealthSnapshot(results: HealthResults, checkedAt: string) {
