@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { syncGoogleHealthForUser } from '../_shared/google-health-sync.ts';
+import { isActiveCaregiver } from '../_shared/caregiver-access.ts';
 
 function redirect(location: string) {
   return new Response(null, { status: 302, headers: { Location: location } });
@@ -36,6 +37,10 @@ Deno.serve(async (request) => {
 
   if (stateError || !oauthState) return new Response('OAuth state is invalid or expired.', { status: 400 });
   await admin.from('google_health_oauth_states').delete().eq('state', state);
+
+  if (!await isActiveCaregiver(admin, oauthState.user_id)) {
+    return redirect(withResult(oauthState.app_redirect_uri, { error: 'account_inactive' }));
+  }
 
   if (oauthError || !code) {
     return redirect(withResult(oauthState.app_redirect_uri, {

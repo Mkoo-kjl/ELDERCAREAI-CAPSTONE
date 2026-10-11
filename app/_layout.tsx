@@ -6,7 +6,8 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { AuthProvider } from '@/src/providers/AuthProvider';
+import { AuthProvider, useAuth } from '@/src/providers/AuthProvider';
+import { HealthDataProvider } from '@/src/providers/HealthDataProvider';
 import { ThemePreferenceProvider } from '@/src/providers/ThemePreferenceProvider';
 import { initializeNotifications } from '@/src/lib/notifications';
 import { appFontAssets } from '@/src/theme/typography';
@@ -29,6 +30,30 @@ function NotificationObserver() {
   return null;
 }
 
+function AppNavigator({ isDark }: { isDark: boolean }) {
+  const { session } = useAuth();
+  return (
+    <HealthDataProvider key={session?.user.id ?? 'signed-out'}>
+      <NotificationObserver />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="auth/callback" />
+        <Stack.Screen name="setup/intro" />
+        <Stack.Screen name="setup/caregiver" />
+        <Stack.Screen name="setup/elderly" />
+        <Stack.Screen name="setup/fitness" />
+        <Stack.Screen name="setup/location" />
+        <Stack.Screen name="home" />
+        <Stack.Screen name="location" />
+        <Stack.Screen name="health-records" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+    </HealthDataProvider>
+  );
+}
+
 export default function RootLayout() {
   const isDark = useColorScheme() === 'dark';
   const [fontsLoaded, fontError] = useFonts(appFontAssets);
@@ -40,23 +65,9 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemePreferenceProvider>
-      <AuthProvider>
-        <NotificationObserver />
-        <StatusBar style={isDark ? 'light' : 'dark'} />
-        <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="login" />
-          <Stack.Screen name="auth/callback" />
-          <Stack.Screen name="setup/intro" />
-          <Stack.Screen name="setup/caregiver" />
-          <Stack.Screen name="setup/elderly" />
-          <Stack.Screen name="setup/fitness" />
-          <Stack.Screen name="setup/location" />
-          <Stack.Screen name="home" />
-          <Stack.Screen name="location" />
-          <Stack.Screen name="(tabs)" />
-        </Stack>
-      </AuthProvider>
+        <AuthProvider>
+          <AppNavigator isDark={isDark} />
+        </AuthProvider>
       </ThemePreferenceProvider>
     </SafeAreaProvider>
   );

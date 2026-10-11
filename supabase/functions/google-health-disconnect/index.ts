@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders, json } from '../_shared/cors.ts';
+import { isActiveCaregiver } from '../_shared/caregiver-access.ts';
 
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -17,6 +18,7 @@ Deno.serve(async (request) => {
   if (!userData.user) return json({ error: 'Authentication required.' }, 401);
 
   const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
+  if (!await isActiveCaregiver(admin, userData.user.id)) return json({ error: 'Caregiver access is inactive.' }, 403);
   const { data: token } = await admin.from('google_health_tokens').select('google_access_token, google_refresh_token').eq('user_id', userData.user.id).maybeSingle();
   const revokeToken = token?.google_refresh_token ?? token?.google_access_token;
   if (revokeToken) {

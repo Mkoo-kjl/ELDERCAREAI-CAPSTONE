@@ -5,7 +5,7 @@ import { syncGoogleHealthForUser } from '@/supabase/functions/_shared/google-hea
 const sampleTime = '2026-10-08T09:05:00Z';
 const heartPoint = { heartRate: { beatsPerMinute: '78', sampleTime: { physicalTime: sampleTime } } };
 
-function database(latest: Record<string, unknown> | null = null) {
+function database(latest: Record<string, unknown> | null = null, access = { role: 'caregiver', status: 'active' }) {
   const insert = jest.fn((row: Record<string, unknown>) => ({
     select: () => ({ single: async () => ({ data: { id: 'saved-vital', ...row }, error: null }) }),
   }));
@@ -19,7 +19,8 @@ function database(latest: Record<string, unknown> | null = null) {
         limit: jest.fn().mockReturnThis(), maybeSingle: jest.fn(async () => ({
           data: table === 'google_health_tokens'
             ? { google_access_token: 'test-token', google_refresh_token: 'unused', token_expires_at: '2999-01-01T00:00:00Z' }
-            : table === 'elderly_profiles' ? { elderly_id: 'patient-1' } : latest,
+            : table === 'elderly_profiles' ? { elderly_id: 'patient-1' }
+              : table === 'user_access' ? access : latest,
           error: null,
         })),
         insert, update,
@@ -32,6 +33,13 @@ function database(latest: Record<string, unknown> | null = null) {
 
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });
+
+test('a suspended caregiver cannot trigger service-role health sync', async () => {
+  const { admin, insert } = database(null, { role: 'caregiver', status: 'suspended' });
+  await expect(syncGoogleHealthForUser(admin, 'caregiver-1', 'client-id', 'client-secret'))
+    .rejects.toMatchObject({ code: 'ACCOUNT_INACTIVE', status: 403 });
+  expect(insert).not.toHaveBeenCalled();
+});
 
 test('a new Google Health heart-rate sample is written to the database', async () => {
   globalThis.fetch = jest.fn(async (input: string | URL | Request) => new Response(JSON.stringify({

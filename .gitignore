@@ -6,6 +6,7 @@ web-build/
 coverage/
 .env
 .env.local
+website/edcadmin/config.js
 *.jks
 *.p8
 *.p12

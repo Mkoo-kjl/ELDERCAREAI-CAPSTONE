@@ -3,7 +3,6 @@ import { Image, StyleSheet, useColorScheme, View } from 'react-native';
 
 import { getPostAuthRoute } from '@/src/lib/onboarding-route';
 import { useAuth } from '@/src/providers/AuthProvider';
-import { HealthDataProvider } from '@/src/providers/HealthDataProvider';
 import { getTheme, palette } from '@/src/theme/colors';
 import { fontFamily } from '@/src/theme/typography';
 
@@ -22,8 +21,7 @@ export default function TabLayout() {
   if (!isLoading && !isOnboardingLoading && !onboarding?.completed_at) return <Redirect href={getPostAuthRoute(onboarding)} />;
 
   return (
-    <HealthDataProvider>
-      <Tabs screenOptions={({ route }) => ({
+    <Tabs screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: palette.primaryDark,
         tabBarInactiveTintColor: theme.subtitle,
@@ -55,8 +53,7 @@ export default function TabLayout() {
         }} />
         <Tabs.Screen name="care" options={{ title: 'Care' }} />
         <Tabs.Screen name="profile" options={{ title: 'Settings' }} />
-      </Tabs>
-    </HealthDataProvider>
+    </Tabs>
   );
 }
 

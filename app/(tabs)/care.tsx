@@ -92,7 +92,7 @@ export default function CareScreen() {
     const error = meds.error ?? medLogs.error ?? visits.error ?? noteRows.error;
     if (error) Alert.alert('Unable to load care data', error.message);
     const medicationRows = (meds.data as Medication[]) ?? [];
-    const appointmentRows = (visits.data as Appointment[]) ?? [];
+    const appointmentRows = ((visits.data as Appointment[]) ?? []).filter((item) => item.status !== 'completed');
     setMedications(medicationRows);
     setMedicationLogs((medLogs.data as MedicationLog[]) ?? []);
     setAppointments(appointmentRows);

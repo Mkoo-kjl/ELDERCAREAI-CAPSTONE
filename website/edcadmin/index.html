@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'">
+    <title>Admin | ElderCareAI</title>
+    <link rel="icon" href="../assets/eldercare-logo.png" type="image/png">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="admin.css">
+    <script defer src="config.js"></script>
+    <script defer src="admin.js"></script>
+  </head>
+  <body>
+    <div id="login-view" class="login-view">
+      <div class="login-content">
+        <a class="admin-brand" href="../index.html"><img src="../assets/eldercare-logo.png" alt="" width="48" height="48"><span>ElderCare<span>AI</span></span></a>
+        <p class="admin-eyebrow">ADMINISTRATOR ACCESS</p>
+        <h1>Care oversight,<br>in one place.</h1>
+        <p class="login-copy">Sign in to review accounts, health activity, and security events.</p>
+        <form id="login-form" class="login-form">
+          <label for="username">Username or email</label>
+          <input id="username" name="username" type="text" autocomplete="username" required maxlength="254" placeholder="eldercareadmin or admin@email.com">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+          <button class="admin-button primary" type="submit">Sign in</button>
+          <p id="login-message" class="form-message" role="alert" aria-live="polite"></p>
+        </form>
+        <form id="invite-form" class="login-form" hidden>
+          <h2>Set your admin password</h2>
+          <p id="invite-email" class="quiet-note"></p>
+          <label for="invite-password">New password</label>
+          <input id="invite-password" name="password" type="password" autocomplete="new-password" minlength="12" required>
+          <label for="invite-confirm">Confirm password</label>
+          <input id="invite-confirm" name="confirm" type="password" autocomplete="new-password" minlength="12" required>
+          <button class="admin-button primary" type="submit">Set password</button>
+          <p id="invite-message" class="form-message" role="alert" aria-live="polite"></p>
+        </form>
+        <p class="login-footnote">Authorized team members only. Activity is recorded.</p>
+      </div>
+      <div class="login-visual" aria-hidden="true"><img src="../assets/hero-desktop.png" alt=""></div>
+    </div>
+
+    <div id="admin-app" class="admin-app" hidden>
+      <aside class="admin-sidebar" aria-label="Admin navigation">
+        <div class="sidebar-top"><a class="admin-brand" href="../index.html"><img src="../assets/eldercare-logo.png" alt="" width="36" height="36"><span>ElderCare<span>AI</span></span></a><small>ADMIN CONSOLE</small></div>
+        <nav id="admin-nav">
+          <button type="button" class="is-active" data-view="dashboard">Overview</button>
+          <button type="button" data-view="accounts">Accounts</button>
+          <button type="button" data-view="monitor">System monitor</button>
+          <button type="button" data-view="alerts">Alerts &amp; notifications</button>
+          <button type="button" data-view="reports">Reports</button>
+          <button type="button" data-view="security">Security</button>
+        </nav>
+        <div class="sidebar-bottom"><span id="admin-identity"></span><button type="button" id="sign-out">Sign out</button></div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar"><div><p class="admin-eyebrow">ELDERCAREAI / ADMIN</p><h1 id="view-title">Overview</h1></div><div class="top-actions"><span id="last-updated"></span><button type="button" id="refresh-view" class="admin-button secondary">Refresh</button></div></header>
+        <p id="global-message" class="global-message" role="status" aria-live="polite" hidden></p>
+
+        <section id="view-dashboard" class="admin-view">
+          <div class="metric-strip"><div><span>Caregivers</span><strong id="metric-caregivers">--</strong></div><div><span>Older adults</span><strong id="metric-patients">--</strong></div><div><span>Connected devices</span><strong id="metric-devices">--</strong></div><div><span>Suspended accounts</span><strong id="metric-suspended">--</strong></div></div>
+          <div class="dashboard-grid"><div class="data-section"><div class="section-heading"><h2>Health data pipeline</h2><span id="pipeline-status" class="status-pill">Checking</span></div><dl class="status-list"><div><dt>Latest saved vital</dt><dd id="latest-vital">--</dd></div><div><dt>Admin API response</dt><dd id="api-response">--</dd></div><div><dt>Data source</dt><dd>Supabase health records</dd></div></dl></div><div class="data-section"><div class="section-heading"><h2>Recent alerts</h2><button type="button" class="text-command" data-go="alerts">View all</button></div><div id="dashboard-alerts" class="activity-list"></div></div></div>
+          <div class="data-section"><div class="section-heading"><h2>Recent emergencies</h2><button type="button" class="text-command" data-go="alerts">View history</button></div><div id="dashboard-emergencies" class="activity-list"></div></div>
+        </section>
+
+        <section id="view-accounts" class="admin-view" hidden>
+          <div class="section-heading"><div><h2>Caregiver accounts</h2><p>Profiles and the older adults linked to them.</p></div><div class="pager"><button type="button" id="accounts-prev" class="admin-button secondary">Previous</button><span id="accounts-page">Page 1</span><button type="button" id="accounts-next" class="admin-button secondary">Next</button></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Caregiver</th><th>Contact</th><th>Role</th><th>Status</th><th>Patients</th><th></th></tr></thead><tbody id="caregiver-rows"></tbody></table></div>
+          <div class="section-heading split-heading"><div><h2>Older adult profiles</h2><p id="patient-context">Select a caregiver to view their profiles.</p></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Name</th><th>Age</th><th>Emergency contact</th><th>Conditions</th><th></th></tr></thead><tbody id="patient-rows"></tbody></table></div>
+          <form id="caregiver-editor" class="editor" hidden><h3>Edit caregiver</h3><input type="hidden" name="id"><div class="field-grid"><label>Full name<input name="full_name" required maxlength="120"></label><label>Phone<input name="phone" maxlength="40" type="tel"></label></div><div class="editor-actions"><button type="submit" class="admin-button primary">Save changes</button><button type="button" class="admin-button secondary" data-cancel>Edit later</button></div></form>
+          <form id="patient-editor" class="editor" hidden><h3>Edit older adult</h3><input type="hidden" name="id"><div class="field-grid"><label>Full name<input name="full_name" required maxlength="120"></label><label>Age<input name="age" type="number" min="0" max="125"></label><label>Gender<input name="gender" maxlength="40"></label><label>Emergency contact<input name="emergency_contact" maxlength="120"></label><label>Emergency phone<input name="emergency_contact_phone" maxlength="40"></label><label class="wide-field">Medical history<textarea name="medical_conditions" maxlength="2000" rows="4"></textarea></label></div><div class="editor-actions"><button type="submit" class="admin-button primary">Save changes</button><button type="button" class="admin-button secondary" data-cancel>Edit later</button></div></form>
+        </section>
+
+        <section id="view-monitor" class="admin-view" hidden>
+          <div class="data-section"><div class="section-heading"><div><h2>Connected devices</h2><p>Connection state reported during caregiver onboarding. This is not live device telemetry.</p></div></div><div class="table-wrap"><table><thead><tr><th>Caregiver ID</th><th>Connection</th><th>Paired devices</th><th>Last state change</th></tr></thead><tbody id="device-rows"></tbody></table></div></div>
+          <div class="data-section"><div class="section-heading"><div><h2>Recent health syncs</h2><p>Most recent database writes; a reading may have been measured earlier.</p></div></div><div class="table-wrap"><table><thead><tr><th>Patient ID</th><th>Saved at</th><th>Measured at</th><th>Source</th></tr></thead><tbody id="sync-rows"></tbody></table></div></div>
+        </section>
+
+        <section id="view-alerts" class="admin-view" hidden>
+          <div class="data-section"><h2>Health alerts</h2><div class="table-wrap"><table><thead><tr><th>When</th><th>Severity</th><th>Alert</th><th>Patient ID</th><th>Status</th></tr></thead><tbody id="alert-rows"></tbody></table></div></div>
+          <div class="data-section"><h2>Notifications</h2><div class="table-wrap"><table><thead><tr><th>When</th><th>Type</th><th>Notification</th><th>Delivery</th></tr></thead><tbody id="notification-rows"></tbody></table></div></div>
+          <div class="data-section"><h2>Emergency history</h2><div class="table-wrap"><table><thead><tr><th>When</th><th>Severity</th><th>Event</th><th>Patient ID</th><th>Status</th></tr></thead><tbody id="emergency-rows"></tbody></table></div></div>
+        </section>
+
+        <section id="view-reports" class="admin-view" hidden>
+          <div class="section-heading"><div><h2>Export a report</h2><p>Generate a CSV from saved patient records or administrative activity. Reports are limited to 90 days and 2,000 rows per export.</p></div></div>
+          <form id="report-form" class="report-form"><label>Report type<select name="type"><option value="vitals">Health readings</option><option value="alerts">Health alerts</option><option value="appointments">Appointments</option><option value="medications">Medication schedules</option><option value="medicalHistory">Medical history</option><option value="activities">Admin activity</option></select></label><label>From<input type="date" name="from" required></label><label>To<input type="date" name="to" required></label><button type="submit" class="admin-button primary">Generate CSV</button></form>
+          <p id="report-result" class="quiet-note" aria-live="polite"></p>
+        </section>
+
+        <section id="view-security" class="admin-view" hidden>
+          <div class="data-section"><div class="section-heading"><h2>Administrators</h2><span id="admin-count"></span></div>
+            <form id="admin-invite-form" class="admin-invite-form"><label>Admin email<input name="email" type="email" autocomplete="off" required maxlength="254" placeholder="name@example.com"></label><button type="submit" class="admin-button primary">Send invite</button></form>
+            <p id="admin-invite-result" class="quiet-note" role="status" aria-live="polite"></p>
+            <div class="table-wrap"><table><thead><tr><th>Email</th><th>Access</th><th>Added</th><th></th></tr></thead><tbody id="admin-rows"></tbody></table></div>
+          </div>
+          <div class="section-heading"><div><h2>Security settings</h2><p>Review account protection and change caregiver access status.</p></div></div>
+          <div class="security-grid"><div class="data-section"><h3>Current session</h3><dl class="status-list"><div><dt>Signed in as</dt><dd id="security-email">--</dd></div><div><dt>Role</dt><dd>Administrator</dd></div><div><dt>Session storage</dt><dd>Memory only; closing this page signs out</dd></div></dl></div><form id="security-form" class="data-section"><h3>Manage account protection</h3><label>Caregiver<select name="id" id="security-caregiver" required><option value="">Select caregiver</option></select></label><label>Account status<select name="status"><option value="active">Active</option><option value="suspended">Suspended</option></select></label><button type="submit" class="admin-button primary">Save changes</button></form></div>
+          <div class="data-section"><div class="section-heading"><h2>Administrative activity</h2><span>Most recent 30 events</span></div><div class="table-wrap"><table><thead><tr><th>When</th><th>Action</th><th>Target</th></tr></thead><tbody id="audit-rows"></tbody></table></div></div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

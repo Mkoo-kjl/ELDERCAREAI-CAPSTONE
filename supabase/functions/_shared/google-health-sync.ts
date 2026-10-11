@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { buildHealthSnapshot, sleepSessionRows, snapshotChanged, type HealthResults } from './health-snapshot.ts';
+import { isActiveCaregiver } from './caregiver-access.ts';
 
 type Row = Record<string, any>;
 
@@ -72,6 +73,7 @@ async function refreshGoogleToken(token: Row, clientId: string, clientSecret: st
 }
 
 export async function syncGoogleHealthForUser(admin: SupabaseClient, userId: string, clientId: string, clientSecret: string, includeWatchSync = false) {
+  if (!await isActiveCaregiver(admin, userId)) throw new HealthSyncError('Caregiver access is inactive.', 'ACCOUNT_INACTIVE', [], 403);
   const [{ data: token, error: tokenError }, { data: elderly, error: elderlyError }] = await Promise.all([
     admin.from('google_health_tokens').select('*').eq('user_id', userId).maybeSingle(),
     admin.from('elderly_profiles').select('elderly_id').eq('caregiver_id', userId).order('created_at').limit(1).maybeSingle(),

@@ -147,7 +147,7 @@ export default function DashboardScreen() {
     if (notesResult.error) console.warn('Unable to load notes:', notesResult.error.message);
     else setNotes((notesResult.data as NotePreview[]) ?? []);
     if (appointmentResult.error) console.warn('Unable to load appointments:', appointmentResult.error.message);
-    else if (appointmentResult.data?.length) setAppointments(appointmentResult.data as AppointmentPreview[]);
+    else if (appointmentResult.data?.some((item) => item.status !== 'completed')) setAppointments((appointmentResult.data as AppointmentPreview[]).filter((item) => item.status !== 'completed'));
     else {
       const recent = await supabase.from('appointments')
         .select('id, title, doctor_name, appointment_at, status')
@@ -155,9 +155,9 @@ export default function DashboardScreen() {
         .eq('elderly_id', elderlyId)
         .lt('appointment_at', new Date().toISOString())
         .order('appointment_at', { ascending: false })
-        .limit(1);
+        .limit(10);
       if (recent.error) console.warn('Unable to load recent appointment:', recent.error.message);
-      else setAppointments((recent.data as AppointmentPreview[]) ?? []);
+      else setAppointments(((recent.data as AppointmentPreview[]) ?? []).filter((item) => item.status !== 'completed').slice(0, 1));
     }
   }, [caregiverId, elderlyId]);
 

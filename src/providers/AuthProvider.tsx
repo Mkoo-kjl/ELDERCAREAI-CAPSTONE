@@ -51,14 +51,15 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 async function syncAuthenticatedUser(session: Session) {
   const { user } = session;
   const metadata = user.user_metadata ?? {};
-  const fullName = metadata.full_name ?? metadata.name ?? user.email?.split('@')[0] ?? 'Caregiver';
+  const googleName = metadata.full_name ?? metadata.name ?? user.email?.split('@')[0] ?? 'Caregiver';
   const avatarUrl = metadata.avatar_url ?? metadata.picture ?? null;
 
   const { data: existingCaregiver } = await supabase
     .from('caregivers')
-    .select('id')
+    .select('id, full_name')
     .eq('id', user.id)
     .maybeSingle();
+  const fullName = existingCaregiver?.full_name || googleName;
 
   const caregiverWrite = existingCaregiver
     ? supabase.from('caregivers').update({
@@ -131,6 +132,23 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const initializeSession = useCallback(async (nextSession: Session | null) => {
     sessionRef.current = nextSession;
+    if (nextSession) {
+      const { data: access, error: accessError } = await supabase.from('user_access')
+        .select('role, status').eq('user_id', nextSession.user.id).maybeSingle();
+      if (accessError) console.warn('Unable to verify account access:', accessError.message);
+      if (access && (access.role !== 'caregiver' || access.status !== 'active')) {
+        setAuthError(access.status === 'suspended'
+          ? 'This caregiver account is suspended. Contact an administrator.'
+          : 'Administrator accounts can only sign in through the admin website.');
+        sessionRef.current = null;
+        setSession(null);
+        setOnboarding(null);
+        setIsOnboardingLoading(false);
+        setIsLoading(false);
+        await supabase.auth.signOut();
+        return;
+      }
+    }
     setSession(nextSession);
     if (nextSession) await syncAuthenticatedUser(nextSession);
     await loadOnboarding(nextSession);

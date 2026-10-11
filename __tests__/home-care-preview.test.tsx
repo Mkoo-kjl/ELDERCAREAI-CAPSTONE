@@ -21,6 +21,7 @@ jest.mock('@/src/components/GradientButton', () => ({ GradientButton: () => null
 jest.mock('@/src/components/LocationMapPreview', () => ({ LocationMapPreview: () => null }));
 
 const pastAppointment = { id: 'appt-1', title: 'Follow-up visit', doctor_name: null, appointment_at: '2025-05-10T10:00:00.000Z', status: 'scheduled' };
+let pastStatus = 'scheduled';
 
 function queryFor(table: string) {
   let past = false;
@@ -35,7 +36,7 @@ function queryFor(table: string) {
       ? { data: null, error: { message: 'Doctor contact unavailable' } }
       : { data: null, error: null }),
     then: (resolve: (result: { data: unknown[]; error: null }) => void) => {
-      const data = table === 'appointments' ? (past ? [pastAppointment] : [])
+      const data = table === 'appointments' ? (past ? [{ ...pastAppointment, status: pastStatus }] : [])
         : table === 'medication_schedules' ? [{ id: 'med-1', medication_name: 'Losartan', dosage: '50 mg', frequency: 'Daily', times_of_day: ['17:00'] }]
           : table === 'caregiver_notes' ? [{ id: 'note-1', title: 'Call family', content: 'Check in tonight', is_pinned: false, updated_at: '2025-05-10T00:00:00.000Z' }]
             : [];
@@ -46,6 +47,7 @@ function queryFor(table: string) {
 }
 
 test('Home shows care items independently and falls back to the most recent appointment', async () => {
+  pastStatus = 'scheduled';
   jest.spyOn(console, 'warn').mockImplementation(() => undefined);
   (supabase.from as jest.Mock).mockImplementation(queryFor);
   await render(<DashboardScreen />);
@@ -53,5 +55,15 @@ test('Home shows care items independently and falls back to the most recent appo
   expect(screen.getByText('Losartan')).toBeTruthy();
   expect(screen.getByText('Call family')).toBeTruthy();
   expect(screen.getByText(/Previous appointment/)).toBeTruthy();
+  jest.restoreAllMocks();
+});
+
+test('Home keeps completed checkups out of the appointment preview', async () => {
+  pastStatus = 'completed';
+  jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+  (supabase.from as jest.Mock).mockImplementation(queryFor);
+  await render(<DashboardScreen />);
+  await waitFor(() => expect(screen.getByText('Losartan')).toBeTruthy());
+  expect(screen.queryByText('Follow-up visit')).toBeNull();
   jest.restoreAllMocks();
 });

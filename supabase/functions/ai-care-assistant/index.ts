@@ -283,6 +283,11 @@ Deno.serve(async (request) => {
   if (userError || !userData.user) return json({ error: 'Invalid user session.' }, 401);
 
   const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
+  const { data: access, error: accessError } = await admin.from('user_access')
+    .select('role, status').eq('user_id', userData.user.id).maybeSingle();
+  if (accessError || access?.role !== 'caregiver' || access.status !== 'active') {
+    return json({ error: 'Caregiver access is inactive.' }, 403);
+  }
 
   try {
     const userId = userData.user.id;

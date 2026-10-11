@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders, json } from '../_shared/cors.ts';
+import { isActiveCaregiver } from '../_shared/caregiver-access.ts';
 
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const HEALTH_SCOPES = [
@@ -62,6 +63,7 @@ Deno.serve(async (request) => {
   const codeVerifier = randomBase64Url(64);
   const codeChallenge = await sha256Base64Url(codeVerifier);
   const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
+  if (!await isActiveCaregiver(admin, userData.user.id)) return json({ error: 'Caregiver access is inactive.' }, 403);
 
   const { error: stateError } = await admin.from('google_health_oauth_states').insert({
     state,
