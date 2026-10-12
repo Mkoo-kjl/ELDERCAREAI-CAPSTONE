@@ -195,7 +195,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const signInWithGoogle = useCallback(async () => {
     if (!isSupabaseConfigured) {
-      setAuthError('Add your Supabase URL and publishable key to .env, then restart Expo.');
+      setAuthError('This app build is missing its Supabase settings. Install a newly configured APK.');
       return false;
     }
     setIsSigningIn(true);

@@ -104,7 +104,7 @@ export default function LoginScreen() {
           {!isSupabaseConfigured && !authError ? (
             <View style={styles.message}>
               <Ionicons name="information-circle" size={18} color={palette.warning} />
-              <Text style={styles.messageText}>Supabase setup is still needed. See README.md before signing in.</Text>
+              <Text style={styles.messageText}>This app build is missing its Supabase settings. Install a newly configured APK.</Text>
             </View>
           ) : null}
 

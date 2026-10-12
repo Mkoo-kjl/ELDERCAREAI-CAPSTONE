@@ -46,6 +46,18 @@ EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_OR_ANON_KEY
 
 Use the publishable key from **Supabase Dashboard → Project Settings → API**. A legacy `anon` key also works. Never put the service-role/secret key in a mobile app.
 
+### Installed APK says Supabase setup is needed
+
+An installed preview/production APK uses the JavaScript bundle created during its build. Restarting Metro or editing the local `.env` cannot change an APK already on a phone. This project's `eas.json` includes the public Supabase URL and publishable key in every build profile so EAS cloud builds can inline them even though `.env` is git-ignored. These two values are public client configuration, **not** a service-role or Google/Gemini secret. If the Supabase project or publishable key changes, update the build profiles and local `.env` together.
+
+Rebuild an installable Android APK and install the new build on the phone:
+
+```bash
+npx eas-cli@latest build --platform android --profile preview
+```
+
+Open the resulting EAS build link on the phone and install it over the old app. The `production` profile is for store distribution; its Android output is normally an AAB, not the direct-install preview APK. An old APK cannot be repaired by `npm start` or by reopening it.
+
 ## 2. Configure Supabase and Google
 
 ### Google Cloud / Google Auth Platform
