@@ -25,7 +25,17 @@
           <label for="password">Password</label>
           <input id="password" name="password" type="password" autocomplete="current-password" required>
           <button class="admin-button primary" type="submit">Sign in</button>
+          <button id="reset-password" class="text-command recovery-link" type="button">Forgot password?</button>
           <p id="login-message" class="form-message" role="alert" aria-live="polite"></p>
+        </form>
+        <form id="recovery-form" class="login-form" hidden>
+          <h2>Verify reset code</h2>
+          <p id="recovery-email" class="quiet-note"></p>
+          <label for="recovery-code">Code from your email</label>
+          <input id="recovery-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,8}" maxlength="8" required>
+          <button class="admin-button primary" type="submit">Verify code</button>
+          <button id="recovery-back" class="text-command recovery-link" type="button">Back to sign in</button>
+          <p id="recovery-message" class="form-message" role="alert" aria-live="polite"></p>
         </form>
         <form id="invite-form" class="login-form" hidden>
           <h2>Set your admin password</h2>

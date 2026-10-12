@@ -18,6 +18,7 @@ textarea{resize:vertical}
 input:focus,select:focus,textarea:focus{border-color:#509393;outline:2px solid #d2ebeb;outline-offset:0}
 .login-form input{margin-bottom:8px}
 .login-form .admin-button{margin-top:10px}
+.login-form .recovery-link{justify-self:start;margin-top:2px}
 .form-message{min-height:22px;margin:2px 0 0;color:#b1443e;font-size:.83rem}
 .form-message.is-success{color:#2b7452}
 .login-footnote{margin-top:40px;color:#889994;font-size:.73rem}

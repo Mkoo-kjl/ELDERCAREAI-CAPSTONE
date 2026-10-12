@@ -1,6 +1,6 @@
 (() => {
   const config = window.ELDERCARE_ADMIN_CONFIG;
-  const state = { token: null, email: '', currentView: 'dashboard', page: 0, accounts: null, selectedCaregiver: null, lastInteraction: Date.now() };
+  const state = { token: null, email: '', recoveryEmail: '', currentView: 'dashboard', page: 0, accounts: null, selectedCaregiver: null, lastInteraction: Date.now() };
   const $ = (id) => document.getElementById(id);
   const titles = { dashboard: 'Overview', accounts: 'Manage accounts', monitor: 'System monitor', alerts: 'Alerts & notifications', reports: 'Generate reports', security: 'Manage security' };
 
@@ -80,15 +80,23 @@
   function signOut() {
     state.token = null;
     state.email = '';
+    state.recoveryEmail = '';
     state.accounts = null;
     $('password').value = '';
     $('invite-form').hidden = true;
+    $('recovery-form').hidden = true;
     $('login-form').hidden = false;
+    $('recovery-code').value = '';
     $('invite-password').value = '';
     $('invite-confirm').value = '';
     $('login-message').classList.remove('is-success');
     $('login-view').hidden = false;
     $('admin-app').hidden = true;
+  }
+
+  function loginEmail() {
+    const entered = $('username').value.trim().toLowerCase();
+    return entered === 'eldercareadmin' ? config.adminEmail : entered;
   }
 
   async function api(action, payload = {}) {
@@ -100,7 +108,9 @@
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) signOut();
-      throw new Error(data.error || 'Could not complete the request. Please try again.');
+      const error = new Error(data.error || 'Could not complete the request. Please try again.');
+      error.status = response.status;
+      throw error;
     }
     return data;
   }
@@ -334,21 +344,25 @@
       loginMessage.textContent = 'Admin configuration is missing. Contact the project administrator.';
       return;
     }
-    const entered = form.elements.username.value.trim();
-    const email = entered.toLowerCase() === 'eldercareadmin' ? config.adminEmail : entered.toLowerCase();
+    const email = loginEmail();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       loginMessage.textContent = 'Invalid admin credentials.';
       return;
     }
     const submit = form.querySelector('button[type="submit"]');
     submit.disabled = true;
+    let authSucceeded = false;
     try {
       const response = await fetch(`${config.url}/auth/v1/token?grant_type=password`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', apikey: config.publishableKey },
         body: JSON.stringify({ email, password: form.elements.password.value }),
       });
-      const auth = await response.json();
-      if (!response.ok || !auth.access_token) throw new Error('Invalid admin credentials.');
+      const auth = await response.json().catch(() => ({}));
+      if (!response.ok || !auth.access_token) {
+        if (auth.error_code === 'email_not_confirmed') throw new Error('Confirm the separate admin email in Supabase, then try again.');
+        throw new Error('Admin email or password was not accepted. Check the separate admin Auth account.');
+      }
+      authSucceeded = true;
       state.token = auth.access_token;
       const verified = await api('session');
       state.email = verified.user.email;
@@ -360,12 +374,109 @@
       await showView('dashboard');
     } catch (error) {
       signOut();
-      loginMessage.textContent = error.message === 'Admin access is required.' ? error.message : 'Sign in failed. Check your credentials and admin access.';
+      if (!authSucceeded) loginMessage.textContent = error instanceof TypeError
+        ? 'Cannot reach Supabase Auth. Check your connection and try again.' : error.message;
+      else if (error.message === 'Admin access is required.') loginMessage.textContent = 'This account is not an active administrator. Check its role and status in user_access.';
+      else if (error.status === 403) loginMessage.textContent = 'The admin service rejected access. Check the admin-portal function logs.';
+      else if (error.status === 404) loginMessage.textContent = 'The admin-portal function is not deployed to this Supabase project.';
+      else if (error.message === 'Unable to verify admin permissions.') loginMessage.textContent = 'Admin permissions could not be checked. Confirm the admin migration is applied.';
+      else loginMessage.textContent = 'Authentication succeeded, but the admin service could not complete sign-in. Check Edge Function logs.';
     } finally { submit.disabled = false; }
+  });
+
+  $('reset-password').addEventListener('click', async (event) => {
+    const feedback = $('login-message');
+    feedback.textContent = '';
+    feedback.classList.remove('is-success');
+    if (!config?.url || !config?.publishableKey || !config?.adminEmail) {
+      feedback.textContent = 'Admin configuration is missing. Contact the project administrator.';
+      return;
+    }
+    const email = loginEmail();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      feedback.textContent = 'Enter your admin username or email above first.';
+      return;
+    }
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      const redirect = new URL('/edcadmin/', window.location.origin).href;
+      const response = await fetch(`${config.url}/auth/v1/recover?redirect_to=${encodeURIComponent(redirect)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: config.publishableKey },
+        body: JSON.stringify({ email }),
+      });
+      if (!response.ok) {
+        feedback.textContent = response.status === 429
+          ? 'Please wait before requesting another reset email.'
+          : 'Could not send a reset email right now. Try again later.';
+        return;
+      }
+      state.recoveryEmail = email;
+      $('recovery-email').textContent = email;
+      $('recovery-message').textContent = 'If this account exists, enter the code from the newest reset email.';
+      $('recovery-message').classList.add('is-success');
+      $('login-form').hidden = true;
+      $('recovery-form').hidden = false;
+    } catch {
+      feedback.textContent = 'Could not reach Supabase Auth. Check your connection and try again.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  $('recovery-back').addEventListener('click', () => {
+    signOut();
+    $('login-message').textContent = '';
+  });
+
+  $('recovery-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const feedback = $('recovery-message');
+    const code = form.elements.code.value.trim();
+    feedback.textContent = '';
+    feedback.classList.remove('is-success');
+    if (!/^\d{6,8}$/.test(code) || !state.recoveryEmail) {
+      feedback.textContent = 'Enter the code from your newest reset email.';
+      return;
+    }
+    const submit = form.querySelector('button[type="submit"]');
+    submit.disabled = true;
+    try {
+      const response = await fetch(`${config.url}/auth/v1/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: config.publishableKey },
+        body: JSON.stringify({ email: state.recoveryEmail, token: code, type: 'recovery' }),
+      });
+      const verified = await response.json().catch(() => ({}));
+      if (!response.ok || !verified.access_token || verified.user?.email?.toLowerCase() !== state.recoveryEmail) {
+        feedback.textContent = 'That code is invalid or expired. Request a new reset email.';
+        return;
+      }
+      state.token = verified.access_token;
+      state.email = verified.user.email;
+      state.lastInteraction = Date.now();
+      form.elements.code.value = '';
+      $('invite-email').textContent = state.email;
+      $('recovery-form').hidden = true;
+      $('invite-form').hidden = false;
+    } catch {
+      feedback.textContent = 'Could not verify the code. Check your connection and try again.';
+    } finally {
+      submit.disabled = false;
+    }
   });
 
   async function openInviteLink() {
     const params = new URLSearchParams(window.location.hash.slice(1));
+    if (params.has('error')) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      $('login-message').textContent = params.get('error_code') === 'otp_expired'
+        ? 'This reset link expired or was already used. Request a new one and open the newest email once.'
+        : 'This admin link could not be verified. Request a new one.';
+      return;
+    }
     if (!params.has('access_token')) return;
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
     const token = params.get('access_token');
