@@ -1,0 +1,1 @@
+window.ELDERCARE_ADMIN_CONFIG = {"url":"https://iuhulbsgsmpezpmegeis.supabase.co","publishableKey":"sb_publishable_TdD_JmS_BFIQF1c83RnA3A_ighUzNkp","adminEmail":"jaweplanos22+eldercareadmin@gmail.com"};

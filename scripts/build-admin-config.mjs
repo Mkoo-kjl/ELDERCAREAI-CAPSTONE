@@ -19,8 +19,8 @@ const email = read('ELDERCARE_ADMIN_EMAIL') || 'jaweplanos22+eldercareadmin@gmai
 if (!url || !key || !email) {
   throw new Error('Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY.');
 }
-if (!/^https:\/\/[^/]+\.supabase\.co$/.test(url) || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-  throw new Error('Check the Supabase URL and admin email.');
+if (!/^https:\/\/[^/]+\.supabase\.co$/.test(url) || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !key.startsWith('sb_publishable_')) {
+  throw new Error('Check the Supabase URL, publishable key, and admin email. Never use a service-role key in website config.');
 }
 writeFileSync(resolve(root, 'website/edcadmin/config.js'),
   `window.ELDERCARE_ADMIN_CONFIG = ${JSON.stringify({ url, publishableKey: key, adminEmail: email })};\n`, 'utf8');

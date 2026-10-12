@@ -2,6 +2,8 @@
 
 Open `index.html` directly in a browser. The landing page is static and separate from the Expo app.
 
+For a Git-based Vercel deployment, set the project root directory to `website` and use the `Other` framework preset. The admin portal at `/edcadmin/` requires the committed `edcadmin/config.js` public configuration file; see [admin setup](edcadmin/README.md). After deployment, check that `/edcadmin/config.js` returns JavaScript, not a 404.
+
 ## Team photos
 
 The three team cards deliberately show photo placeholders. To add portraits later, place `kristoffer.jpg`, `melvence.jpg`, and `john-wayne.jpg` in `assets/team/`. Add the corresponding `<img src="assets/team/..." alt="...">` inside each `.team-photo` element in `index.html`; the existing CSS fills the photo area. The initials remain behind the photo as a fallback.
