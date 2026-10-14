@@ -23,7 +23,7 @@ export function SetupScaffold({ step, title, subtitle, canGoBack = true, childre
   const theme = getTheme(isDark);
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <View style={[styles.screen, { backgroundColor: theme.background }]}>
         <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <View style={styles.navRow}>

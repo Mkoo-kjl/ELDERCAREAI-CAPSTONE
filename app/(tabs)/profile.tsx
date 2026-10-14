@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, useColorScheme, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, AppState, Image, KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, useColorScheme, View } from 'react-native';
 
 import { AppText as Text } from '@/src/components/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -31,7 +32,9 @@ export default function ProfileScreen() {
   const { isDark, toggleDarkMode } = useThemePreference();
   const [caregiver, setCaregiver] = useState<Caregiver | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean | null>(null);
+  const [locationPermission, setLocationPermission] = useState<Location.PermissionResponse | null>(null);
+  const [permissionBusy, setPermissionBusy] = useState<'notifications' | 'location' | null>(null);
   const [exporting, setExporting] = useState<'health' | 'medications' | null>(null);
   const [doctor, setDoctor] = useState<DoctorContact | null>(null);
   const [doctorModalOpen, setDoctorModalOpen] = useState(false);
@@ -61,21 +64,79 @@ export default function ProfileScreen() {
     else setDoctor(data as DoctorContact | null);
   }, [elderly, session]);
 
+  const loadPermissionStatuses = useCallback(async () => {
+    try {
+      const [notificationAllowed, phoneLocation] = await Promise.all([
+        hasNotificationPermission(),
+        Location.getForegroundPermissionsAsync(),
+      ]);
+      setNotificationsEnabled(notificationAllowed);
+      setLocationPermission(phoneLocation);
+    } catch (caught) {
+      console.warn('Unable to check app permissions:', caught);
+    }
+  }, []);
+
   useFocusEffect(useCallback(() => {
     void loadCaregiver();
     void refresh(false);
     void loadDoctor();
-    void hasNotificationPermission().then(setNotificationsEnabled);
-  }, [loadCaregiver, loadDoctor, refresh]));
+    void loadPermissionStatuses();
+  }, [loadCaregiver, loadDoctor, loadPermissionStatuses, refresh]));
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void loadPermissionStatuses();
+    });
+    return () => subscription.remove();
+  }, [loadPermissionStatuses]);
 
   const configureNotifications = async () => {
     if (notificationsEnabled) {
       Alert.alert('Notification settings', 'Use the phone settings to change or disable ElderCareAI notifications.', [{ text: 'Cancel', style: 'cancel' }, { text: 'Open Settings', onPress: () => void Linking.openSettings() }]);
       return;
     }
-    const granted = await ensureNotificationPermission();
-    setNotificationsEnabled(granted);
-    if (!granted) Alert.alert('Notifications are off', 'Enable notifications in the phone settings to receive appointment, medication, and health reminders.', [{ text: 'Cancel', style: 'cancel' }, { text: 'Open Settings', onPress: () => void Linking.openSettings() }]);
+    setPermissionBusy('notifications');
+    try {
+      const granted = await ensureNotificationPermission();
+      setNotificationsEnabled(granted);
+      if (!granted) Alert.alert('Notifications are off', 'Enable notifications in the phone settings to receive appointment, medication, and health reminders.', [{ text: 'Cancel', style: 'cancel' }, { text: 'Open Settings', onPress: () => void Linking.openSettings() }]);
+    } catch (caught) {
+      Alert.alert('Unable to enable notifications', caught instanceof Error ? caught.message : 'Please try again.');
+    } finally {
+      setPermissionBusy(null);
+    }
+  };
+
+  const configureLocation = async () => {
+    if (!session) return;
+    if (locationPermission?.granted && onboarding?.location_permission === 'granted') {
+      Alert.alert('Location settings', 'Use the phone settings to change location access. ElderCareAI records this phone only after a manual health sync.', [{ text: 'Cancel', style: 'cancel' }, { text: 'Open Settings', onPress: () => void Linking.openSettings() }]);
+      return;
+    }
+    setPermissionBusy('location');
+    try {
+      let permission = await Location.getForegroundPermissionsAsync();
+      if (!permission.granted && permission.canAskAgain) permission = await Location.requestForegroundPermissionsAsync();
+      setLocationPermission(permission);
+      if (!permission.granted) {
+        Alert.alert('Phone location is off', 'Allow location for ElderCareAI in phone settings, then return here and tap Enable to finish.', [{ text: 'Cancel', style: 'cancel' }, { text: 'Open Settings', onPress: () => void Linking.openSettings() }]);
+        return;
+      }
+      const now = new Date().toISOString();
+      const { error } = await supabase.from('onboarding_progress').upsert({
+        user_id: session.user.id,
+        location_permission: 'granted',
+        location_consent_at: now,
+        updated_at: now,
+      }, { onConflict: 'user_id' });
+      if (error) throw error;
+      await refreshOnboarding();
+    } catch (caught) {
+      Alert.alert('Unable to enable location', caught instanceof Error ? caught.message : 'Please try again.');
+    } finally {
+      setPermissionBusy(null);
+    }
   };
 
   const savePhoto = async (kind: 'caregiver' | 'elderly', photo: LocalPhoto) => {
@@ -175,6 +236,7 @@ export default function ProfileScreen() {
   };
 
   const connected = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
+  const locationEnabled = locationPermission?.granted === true && onboarding?.location_permission === 'granted';
   return <ScrollView style={[styles.screen, { backgroundColor: theme.background }]} contentContainerStyle={{ paddingTop: insets.top + 14, paddingBottom: insets.bottom + 95 }}>
     <View style={styles.header}><Text style={[styles.title, { color: theme.text }]}>Settings</Text><Text style={[styles.subtitle, { color: theme.subtitle }]}>Profiles and connected services</Text></View>
     <Section title="ACCOUNT"><View style={[styles.card, { backgroundColor: theme.cardElevated }]}><View style={styles.account}><View style={styles.accountIcon}><Text style={styles.initial}>{(caregiver?.full_name ?? session?.user.email ?? 'C')[0].toUpperCase()}</Text></View><View style={styles.accountCopy}><Text numberOfLines={1} style={[styles.cardTitle, { color: theme.text }]}>{caregiver?.full_name ?? 'Caregiver'}</Text><Text numberOfLines={1} style={[styles.body, { color: theme.subtitle }]}>{caregiver?.email ?? session?.user.email}</Text></View></View></View></Section>
@@ -184,17 +246,18 @@ export default function ProfileScreen() {
     <Section title="DOCTOR CONTACT"><View style={[styles.doctorCard, { backgroundColor: theme.cardElevated }]}>{doctor?.photo_url ? <Image source={{ uri: doctor.photo_url }} style={styles.doctorPhoto} /> : <View style={[styles.doctorPhotoFallback, { backgroundColor: `${palette.primary}16` }]}><Ionicons name="medical" size={23} color={palette.primaryDark} /></View>}<View style={styles.doctorCopy}><Text style={[styles.cardTitle, { color: theme.text }]}>{doctor?.full_name ?? 'No doctor saved'}</Text><Text style={[styles.body, { color: theme.subtitle }]}>{doctor?.phone ?? 'Add a doctor phone number for quick calls from Home.'}</Text></View><Pressable onPress={openDoctorForm} style={[styles.doctorEdit, { backgroundColor: `${palette.primary}14` }]}><Text style={styles.doctorEditText}>{doctor ? 'Edit' : 'Add'}</Text></Pressable></View></Section>
     <Section title="INTEGRATIONS"><SettingsCard><Row icon={connected ? 'checkmark-circle-outline' : 'cloud-offline-outline'} title="Google Health API v4" subtitle={connected ? onboarding?.wearable_status === 'connected' ? `${onboarding.paired_device_count} paired device(s)` : 'Authorized • no paired device' : 'Disconnected'} color={connected ? palette.accentDark : theme.subtitle} onPress={() => connected ? disconnect() : router.push('/setup/fitness?mode=edit')} trailing={connected ? 'Disconnect' : 'Connect'} /></SettingsCard></Section>
     <Section title="DATA MANAGEMENT"><SettingsCard><Row icon="document-outline" title="Health vitals PDF" subtitle={exporting === 'health' ? 'Generating organized report…' : 'Export a receipt-style table of synchronized readings'} onPress={exporting ? undefined : () => void exportHealth()} /><Divider color={theme.border} /><Row icon="receipt-outline" title="Medication schedule PDF" subtitle={exporting === 'medications' ? 'Generating organized report…' : 'Export medications as a caregiver-ready table'} onPress={exporting ? undefined : () => void exportMedications()} /></SettingsCard></Section>
-    <Section title="PREFERENCES"><SettingsCard><Row icon="notifications-outline" title="Care notifications" subtitle={notificationsEnabled ? 'Appointments, medications, and health warnings enabled' : 'Tap to enable reminders'} color={notificationsEnabled ? palette.accentDark : palette.warning} onPress={() => void configureNotifications()} trailing={notificationsEnabled ? 'Enabled' : 'Enable'} /><Divider color={theme.border} /><View style={styles.row}><View style={[styles.rowIcon, { backgroundColor: `${palette.purple}14` }]}><Ionicons name="moon-outline" size={20} color={palette.purple} /></View><View style={styles.rowCopy}><Text style={[styles.rowTitle, { color: theme.text }]}>Dark Mode</Text><Text style={[styles.rowSubtitle, { color: theme.subtitle }]}>Use the dark color palette</Text></View><Switch value={isDark} onValueChange={toggleDarkMode} trackColor={{ true: palette.primary }} /></View></SettingsCard></Section>
+    <Section title="APP PERMISSIONS"><SettingsCard><Row icon="notifications-outline" title="Care notifications" subtitle={notificationsEnabled === null ? 'Checking phone permission' : notificationsEnabled ? 'App notifications allowed; tap to manage' : 'Allow appointment, medication and health alerts'} color={notificationsEnabled ? palette.accentDark : palette.warning} onPress={permissionBusy ? undefined : () => void configureNotifications()} trailing={permissionBusy === 'notifications' ? 'Opening...' : notificationsEnabled === null ? 'Checking' : notificationsEnabled ? 'On' : 'Enable'} /><Divider color={theme.border} /><Row icon="location-outline" title="Phone location" subtitle={locationPermission === null ? 'Checking phone permission' : locationEnabled ? 'Saved after manual sync; tap to manage' : locationPermission.granted ? 'Phone access allowed; enable sync location' : 'Allow phone location for manual syncs'} color={locationEnabled ? palette.accentDark : palette.warning} onPress={permissionBusy ? undefined : () => void configureLocation()} trailing={permissionBusy === 'location' ? 'Opening...' : locationPermission === null ? 'Checking' : locationEnabled ? 'On' : locationPermission?.canAskAgain === false ? 'Settings' : 'Enable'} /></SettingsCard></Section>
+    <Section title="PREFERENCES"><SettingsCard><View style={styles.row}><View style={[styles.rowIcon, { backgroundColor: `${palette.purple}14` }]}><Ionicons name="moon-outline" size={20} color={palette.purple} /></View><View style={styles.rowCopy}><Text style={[styles.rowTitle, { color: theme.text }]}>Dark Mode</Text><Text style={[styles.rowSubtitle, { color: theme.subtitle }]}>Use the dark color palette</Text></View><Switch value={isDark} onValueChange={toggleDarkMode} trackColor={{ true: palette.primary }} /></View></SettingsCard></Section>
     <Section title="ABOUT"><SettingsCard><Row icon="information-circle-outline" title="ElderCareAI" subtitle="Version 1.0.0" /><Divider color={theme.border} /><Row icon="shield-checkmark-outline" title="Privacy Policy" subtitle="How health and account data are handled" onPress={() => Alert.alert('Privacy Policy', 'ElderCareAI stores account and care data in your configured Supabase project. Google Health tokens remain server-side. This app does not perform hidden background location tracking. Replace this placeholder with your reviewed production policy before release.')} /><Divider color={theme.border} /><Row icon="document-outline" title="Terms of Service" subtitle="Demo application terms" onPress={() => Alert.alert('Terms of Service', 'This demo is not a medical device and does not provide medical diagnosis. Replace this placeholder with reviewed production terms before release.')} /></SettingsCard></Section>
     <Pressable onPress={() => void signOut()} style={styles.logout}><Ionicons name="log-out-outline" size={20} color={palette.error} /><Text style={styles.logoutText}>Log out</Text></Pressable>
     <Modal visible={doctorModalOpen} transparent animationType="slide" onRequestClose={() => setDoctorModalOpen(false)}>
-      <KeyboardAvoidingView style={styles.overlay} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={styles.overlay} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View style={[styles.sheet, { backgroundColor: theme.cardElevated, paddingBottom: Math.max(insets.bottom, 18) }]}>
           <View style={styles.sheetHeader}>
             <Text style={[styles.sheetTitle, { color: theme.text }]}>{doctor ? 'Edit doctor' : 'Add doctor'}</Text>
             <Pressable onPress={() => setDoctorModalOpen(false)}><Ionicons name="close" size={24} color={theme.text} /></Pressable>
           </View>
-          <ScrollView keyboardShouldPersistTaps="handled">
+          <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'} contentContainerStyle={styles.sheetContent}>
             <ProfilePhotoPicker value={doctorPhoto} remoteUrl={doctorRemotePhoto} label="Doctor photo" onChange={setDoctorPhoto} />
             <FormField label="Doctor name" required value={doctorName} onChangeText={setDoctorName} icon="medical-outline" autoCapitalize="words" />
             <FormField label="Phone number" required value={doctorPhone} onChangeText={setDoctorPhone} icon="call-outline" keyboardType="phone-pad" placeholder="e.g. +63 917 123 4567" />
@@ -219,5 +282,5 @@ const styles = StyleSheet.create({
   doctorCard: { minHeight: 72, borderRadius: 14, padding: 13, flexDirection: 'row', alignItems: 'center' }, doctorPhoto: { width: 45, height: 45, borderRadius: 11, backgroundColor: palette.card }, doctorPhotoFallback: { width: 45, height: 45, borderRadius: 11, alignItems: 'center', justifyContent: 'center' }, doctorCopy: { flex: 1, marginLeft: 11 }, doctorEdit: { minWidth: 55, minHeight: 34, borderRadius: 11, alignItems: 'center', justifyContent: 'center' }, doctorEditText: { color: palette.primaryDark, fontSize: 11, fontFamily: fontFamily.semiBold },
   row: { minHeight: 68, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center' }, rowIcon: { width: 38, height: 38, borderRadius: 11, alignItems: 'center', justifyContent: 'center' }, rowCopy: { flex: 1, marginLeft: 11 }, rowTitle: { fontSize: 13, fontFamily: fontFamily.semiBold }, rowSubtitle: { marginTop: 3, ...typeScale.caption }, trailing: { fontSize: 11, fontFamily: fontFamily.medium }, divider: { height: StyleSheet.hairlineWidth, marginLeft: 62 },
   logout: { marginHorizontal: 18, marginTop: 2, height: 50, borderRadius: 14, borderWidth: 1, borderColor: `${palette.error}55`, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, logoutText: { color: palette.error, fontFamily: fontFamily.semiBold, fontSize: 13 },
-  overlay: { flex: 1, backgroundColor: '#00000066', justifyContent: 'flex-end' }, sheet: { maxHeight: '88%', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 20, paddingTop: 18 }, sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }, sheetTitle: { ...typeScale.sectionTitle },
+  overlay: { flex: 1, backgroundColor: '#00000066', justifyContent: 'flex-end' }, sheet: { maxHeight: '88%', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 20, paddingTop: 18 }, sheetContent: { paddingBottom: 18 }, sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }, sheetTitle: { ...typeScale.sectionTitle },
 });

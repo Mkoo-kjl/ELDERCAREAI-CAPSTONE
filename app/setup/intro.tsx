@@ -115,7 +115,14 @@ export default function IntroSetupScreen() {
         style={styles.pager}
       >
         {slides.map((slide, index) => (
-          <View key={slide.title} style={[styles.slide, { width }]}>
+          <ScrollView
+            key={slide.title}
+            testID="intro-slide"
+            style={[styles.slidePage, { width }]}
+            contentContainerStyle={styles.slide}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
             {index === 0 ? <FitbitHero /> : <CareHero slide={slide} index={index} />}
             <View style={styles.copy}>
               <View style={[styles.eyebrowPill, { backgroundColor: `${slide.color}14` }]}>
@@ -125,7 +132,7 @@ export default function IntroSetupScreen() {
               <Text style={[styles.title, { color: theme.text }]}>{slide.title}</Text>
               <Text style={[styles.body, { color: theme.subtitle }]}>{slide.body}</Text>
             </View>
-          </View>
+          </ScrollView>
         ))}
       </ScrollView>
 
@@ -188,10 +195,14 @@ function CareHero({ slide, index }: { slide: IntroSlide; index: number }) {
           <Ionicons name={slide.icon} size={29} color={slide.color} />
         </View>
         <View style={styles.panelGrid}>
-          {items.map(([icon, label]) => (
-            <View key={label} style={[styles.panelItem, { backgroundColor: theme.card }]}>
-              <Ionicons name={icon} size={18} color={slide.color} />
-              <Text style={[styles.panelText, { color: theme.text }]}>{label}</Text>
+          {[0, 2].map((start) => (
+            <View key={start} testID="intro-feature-row" style={styles.panelRow}>
+              {items.slice(start, start + 2).map(([icon, label]) => (
+                <View key={label} style={[styles.panelItem, { backgroundColor: theme.card }]}>
+                  <Ionicons name={icon} size={18} color={slide.color} />
+                  <Text style={[styles.panelText, { color: theme.text }]}>{label}</Text>
+                </View>
+              ))}
             </View>
           ))}
         </View>
@@ -209,18 +220,20 @@ const styles = StyleSheet.create({
   skip: { minWidth: 70, minHeight: 38, paddingHorizontal: 16, borderRadius: 14, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   skipText: { fontSize: 12, fontFamily: fontFamily.medium },
   pager: { flex: 1 },
-  slide: { flex: 1, paddingHorizontal: 22, justifyContent: 'center' },
-  heroWrap: { minHeight: 320, alignItems: 'center', justifyContent: 'center' },
-  deviceStage: { width: 250, height: 250, alignItems: 'center', justifyContent: 'center' },
-  deviceImage: { width: 218, height: 218 },
-  deviceBadge: { marginTop: -15, minHeight: 37, paddingHorizontal: 13, borderRadius: 14, backgroundColor: palette.mintSurface, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  slidePage: { height: '100%' },
+  slide: { flexGrow: 1, paddingHorizontal: 22, paddingVertical: 16, justifyContent: 'center' },
+  heroWrap: { minHeight: 215, alignItems: 'center', justifyContent: 'center' },
+  deviceStage: { width: 170, height: 170, alignItems: 'center', justifyContent: 'center' },
+  deviceImage: { width: 160, height: 160 },
+  deviceBadge: { minHeight: 37, paddingHorizontal: 13, borderRadius: 14, backgroundColor: palette.mintSurface, flexDirection: 'row', alignItems: 'center', gap: 8 },
   liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: palette.accentDark },
   deviceBadgeText: { color: palette.text, fontSize: 11, fontFamily: fontFamily.medium },
-  summaryPanel: { width: '100%', maxWidth: 340, borderRadius: 14, padding: 18 },
-  panelIcon: { alignSelf: 'center', width: 58, height: 58, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
-  panelGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  panelItem: { width: '48%', minHeight: 72, borderRadius: 14, padding: 12, justifyContent: 'space-between' },
-  panelText: { fontSize: 12, fontFamily: fontFamily.medium },
+  summaryPanel: { width: '100%', maxWidth: 320, borderRadius: 14, padding: 14 },
+  panelIcon: { alignSelf: 'center', width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  panelGrid: { width: '100%', gap: 8 },
+  panelRow: { flexDirection: 'row', gap: 8 },
+  panelItem: { flex: 1, minWidth: 0, minHeight: 58, borderRadius: 14, padding: 9, justifyContent: 'space-between' },
+  panelText: { fontSize: 12, fontFamily: fontFamily.medium, flexShrink: 1 },
   copy: { alignItems: 'center', paddingHorizontal: 4 },
   eyebrowPill: { minHeight: 32, paddingHorizontal: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', gap: 6 },
   eyebrow: { ...typeScale.eyebrow },
