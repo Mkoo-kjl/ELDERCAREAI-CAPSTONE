@@ -19,7 +19,7 @@ export function MetricCard({ icon, title, value, unit, timestamp, color, surface
       </View>
       <Text numberOfLines={2} style={[styles.title, { color: theme.text }]}>{title}</Text>
       <View style={styles.valueRow}><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.62} style={[styles.value, { color: theme.text }]}>{value}</Text><Text numberOfLines={1} style={[styles.unit, { color: theme.subtitle }]}>{unit}</Text></View>
-      {annotation ? <Text numberOfLines={1} style={[styles.annotation, { color }]}>{annotation}</Text> : null}
+      {annotation ? <Text style={[styles.annotation, { color }]}>{annotation}</Text> : null}
       <Text numberOfLines={1} style={[styles.timestamp, { color: theme.subtitle }]}>{timestamp}</Text>
     </Pressable>
   );

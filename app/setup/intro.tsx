@@ -21,16 +21,16 @@ type IntroSlide = {
 
 const slides: IntroSlide[] = [
   {
-    eyebrow: 'FITBIT INSPIRE 3',
+    eyebrow: 'GALAXY WATCH6',
     title: 'Start with the wearable your care plan depends on.',
-    body: 'ElderCareAI is built around synced Fitbit and Google Health readings, so caregivers can review patient patterns without typing them in manually.',
+    body: 'Galaxy Watch6 sends measurements directly to ElderCareAI, so caregivers can follow patient readings and location as updates arrive.',
     icon: 'watch-outline',
     color: palette.primaryDark,
   },
   {
-    eyebrow: 'SYNCED READINGS',
+    eyebrow: 'WATCH READINGS',
     title: 'See patient context before you act.',
-    body: 'Heart rate, blood oxygen, sleep, steps, skin temperature, and HRV appear only when real readings are synchronized from Google Health.',
+    body: 'Review heart rate, skin temperature, estimated HRV, monitored steps and spot blood oxygen. Each reading shows its actual measurement time.',
     icon: 'pulse-outline',
     color: palette.accentDark,
   },
@@ -123,7 +123,7 @@ export default function IntroSetupScreen() {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            {index === 0 ? <FitbitHero /> : <CareHero slide={slide} index={index} />}
+            {index === 0 ? <GalaxyWatchHero /> : <CareHero slide={slide} index={index} />}
             <View style={styles.copy}>
               <View style={[styles.eyebrowPill, { backgroundColor: `${slide.color}14` }]}>
                 <Ionicons name={slide.icon} size={14} color={slide.color} />
@@ -158,15 +158,15 @@ export default function IntroSetupScreen() {
   );
 }
 
-function FitbitHero() {
+function GalaxyWatchHero() {
   return (
     <View style={styles.heroWrap}>
       <View style={styles.deviceStage}>
-        <Image source={require('@/assets/images/fitbit-inspire-3.jpg')} style={styles.deviceImage} resizeMode="contain" />
+        <Image source={require('@/assets/images/galaxy-watch-6.jpg')} style={styles.deviceImage} resizeMode="contain" />
       </View>
       <View style={styles.deviceBadge}>
         <View style={styles.liveDot} />
-        <Text style={styles.deviceBadgeText}>Ready for Google Health sync</Text>
+        <Text style={styles.deviceBadgeText}>Direct watch measurements</Text>
       </View>
     </View>
   );

@@ -13,7 +13,7 @@ jest.mock('expo-router', () => {
 jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
 jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({ session: { user: { id: 'caregiver-1' } }, onboarding: { wearable_status: 'connected' } }) }));
 jest.mock('@/src/providers/HealthDataProvider', () => ({ useHealthData: () => ({ elderly: { elderly_id: 'patient-1', full_name: 'Maria Santos', age: 78 }, vital: null, history: [], refreshing: false, error: null, syncState: 'idle', lastSuccessfulSyncAt: null, watchSync: null, watchSyncIssue: null, refresh: mockRefresh }) }));
-jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn() } }));
+jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn(),channel:()=>{const channel={on:()=>channel,subscribe:()=>channel};return channel;},removeChannel:jest.fn().mockResolvedValue(undefined) } }));
 jest.mock('@/src/hooks/useMinuteClock', () => ({ useMinuteClock: jest.fn() }));
 jest.mock('@/src/components/MetricCard', () => ({ MetricCard: () => null }));
 jest.mock('@/src/components/VitalDetailModal', () => ({ VitalDetailModal: () => null }));

@@ -1,6 +1,5 @@
 import { recentNightlySleep, sleepDateLabel, sleepEfficiency } from '@/src/lib/sleep-history';
 import type { SleepSession } from '@/src/providers/HealthDataProvider';
-import { sleepSessionRows } from '@/supabase/functions/_shared/health-snapshot';
 
 const now = new Date('2026-10-10T12:00:00');
 const session = (id: string, end: string, minutes: number, main = false): SleepSession => ({
@@ -28,17 +27,4 @@ test('shows efficiency only when actual time-in-bed data is available', () => {
 
 test('keeps a short main sleep rather than hiding an important night', () => {
   expect(recentNightlySleep([session('short', '2026-10-09T06:00:00', 125, true)], now).map((item) => item.source_key)).toEqual(['short']);
-});
-
-test('extracts individual Google Health sessions for the vital log', () => {
-  const rows = sleepSessionRows([{ name: 'users/me/dataTypes/sleep/dataPoints/one', sleep: {
-    interval: { startTime: '2026-10-08T21:00:00Z', endTime: '2026-10-09T07:00:00Z' },
-    summary: { minutesAsleep: '564', minutesInSleepPeriod: '600' },
-    metadata: { mainSleep: true, processed: true },
-  } }]);
-  expect(rows).toEqual([expect.objectContaining({ source_key: 'users/me/dataTypes/sleep/dataPoints/one', minutes_asleep: 564, minutes_in_sleep_period: 600, is_main_sleep: true })]);
-});
-
-test('does not count time in bed as time asleep when the sleep summary is missing', () => {
-  expect(sleepSessionRows([{ sleep: { interval: { startTime: '2026-10-08T21:00:00Z', endTime: '2026-10-09T07:00:00Z' } } }])).toEqual([]);
 });

@@ -1,25 +1,25 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { AppState, Linking, Platform } from 'react-native';
 
 const CHANNEL_ID = 'care-reminders';
-const MEDICATION_CHANNEL_ID = 'medication-reminders-v1';
-const APPOINTMENT_CHANNEL_ID = 'appointment-reminders-v1';
-const HEALTH_CHANNEL_ID = 'health-warnings-v1';
+const MEDICATION_CHANNEL_ID = 'medication-reminders-v2';
+const APPOINTMENT_CHANNEL_ID = 'appointment-reminders-v2';
+const HEALTH_CHANNEL_ID = 'health-warnings-v2';
+const SOS_CHANNEL_ID = 'watch-sos-v2';
 const MEDICATION_SOUND = 'medication_reminder.wav';
 const APPOINTMENT_SOUND = 'appointment_reminder.wav';
 const HEALTH_SOUND = 'health_warning.wav';
 const STORAGE_PREFIX = 'eldercare-notification';
-const HEALTH_COOLDOWN_KEY = `${STORAGE_PREFIX}:health-warning`;
-const healthWarningsInFlight = new Set<string>();
 
 export type CareNotificationKind = 'appointment' | 'medication';
 
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
+  handleNotification: async (notification) => ({
     shouldShowBanner: true,
     shouldShowList: true,
-    shouldPlaySound: true,
+    // The foreground observer plays these once for both Realtime and push.
+    shouldPlaySound: !(AppState.currentState==='active'&&['vital','sos'].includes(String(notification.request.content.data?.care_kind))),
     shouldSetBadge: true,
   }),
 });
@@ -62,6 +62,15 @@ export async function initializeNotifications() {
       sound: HEALTH_SOUND,
       enableVibrate: true,
     });
+    await Notifications.setNotificationChannelAsync(SOS_CHANNEL_ID, {
+      name: 'Watch SOS',
+      description: 'Emergency requests from the paired Galaxy Watch.',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 500, 200, 500],
+      lightColor: '#EF4444',
+      sound: 'sos_alert.wav',
+      enableVibrate: true,
+    });
   }
 }
 
@@ -77,6 +86,20 @@ export async function ensureNotificationPermission() {
   if (await hasNotificationPermission()) return true;
   const permission = await Notifications.requestPermissionsAsync();
   return permission.granted;
+}
+
+export async function openHealthSoundSettings(){
+  await initializeNotifications();
+  if(Platform.OS==='android'){
+    try{
+      await Linking.sendIntent('android.settings.CHANNEL_NOTIFICATION_SETTINGS',[
+        {key:'android.provider.extra.APP_PACKAGE',value:'com.eldercareai.mobile'},
+        {key:'android.provider.extra.CHANNEL_ID',value:HEALTH_CHANNEL_ID},
+      ]);
+      return;
+    }catch{ /* Fall back to the app's settings page. */ }
+  }
+  await Linking.openSettings();
 }
 
 function storageKey(kind: CareNotificationKind, entityId: string) {
@@ -95,6 +118,20 @@ export async function cancelCareNotifications(kind: CareNotificationKind, entity
     await Promise.all(identifiers.map((identifier) => Notifications.cancelScheduledNotificationAsync(identifier).catch(() => undefined)));
   }
   await AsyncStorage.removeItem(key);
+}
+
+export async function cancelAllCareNotifications() {
+  const keys = await AsyncStorage.getAllKeys();
+  const careKeys = keys.filter((key) => key.startsWith(`${STORAGE_PREFIX}:medication:`) || key.startsWith(`${STORAGE_PREFIX}:appointment:`));
+  await Promise.all(careKeys.map(async (key) => {
+    const saved = await AsyncStorage.getItem(key);
+    if (!saved) return;
+    try {
+      const identifiers = JSON.parse(saved) as string[];
+      await Promise.all(identifiers.map((identifier) => Notifications.cancelScheduledNotificationAsync(identifier).catch(() => undefined)));
+    } catch { /* Ignore malformed local reminder metadata. */ }
+  }));
+  if (careKeys.length) await AsyncStorage.multiRemove(careKeys);
 }
 
 export async function scheduleAppointmentNotification(input: {
@@ -184,35 +221,4 @@ export async function scheduleMedicationNotifications(input: {
   }
   await saveIdentifiers('medication', input.id, identifiers);
   return identifiers.length > 0;
-}
-
-export async function notifyAbnormalVital(vital: { heart_rate_bpm?: number | null; spo2_percent?: number | null }, elderlyName: string) {
-  if (!(await hasNotificationPermission())) return;
-  const warnings: string[] = [];
-  if (vital.heart_rate_bpm != null && (vital.heart_rate_bpm > 110 || vital.heart_rate_bpm < 50)) warnings.push(`heart rate ${vital.heart_rate_bpm} bpm`);
-  if (vital.spo2_percent != null && vital.spo2_percent < 95) warnings.push(`SpO₂ ${vital.spo2_percent.toFixed(1)}%`);
-  if (!warnings.length) return;
-  const signature = warnings.join('|');
-  if (healthWarningsInFlight.has(signature)) return;
-  healthWarningsInFlight.add(signature);
-  try {
-    const previous = await AsyncStorage.getItem(HEALTH_COOLDOWN_KEY);
-    if (previous) {
-      const parsed = JSON.parse(previous) as { signature: string; at: number };
-      if (parsed.signature === signature && Date.now() - parsed.at < 60 * 60 * 1000) return;
-    }
-    await initializeNotifications();
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Health reading needs attention',
-        body: `${elderlyName}: ${warnings.join(' and ')}. Confirm the reading and seek qualified guidance when appropriate.`,
-        sound: HEALTH_SOUND,
-        data: { url: '/alerts?tab=Alerts' },
-      },
-      trigger: { channelId: HEALTH_CHANNEL_ID },
-    });
-    await AsyncStorage.setItem(HEALTH_COOLDOWN_KEY, JSON.stringify({ signature, at: Date.now() }));
-  } finally {
-    healthWarningsInFlight.delete(signature);
-  }
 }

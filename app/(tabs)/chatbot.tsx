@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback,useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -17,6 +17,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText as Text } from '@/src/components/AppText';
+import {EvidenceReadings} from '@/src/components/EvidenceReadings';
+import type {CareEvidence,EvidenceSummary} from '@/src/lib/care-evidence';
 import { getFunctionErrorMessage } from '@/src/lib/function-error';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/providers/AuthProvider';
@@ -26,8 +28,8 @@ import { fontFamily, typeScale } from '@/src/theme/typography';
 
 type ElleEmotion = 'happy' | 'neutral' | 'worried';
 type ChatAction = { label: string; icon: keyof typeof Ionicons.glyphMap; href: Href };
-type Message = { id: string; role: 'user' | 'assistant'; content: string; emotion?: ElleEmotion; actions?: ChatAction[] };
-type AiAssistantResponse = { reply?: string; content?: string; emotion?: ElleEmotion; hasHealthData?: boolean; code?: string };
+type Message = { id: string; role: 'user' | 'assistant'; content: string; emotion?: ElleEmotion; actions?: ChatAction[];evidence?:CareEvidence[];evidence_summary?:EvidenceSummary|null;storageWarning?:boolean };
+type AiAssistantResponse = { reply?: string; content?: string; emotion?: ElleEmotion; hasHealthData?: boolean; code?: string;evidence?:CareEvidence[];evidence_summary?:EvidenceSummary|null };
 
 const elleImages: Record<ElleEmotion, ImageSourcePropType> = {
   happy: require('../../assets/images/elle-happy.png'),
@@ -103,6 +105,8 @@ export default function ChatbotScreen() {
   const [typing, setTyping] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
+  const owner=`${session?.user.id}:${elderly?.elderly_id}`,identity=useRef(owner),sending=useRef(false);identity.current=owner;
+  useEffect(()=>{identity.current=owner;setMessages([greeting]);setSessionId(null);setInput('');setTyping(false);sending.current=false;return()=>{identity.current='';};},[owner]);
 
   const ensureSession = useCallback(async () => {
     if (sessionId) return sessionId;
@@ -114,9 +118,10 @@ export default function ChatbotScreen() {
       context_type: 'general',
     }).select('id').single();
     if (error) throw error;
+    if(identity.current!==owner)throw new Error('The active patient changed.');
     setSessionId(data.id);
     return data.id as string;
-  }, [elderly, session, sessionId]);
+  }, [elderly, session, sessionId,owner]);
 
   const askElle = useCallback(async (content: string, activeSessionId: string) => {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -137,12 +142,14 @@ export default function ChatbotScreen() {
       content: replyContent,
       emotion: data?.emotion ?? 'neutral',
       hasHealthData: data?.hasHealthData ?? Boolean(vital),
+      evidence:data?.evidence??[],evidence_summary:data?.evidence_summary??null,
     };
   }, [vital]);
 
   const send = useCallback(async (preset?: string) => {
     const content = (preset ?? input).trim();
-    if (!content || typing) return;
+    if (!content || sending.current) return;
+    sending.current=true;const activeOwner=owner;
     setInput('');
     const userMessage: Message = { id: `u-${Date.now()}`, role: 'user', content };
     setMessages((current) => [...current, userMessage]);
@@ -150,45 +157,50 @@ export default function ChatbotScreen() {
     try {
       const activeSessionId = await ensureSession();
       const reply = await askElle(content, activeSessionId);
+      if(identity.current!==activeOwner)return;
       const sentAt = new Date();
       const repliedAt = new Date(sentAt.getTime() + 1);
       const { error: persistError } = await supabase.from('ai_chatbot_messages').insert([
         { session_id: activeSessionId, role: 'user', content, has_health_data: false, created_at: sentAt.toISOString() },
-        { session_id: activeSessionId, role: 'assistant', content: reply.content, has_health_data: reply.hasHealthData, created_at: repliedAt.toISOString() },
+        { session_id: activeSessionId, role: 'assistant', content: reply.content, has_health_data: reply.hasHealthData, created_at: repliedAt.toISOString(),evidence:reply.evidence,evidence_summary:reply.evidence_summary },
       ]);
       if (persistError) {
         console.warn('Elle chat persistence failed:', persistError.message);
-      } else {
+      } else if(identity.current===activeOwner) {
         const { error: sessionError } = await supabase.from('ai_chatbot_sessions').update({ total_messages: messages.length + 2 }).eq('id', activeSessionId);
         if (sessionError) console.warn('Elle chat session count failed:', sessionError.message);
       }
-      setMessages((current) => [...current, { id: `a-${Date.now()}`, role: 'assistant', content: reply.content, emotion: reply.emotion, actions: actionsForAssistantText(reply.content) }]);
+      if(identity.current!==activeOwner)return;
+      setMessages((current) => [...current, { id: `a-${Date.now()}`, role: 'assistant', content: reply.content, emotion: reply.emotion, actions: actionsForAssistantText(reply.content),evidence:reply.evidence,evidence_summary:reply.evidence_summary,storageWarning:Boolean(persistError) }]);
     } catch (caught) {
       console.warn('Elle chat failed:', caught instanceof Error ? caught.message : caught);
-      setMessages((current) => [...current, { id: `e-${Date.now()}`, role: 'assistant', emotion: 'worried', content: elleErrorMessage(caught) }]);
+      if(identity.current===activeOwner)setMessages((current) => [...current, { id: `e-${Date.now()}`, role: 'assistant', emotion: 'worried', content: elleErrorMessage(caught) }]);
     } finally {
-      setTyping(false);
+      if(identity.current===activeOwner){sending.current=false;setTyping(false);}
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
     }
-  }, [askElle, ensureSession, input, messages.length, typing]);
+  }, [askElle, ensureSession, input, messages.length,owner]);
 
   const newChat = useCallback(async () => {
+    if(sending.current)return;
+    const activeOwner=owner;
     if (sessionId) await supabase.from('ai_chatbot_sessions').update({ is_active: false, ended_at: new Date().toISOString() }).eq('id', sessionId);
+    if(identity.current!==activeOwner)return;
     setSessionId(null);
     setMessages([greeting]);
     setInput('');
-  }, [sessionId]);
+  }, [sessionId,owner]);
 
   const fresh = useMemo(() => messages.length === 1, [messages.length]);
   return (
     <KeyboardAvoidingView style={[styles.screen, { backgroundColor: theme.background, paddingTop: insets.top }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={0}>
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
         <View style={styles.titleRow}><View style={[styles.headerAvatar, { backgroundColor: theme.card }]}><Image source={elleImages.happy} style={styles.headerMascot} resizeMode="cover" /></View><View><Text style={[styles.title, { color: theme.text }]}>Elle</Text><View style={styles.statusRow}><View style={styles.statusDot} /><Text style={[styles.status, { color: theme.subtitle }]}>Care assistant</Text></View></View></View>
-        <Pressable onPress={() => void newChat()} style={[styles.newButton, { backgroundColor: theme.card }]}><Ionicons name="add" size={17} color={palette.primaryDark} /><Text style={styles.newText}>New Chat</Text></Pressable>
+        <Pressable disabled={typing} accessibilityRole="button" accessibilityLabel="New chat" onPress={() => void newChat()} style={[styles.newButton, { backgroundColor: theme.card,opacity:typing?0.5:1 }]}><Ionicons name="add" size={17} color={palette.primaryDark} /><Text style={styles.newText}>New Chat</Text></Pressable>
       </View>
       <ScrollView ref={scrollRef} style={styles.messages} contentContainerStyle={styles.messageContent} keyboardShouldPersistTaps="handled" keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'} automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'} onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}>
         {fresh ? <><View style={[styles.elleCard, { backgroundColor: theme.cardElevated }]}><View style={styles.ellePortrait}><Image source={elleImages.happy} style={styles.elleHeroImage} resizeMode="cover" /></View><View style={styles.elleIntro}><Text style={[styles.elleGreeting, { color: theme.text }]}>Meet Elle</Text><Text style={[styles.elleDescription, { color: theme.subtitle }]}>Care summaries and everyday guidance for caregivers.</Text></View></View><View style={styles.quickWrap}><Text style={[styles.quickLabel, { color: theme.subtitle }]}>ASK ELLE ABOUT</Text><View style={styles.quickRow}>{quickTopics.map((topic) => <Pressable key={topic} onPress={() => void send(topic)} style={[styles.quickChip, { backgroundColor: theme.cardElevated }]}><Text style={[styles.quickText, { color: theme.text }]}>{topic}</Text></Pressable>)}</View></View></> : null}
-        {messages.map((message) => <View key={message.id} style={[styles.bubbleRow, message.role === 'user' && styles.userRow]}>{message.role === 'assistant' ? <ElleAvatar emotion={message.emotion ?? 'neutral'} /> : null}<View style={[styles.bubble, message.role === 'user' ? styles.userBubble : { backgroundColor: theme.card }]}>{message.role === 'assistant' ? <Text style={styles.elleName}>ELLE</Text> : null}<Text style={[styles.messageText, { color: message.role === 'user' ? '#FFFFFF' : theme.text }]}>{message.content}</Text>{message.role === 'assistant' && message.actions?.length ? <View style={styles.replyActions}>{message.actions.map((action) => <Pressable key={action.label} onPress={() => router.push(action.href)} style={[styles.replyAction, { backgroundColor: theme.cardElevated }]}><Ionicons name={action.icon} size={14} color={palette.primaryDark} /><Text style={styles.replyActionText}>{action.label}</Text></Pressable>)}</View> : null}</View></View>)}
+        {messages.map((message) => <View key={message.id} style={[styles.bubbleRow, message.role === 'user' && styles.userRow]}>{message.role === 'assistant' ? <ElleAvatar emotion={message.emotion ?? 'neutral'} /> : null}<View style={[styles.bubble, message.role === 'user' ? styles.userBubble : { backgroundColor: theme.card }]}>{message.role === 'assistant' ? <Text style={styles.elleName}>ELLE</Text> : null}<Text style={[styles.messageText, { color: message.role === 'user' ? '#FFFFFF' : theme.text }]}>{message.content}</Text>{message.role === 'assistant' ? <EvidenceReadings evidence={message.evidence} summary={message.evidence_summary}/> : null}{message.storageWarning ? <Text style={[typeScale.caption,{color:palette.warning,marginTop:8}]}>This reply could not be saved to chat history.</Text> : null}{message.role === 'assistant' && message.actions?.length ? <View style={styles.replyActions}>{message.actions.map((action) => <Pressable key={action.label} onPress={() => router.push(action.href)} style={[styles.replyAction, { backgroundColor: theme.cardElevated }]}><Ionicons name={action.icon} size={14} color={palette.primaryDark} /><Text style={styles.replyActionText}>{action.label}</Text></Pressable>)}</View> : null}</View></View>)}
         {typing ? <View style={styles.bubbleRow}><ElleAvatar emotion="neutral" /><View style={[styles.typing, { backgroundColor: theme.card }]}><ActivityIndicator size="small" color={palette.primaryDark} /><Text style={{ color: theme.subtitle, fontSize: 12 }}>Elle is thinking…</Text></View></View> : null}
       </ScrollView>
       <View style={[styles.composer, { borderTopColor: theme.border, backgroundColor: theme.cardElevated, paddingBottom: Math.max(insets.bottom, 10) }]}><TextInput value={input} onChangeText={setInput} onSubmitEditing={() => void send()} placeholder="Ask about health or care…" placeholderTextColor={theme.subtitle} style={[styles.input, { color: theme.text, backgroundColor: theme.card, borderColor: theme.border }]} multiline blurOnSubmit={false} textAlignVertical="top" /><Pressable accessibilityLabel="Send message" onPress={() => void send()} disabled={!input.trim() || typing}><View style={[styles.send, (!input.trim() || typing) && { opacity: 0.45 }]}><Ionicons name="send" size={18} color="#FFFFFF" /></View></Pressable></View>

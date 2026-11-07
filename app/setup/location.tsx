@@ -1,9 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import * as Location from 'expo-location';
 import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, useColorScheme, View } from 'react-native';
-
+import { Alert, StyleSheet, useColorScheme, View } from 'react-native';
 import { AppText as Text } from '@/src/components/AppText';
 import { GradientButton } from '@/src/components/GradientButton';
 import { SetupScaffold } from '@/src/components/SetupScaffold';
@@ -14,83 +12,29 @@ import { fontFamily, typeScale } from '@/src/theme/typography';
 
 export default function LocationConsentScreen() {
   const router = useRouter();
-  const { session, onboarding, refreshOnboarding } = useAuth();
+  const { session, refreshOnboarding } = useAuth();
   const theme = getTheme(useColorScheme() === 'dark');
   const [saving, setSaving] = useState(false);
-
   if (!session) return <Redirect href="/login" />;
-
-  const complete = async (permission: 'granted' | 'denied') => {
+  const complete = async () => {
     setSaving(true);
     try {
       const now = new Date().toISOString();
-      const { error: progressError } = await supabase.from('onboarding_progress').upsert({
-        user_id: session.user.id,
-        location_permission: permission,
-        location_consent_at: now,
-        completed_at: now,
-        updated_at: now,
-      }, { onConflict: 'user_id' });
-      if (progressError) throw progressError;
-
-      if (permission === 'granted' && onboarding?.wearable_status === 'connected') {
-        const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-        const { data: elderly } = await supabase.from('elderly_profiles').select('elderly_id').eq('caregiver_id', session.user.id).limit(1).maybeSingle();
-        const { error: locationError } = await supabase.from('wearable_sync_locations').insert({
-          user_id: session.user.id,
-          elderly_id: elderly?.elderly_id ?? null,
-          event_type: 'wearable_connection',
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy_m: position.coords.accuracy,
-          recorded_at: new Date(position.timestamp).toISOString(),
-        });
-        if (locationError) throw locationError;
-      }
-
-      await refreshOnboarding();
-      router.replace('/home');
-    } catch (error) {
-      Alert.alert('Unable to finish setup', error instanceof Error ? error.message : 'Please try again.');
-    } finally {
-      setSaving(false);
-    }
+      const { error } = await supabase.from('onboarding_progress').upsert({ user_id: session.user.id,
+        location_permission: 'denied', location_consent_at: now, completed_at: now, updated_at: now }, { onConflict: 'user_id' });
+      if (error) throw error;
+      await refreshOnboarding(); router.replace('/home');
+    } catch (error) { Alert.alert('Unable to finish setup', error instanceof Error ? error.message : 'Please try again.'); }
+    finally { setSaving(false); }
   };
-
-  const requestPermission = async () => {
-    setSaving(true);
-    const response = await Location.requestForegroundPermissionsAsync();
-    setSaving(false);
-    await complete(response.granted ? 'granted' : 'denied');
-  };
-
-  return (
-    <SetupScaffold step={4} title="Phone location consent" subtitle="Choose whether ElderCareAI may record this phone’s location at specific health-sync events.">
-      <View style={styles.hero}>
-        <View style={styles.heroIcon}>
-          <Ionicons name="phone-portrait-outline" size={40} color={palette.primaryDark} />
-        </View>
-        <Text style={[styles.heroTitle, { color: theme.text }]}>Your phone, not the watch</Text>
-        <Text style={[styles.heroText, { color: theme.subtitle }]}>This permission does not expose the Fitbit Inspire 3’s live GPS location.</Text>
-      </View>
-
-      <View style={[styles.card, { backgroundColor: theme.cardElevated }]}>
-        <ConsentRow icon="navigate-circle-outline" title="When it is recorded" body="Once after a successful wearable connection, and later when you explicitly synchronize health data." />
-        <ConsentRow icon="eye-off-outline" title="What we do not do" body="No continuous tracking, no hidden background location, and no claim that the phone is where the older adult or watch is." />
-        <ConsentRow icon="shield-checkmark-outline" title="Your control" body="Only foreground permission is requested. You can deny it and still finish setup or use the app." last />
-      </View>
-
-      <View style={[styles.disclosure, { backgroundColor: `${palette.warning}12` }]}>
-        <Ionicons name="information-circle" size={21} color={palette.warning} />
-        <Text style={[styles.disclosureText, { color: theme.text }]}>If permission is granted but the wearable is disconnected, no location is recorded now. A future successful sync may record the phone’s location while the app is open.</Text>
-      </View>
-
-      <GradientButton label="Allow phone location" icon="location" onPress={() => void requestPermission()} loading={saving} />
-      <Pressable disabled={saving} onPress={() => void complete('denied')} style={styles.skipButton}>
-        <Text style={[styles.skipText, { color: theme.subtitle }]}>Continue without location</Text>
-      </Pressable>
-    </SetupScaffold>
-  );
+  return <SetupScaffold step={4} title="Watch location sharing" subtitle="Location permission is requested on Galaxy Watch when you start monitoring.">
+    <View style={[styles.card, { backgroundColor: theme.cardElevated }]}>
+      <ConsentRow icon="watch-outline" title="Start on the watch" body="Open ElderCareAI Watch, allow precise location and sensor access, then tap Start monitoring. Measurements are sent to this patient profile." />
+      <ConsentRow icon="navigate-circle-outline" title="GPS and location fallback" body="The watch requests satellite GPS and fused location. Fused location may use the paired phone; the map shows its source, accuracy and measurement time." />
+      <ConsentRow icon="stop-circle-outline" title="Your control" body="Tap Stop monitoring on the watch to end sharing. The app identifies old readings and offline sessions." last />
+    </View>
+    <GradientButton label="Finish setup" icon="checkmark-circle-outline" loading={saving} onPress={() => void complete()} />
+  </SetupScaffold>;
 }
 
 function ConsentRow({ icon, title, body, last }: { icon: keyof typeof Ionicons.glyphMap; title: string; body: string; last?: boolean }) {

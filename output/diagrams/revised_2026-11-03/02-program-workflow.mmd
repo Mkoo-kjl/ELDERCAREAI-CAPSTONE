@@ -1,0 +1,28 @@
+---
+title: ElderCareAI - Program Workflow
+---
+flowchart TD
+    S(["Start"]) --> A["Sign in"]
+    A --> L{"Login<br/>successful?"}
+    L -->|No| A
+    L -->|Yes| B["Complete caregiver and patient profiles<br/>Pair Galaxy Watch6 and allow access"]
+    B --> W{"Watch<br/>ready?"}
+    W -->|No| R["Check pairing, connection<br/>and permissions"]
+    R --> W
+    W -->|Yes| C["Start monitoring and open dashboard<br/>Sync watch updates and Health history"]
+    C --> H["Health and location<br/>Vitals, trends, GPS and alerts<br/>Export health and care reports"]
+    C --> K["Care management<br/>Medications, appointments and notes<br/>Reminders, Taken and SOS"]
+    C --> I["Elle AI and settings<br/>Ask questions and view insights<br/>Manage profiles and notifications"]
+    H --> E{"Continue<br/>session?"}
+    K --> E
+    I --> E
+    E -->|Yes| C
+    E -->|No| X["Finish monitoring and sign out"]
+    X --> F(["End session"])
+
+    classDef standard fill:#EBF7F8,stroke:#397F88,color:#202D2B,stroke-width:1.5px;
+    classDef terminal fill:#397F88,stroke:#397F88,color:#FFFFFF,stroke-width:1.5px;
+    classDef decision fill:#EFF7E9,stroke:#3C704A,color:#202D2B,stroke-width:1.5px;
+    class A,B,C,H,K,I,R,X standard;
+    class L,W,E decision;
+    class S,F terminal;

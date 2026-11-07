@@ -7,6 +7,8 @@ import { VitalDetailModal, type VitalMetricKey } from '@/src/components/VitalDet
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMinuteClock } from '@/src/hooks/useMinuteClock';
 
+import { watchMetricStatus } from '@/src/lib/galaxy-watch';
+import { stressIndexValue, stressIndexCaption } from '@/src/lib/stress-index';
 import { vitalTimeLabel } from '@/src/lib/vital-time';
 import { sleepDurationContext } from '@/src/lib/sleep-score';
 import { buildHealthAnomalies, buildHealthInsights, buildHealthPredictions, type AnalysisMetric, type AnalysisResult } from '@/src/lib/health-analysis';
@@ -21,13 +23,13 @@ export default function HealthScreen() {
   useMinuteClock();
   const insets = useSafeAreaInsets();
   const theme = getTheme(useColorScheme() === 'dark');
-  const { vital, history, sleepSessions, refreshing, refresh } = useHealthData();
+  const { vital, history, sleepSessions, refreshing, refresh, galaxyWatch } = useHealthData();
   const [tab, setTab] = useState<TabName>('Vitals');
   const [selectedMetric, setSelectedMetric] = useState<VitalMetricKey | null>(null);
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background, paddingTop: insets.top }]}>
-      <View style={styles.header}><Text style={[styles.title, { color: theme.text }]}>Health</Text><Text style={[styles.subtitle, { color: theme.subtitle }]}>Synced readings and trends</Text></View>
+      <View style={styles.header}><Text style={[styles.title, { color: theme.text }]}>Health</Text><Text style={[styles.subtitle, { color: theme.subtitle }]}>Galaxy Watch readings and trends</Text></View>
       <View style={{ height: 46 }}><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>{tabs.map((item) => <Pressable key={item} onPress={() => setTab(item)} style={[styles.tab, { backgroundColor: tab === item ? palette.aquaSurface : theme.cardElevated, borderColor: tab === item ? palette.aquaSurface : theme.border }]}><Text style={[styles.tabText, { color: tab === item ? palette.text : theme.subtitle }]}>{item}</Text></Pressable>)}</ScrollView></View>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void refresh(true)} colors={[palette.primary]} />} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 90 }]}>
         {tab === 'Vitals' ? <Vitals vital={vital} onSelect={setSelectedMetric} /> : null}
@@ -35,20 +37,21 @@ export default function HealthScreen() {
         {tab === 'Predictions' ? <Predictions history={history} /> : null}
         {tab === 'Anomalies' ? <Anomalies history={history} /> : null}
       </ScrollView>
-      <VitalDetailModal visible={selectedMetric !== null} metric={selectedMetric} history={history} sleepSessions={sleepSessions} onClose={() => setSelectedMetric(null)} />
+      <VitalDetailModal visible={selectedMetric !== null} metric={selectedMetric} history={history} currentVital={vital} sensorStatus={selectedMetric ? watchMetricStatus(galaxyWatch, selectedMetric, vital) : undefined} sleepSessions={sleepSessions} onClose={() => setSelectedMetric(null)} />
     </View>
   );
 }
 
 const metricDefinitions = [
   ['heart', 'Heart Rate', 'heart_rate_bpm', 'bpm', palette.error], ['water', 'Blood Oxygen', 'spo2_percent', '%', palette.primaryDark],
-  ['thermometer', 'Overnight Skin Temp', 'skin_temp_celsius', '°C', palette.warning], ['leaf', 'Heart Rate Variability', 'hrv_rmssd_ms', 'ms', palette.pink],
+  ['thermometer', 'Skin Temperature', 'skin_temp_celsius', '°C', palette.warning], ['leaf', 'Stress level', 'hrv_rmssd_ms', 'ms', palette.pink],
   ['moon', 'Sleep', 'sleep_hours', 'hours', palette.purple], ['footsteps', 'Steps', 'steps_count', 'steps', palette.accentDark],
 ] as const;
 
 function Vitals({ vital, onSelect }: { vital: VitalLog | null; onSelect: (metric: VitalMetricKey) => void }) {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
+  const { galaxyWatch } = useHealthData();
   const surfaces = [palette.lemonSurface, palette.aquaSurface, palette.peachSurface, palette.lavenderSurface, palette.lavenderSurface, palette.mintSurface];
   return <View style={styles.list}>{metricDefinitions.map(([icon, label, key, unit, color], index) => {
     const raw = vital?.[key];
@@ -56,8 +59,8 @@ function Vitals({ vital, onSelect }: { vital: VitalLog | null; onSelect: (metric
     const sleepContext = key === 'sleep_hours' ? sleepDurationContext(vital?.sleep_hours) : null;
     return <Pressable key={label} accessibilityRole="button" accessibilityLabel={`${label} details`} onPress={() => onSelect(key)} style={[styles.metricRow, { backgroundColor: isDark ? theme.cardElevated : surfaces[index] }]}>
       <View style={[styles.metricIcon, { backgroundColor: theme.cardElevated }]}><Ionicons name={icon} size={19} color={color} /></View>
-      <View style={styles.metricCopy}><Text style={[styles.metricLabel, { color: theme.text }]}>{label}</Text><Text style={[styles.metricTime, { color: theme.subtitle }]}>{vitalTimeLabel(vital, key)}</Text>{sleepContext ? <Text style={[styles.scoreCaption, { color }]}>{sleepContext.label}</Text> : null}</View>
-      <Text style={[styles.metricValue, { color: theme.text }]}>{value} <Text style={[styles.metricUnit, { color: theme.subtitle }]}>{unit}</Text></Text>
+      <View style={styles.metricCopy}><Text style={[styles.metricLabel, { color: theme.text }]}>{label}</Text><Text style={[styles.metricTime, { color: theme.subtitle }]}>{key === 'hrv_rmssd_ms' ? stressIndexCaption(vital) : raw == null ? watchMetricStatus(galaxyWatch, key) : vitalTimeLabel(vital, key)}</Text>{sleepContext ? <Text style={[styles.scoreCaption, { color }]}>{sleepContext.label}</Text> : null}</View>
+      <Text style={[styles.metricValue, { color: theme.text }]}>{key === 'hrv_rmssd_ms' ? stressIndexValue(vital) : value} <Text style={[styles.metricUnit, { color: theme.subtitle }]}>{key==='hrv_rmssd_ms'?'/100':unit}</Text></Text>
     </Pressable>;
   })}</View>;
 }

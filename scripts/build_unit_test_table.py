@@ -34,8 +34,8 @@ def read_rows() -> list[list[str]]:
     if rows[0] != HEADERS or len(rows[0]) != len(WIDTHS):
         raise ValueError("The table headings do not match the report template")
     data = rows[2:]
-    if len(data) != 63:
-        raise ValueError(f"Expected 63 cases, found {len(data)}")
+    if not data:
+        raise ValueError("The test table has no cases")
     for number, row in enumerate(data, 1):
         if len(row) != len(HEADERS) or row[4] != f"CASE-{number:03d}":
             raise ValueError(f"Invalid case row {number}")
@@ -54,7 +54,7 @@ def set_shading(cell, fill: str) -> None:
 def set_margins(cell) -> None:
     tc_pr = cell._tc.get_or_add_tcPr()
     margins = OxmlElement("w:tcMar")
-    for edge, value in (("top", "80"), ("bottom", "80"), ("left", "65"), ("right", "65")):
+    for edge, value in (("top", "55"), ("bottom", "55"), ("left", "65"), ("right", "65")):
         element = OxmlElement(f"w:{edge}")
         element.set(qn("w:w"), value)
         element.set(qn("w:type"), "dxa")
@@ -108,7 +108,7 @@ def build() -> None:
     section.left_margin = Inches(0.45)
     section.right_margin = Inches(0.45)
     section.top_margin = Inches(0.55)
-    section.bottom_margin = Inches(0.55)
+    section.bottom_margin = Inches(0.35)
 
     title = document.add_paragraph(style="Title")
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -118,7 +118,7 @@ def build() -> None:
     bottom_border.set(qn("w:val"), "nil")
     title_border.append(bottom_border)
     title._p.get_or_add_pPr().append(title_border)
-    run = title.add_run("Unit Testing")
+    run = title.add_run("ElderCareAI Unit Testing")
     run.font.name = "Times New Roman"
     run.font.size = Pt(14)
     run.font.bold = True
@@ -127,7 +127,7 @@ def build() -> None:
     note = document.add_paragraph()
     note.alignment = WD_ALIGN_PARAGRAPH.CENTER
     note.paragraph_format.space_after = Pt(8)
-    run = note.add_run("Jest and React Native Testing Library  |  63 automated cases")
+    run = note.add_run(f"Jest and React Native Testing Library  |  {len(data)} automated cases")
     run.font.name = "Times New Roman"
     run.font.size = Pt(8)
     run.font.color.rgb = RGBColor(0, 0, 0)

@@ -15,15 +15,11 @@ The portal lives at `/edcadmin` (or `/edcadmin/` on static hosts that redirect d
    ```
 
    Verify that exactly one row changed. The portal username is `eldercareadmin`; the browser maps it to this configured email. It never contains the password.
-4. Deploy `admin-portal` and redeploy `google-health-sync`, `google-health-webhook`, `google-health-oauth-start`, `google-health-oauth-callback`, `google-health-disconnect`, and `ai-care-assistant` because the shared caregiver-access check changed. Use the project linked to this repository. The admin function must keep JWT verification enabled as configured in `supabase/config.toml`.
+4. Deploy `admin-portal`, `galaxy-watch` and `ai-care-assistant`. Use the project linked to this repository. The admin function must keep JWT verification enabled as configured in `supabase/config.toml`.
 
    ```powershell
+   supabase functions deploy galaxy-watch --no-verify-jwt
    supabase functions deploy admin-portal
-   supabase functions deploy google-health-sync
-   supabase functions deploy google-health-webhook
-   supabase functions deploy google-health-oauth-start
-   supabase functions deploy google-health-oauth-callback
-   supabase functions deploy google-health-disconnect
    supabase functions deploy ai-care-assistant
    ```
 5. Set the Edge Function secret `ADMIN_PORTAL_URL` to the final HTTPS URL ending in `/edcadmin/`, for example `https://your-domain.example/edcadmin/`. In **Supabase Dashboard → Authentication → URL Configuration → Redirect URLs**, allowlist that same URL. If the **Site URL** is the Supabase API domain, replace it with a real website URL; the API root is not a password-reset page. Check any existing mobile-auth callbacks before changing the shared Site URL. For a deployed project, the CLI command is `supabase secrets set ADMIN_PORTAL_URL=https://your-domain.example/edcadmin/`. Invited-admin links will not work until both settings match.

@@ -1,0 +1,15 @@
+---
+title: ElderCareAI - Network Design
+---
+flowchart TD
+    W["Galaxy Watch6<br/>Watch app"] --> B["Supabase cloud<br/>Auth, API and database"]
+    P["Caregiver phone<br/>App and Health history"] <-->|App data| B
+    A["Admin computer<br/>Web portal"] <--> B
+    B <--> G["Gemini AI"]
+    B --> N["Expo Push / Firebase FCM"]
+    N -->|Push| P
+
+    classDef standard fill:#EBF7F8,stroke:#397F88,color:#202D2B,stroke-width:1.5px;
+    classDef cloud fill:#EFF7E9,stroke:#3C704A,color:#202D2B,stroke-width:1.5px;
+    class W,P,A,G,N standard;
+    class B cloud;

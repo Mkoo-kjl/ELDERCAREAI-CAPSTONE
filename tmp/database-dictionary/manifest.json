@@ -1,0 +1,26 @@
+{
+  "reference_sha256": "5f0b51c8cfffb4fe408e31002becd95396e1085f4f049631efb5db19a1f4a667",
+  "latest_migration": "20261107000000",
+  "tables": [
+    "caregivers",
+    "elderly_profiles",
+    "wearable_devices",
+    "wearable_live_state",
+    "vital_sign_logs",
+    "watch_location_points",
+    "medication_schedules",
+    "medication_logs",
+    "appointments",
+    "caregiver_notes",
+    "health_alerts",
+    "alert_response_events",
+    "caregiver_notifications",
+    "emergency_events",
+    "ai_chatbot_sessions",
+    "ai_chatbot_messages",
+    "patient_safe_zones",
+    "safe_zone_events"
+  ],
+  "columns": 245,
+  "output": "C:\\ELDERCAREAI-CAPSTONE\\output\\documents\\ElderCareAI_Updated_Database_Dictionary.docx"
+}

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -28,11 +28,13 @@ import {
   scheduleMedicationNotifications,
   secondDailyTime,
 } from '@/src/lib/notifications';
+import { isCarePushRegistered } from '@/src/lib/watch-push';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { useHealthData } from '@/src/providers/HealthDataProvider';
 import { getTheme, palette } from '@/src/theme/colors';
 import { fontFamily, typeScale } from '@/src/theme/typography';
+import {useCareRefresh} from '@/src/hooks/useCareRefresh';
 
 type Tab = 'Medications' | 'Appointments' | 'Notes';
 type Medication = { id: string; medication_name: string; dosage: string | null; frequency: string; instructions: string | null; color_tag: string | null; is_active: boolean; times_of_day: string[] | null; reminder_enabled: boolean | null; start_date: string | null };
@@ -61,6 +63,7 @@ export default function CareScreen() {
   const [editing, setEditing] = useState<Editing>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const saveInFlight=useRef(false);
   const [name, setName] = useState('');
   const [secondary, setSecondary] = useState('');
   const [details, setDetails] = useState('');
@@ -83,6 +86,7 @@ export default function CareScreen() {
   const load = useCallback(async () => {
     if (!session || !elderly) return;
     setRefreshing(true);
+    try {
     const [meds, medLogs, visits, noteRows] = await Promise.all([
       supabase.from('medication_schedules').select('id, medication_name, dosage, frequency, instructions, color_tag, is_active, times_of_day, reminder_enabled, start_date').eq('caregiver_id', session.user.id).eq('elderly_id', elderly.elderly_id).eq('is_active', true).order('created_at', { ascending: false }),
       supabase.from('medication_logs').select('schedule_id, status, scheduled_time, taken_at').eq('elderly_id', elderly.elderly_id).gte('scheduled_time', startOfLocalDay().toISOString()),
@@ -90,23 +94,32 @@ export default function CareScreen() {
       supabase.from('caregiver_notes').select('id, title, content, is_pinned, updated_at').eq('caregiver_id', session.user.id).eq('elderly_id', elderly.elderly_id).order('is_pinned', { ascending: false }).order('updated_at', { ascending: false }),
     ]);
     const error = meds.error ?? medLogs.error ?? visits.error ?? noteRows.error;
-    if (error) Alert.alert('Unable to load care data', error.message);
+    if (error) throw error;
     const medicationRows = (meds.data as Medication[]) ?? [];
-    const appointmentRows = ((visits.data as Appointment[]) ?? []).filter((item) => item.status !== 'completed');
+    const appointmentRows = ((visits.data as Appointment[]) ?? []).filter((item) => !['completed','cancelled','canceled'].includes(item.status??''));
     setMedications(medicationRows);
     setMedicationLogs((medLogs.data as MedicationLog[]) ?? []);
     setAppointments(appointmentRows);
     setNotes((noteRows.data as Note[]) ?? []);
-    if (await hasNotificationPermission()) {
+    const remotePushEnabled=await isCarePushRegistered().catch(()=>false);
+    if(remotePushEnabled){
+      void Promise.all([
+        ...medicationRows.map((item)=>cancelCareNotifications('medication',item.id)),
+        ...appointmentRows.map((item)=>cancelCareNotifications('appointment',item.id)),
+      ]).catch(()=>undefined);
+    } else if (await hasNotificationPermission()) {
       void Promise.all([
         ...medicationRows.map((item) => scheduleMedicationNotifications({ id: item.id, medicationName: item.medication_name, dosage: item.dosage, frequency: item.frequency, timesOfDay: item.times_of_day ?? [], elderlyName: elderly.full_name, startDate: item.start_date }, false)),
         ...appointmentRows.filter((item) => new Date(item.appointment_at).getTime() > Date.now()).map((item) => scheduleAppointmentNotification({ id: item.id, title: item.title, appointmentAt: item.appointment_at, elderlyName: elderly.full_name, doctorName: item.doctor_name, location: item.location }, false)),
       ]).catch(() => undefined);
     }
-    setRefreshing(false);
+    } catch(error) {
+      Alert.alert('Unable to refresh care data',error instanceof Error?error.message:'Pull to refresh and try again.');
+    } finally { setRefreshing(false); }
   }, [elderly, session]);
 
   useFocusEffect(useCallback(() => { void load(); }, [load]));
+  useCareRefresh(elderly?.elderly_id,load);
 
   const openForm = (item: Editing = null) => {
     setEditing(item);
@@ -127,45 +140,62 @@ export default function CareScreen() {
   };
 
   const save = async () => {
+    if(saveInFlight.current)return;
     if (!session || !elderly || (tab !== 'Notes' && !name.trim()) || (tab === 'Notes' && !details.trim())) { Alert.alert('Missing information', tab === 'Notes' ? 'Add note content.' : 'Add a name or title.'); return; }
     if (tab === 'Appointments' && date.getTime() < Date.now()) { Alert.alert('Choose a future time', 'Appointments cannot be scheduled in the past.'); return; }
     if (tab === 'Medications' && frequency !== 'As needed' && !isValidReminderTime(reminderTime)) { Alert.alert('Invalid reminder time', 'Use 24-hour HH:MM format, for example 08:00 or 20:30.'); return; }
-    setSaving(true);
+    saveInFlight.current=true;setSaving(true);
     try {
       let reminderWarning: string | null = null;
       if (tab === 'Medications') {
         const timesOfDay = frequency === 'As needed' ? [] : frequency === 'Twice daily' ? [reminderTime, secondDailyTime(reminderTime)] : [reminderTime];
-        const payload = { elderly_id: elderly.elderly_id, caregiver_id: session.user.id, medication_name: name.trim(), dosage: secondary.trim() || null, frequency, times_of_day: timesOfDay, reminder_enabled: frequency !== 'As needed', instructions: details.trim() || null, color_tag: tag, updated_at: new Date().toISOString() };
+        const payload = { elderly_id: elderly.elderly_id, caregiver_id: session.user.id, medication_name: name.trim(), dosage: secondary.trim() || null, frequency, times_of_day: timesOfDay, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Manila', reminder_enabled: frequency !== 'As needed', instructions: details.trim() || null, color_tag: tag, updated_at: new Date().toISOString() };
         const result = editing ? await supabase.from('medication_schedules').update(payload).eq('id', editing.id).select('id, start_date').single() : await supabase.from('medication_schedules').insert(payload).select('id, start_date').single();
         if (result.error) throw result.error;
         try {
+          if(await isCarePushRegistered())await cancelCareNotifications('medication',result.data.id);
+          else {
           const scheduled = await scheduleMedicationNotifications({ id: result.data.id, medicationName: name.trim(), dosage: secondary.trim() || null, frequency, timesOfDay, elderlyName: elderly.full_name, startDate: result.data.start_date });
           if (!scheduled) reminderWarning = 'Medication saved, but notification permission was not granted.';
-        } catch (notificationError) { reminderWarning = notificationError instanceof Error ? notificationError.message : 'Medication saved, but its notification could not be scheduled.'; }
+          }
+        } catch { reminderWarning = 'Medication saved. Reminder setup could not finish. Open Alerts to enable background notifications, or check the phone notification permission.'; }
       } else if (tab === 'Appointments') {
         const payload = { elderly_id: elderly.elderly_id, caregiver_id: session.user.id, title: name.trim(), doctor_name: secondary.trim() || null, location: location.trim() || null, notes: details.trim() || null, appointment_at: date.toISOString(), updated_at: new Date().toISOString() };
         const result = editing ? await supabase.from('appointments').update(payload).eq('id', editing.id).select('id').single() : await supabase.from('appointments').insert(payload).select('id').single();
         if (result.error) throw result.error;
         try {
+          if(await isCarePushRegistered())await cancelCareNotifications('appointment',result.data.id);
+          else {
           const scheduled = await scheduleAppointmentNotification({ id: result.data.id, title: name.trim(), appointmentAt: date.toISOString(), elderlyName: elderly.full_name, doctorName: secondary.trim() || null, location: location.trim() || null });
           if (!scheduled) reminderWarning = 'Appointment saved, but notification permission was not granted.';
-        } catch (notificationError) { reminderWarning = notificationError instanceof Error ? notificationError.message : 'Appointment saved, but its notification could not be scheduled.'; }
+          }
+        } catch { reminderWarning = 'Appointment saved. Reminder setup could not finish. Open Alerts to enable background notifications, or check the phone notification permission.'; }
       } else {
         const payload = { elderly_id: elderly.elderly_id, caregiver_id: session.user.id, title: name.trim() || null, content: details.trim(), updated_at: new Date().toISOString() };
         const result = editing ? await supabase.from('caregiver_notes').update(payload).eq('id', editing.id) : await supabase.from('caregiver_notes').insert(payload);
         if (result.error) throw result.error;
       }
       setModalOpen(false); await load();
-      if (reminderWarning) Alert.alert('Reminder not scheduled', reminderWarning);
+      if (reminderWarning) Alert.alert('Saved — reminder setup needs attention', reminderWarning);
     } catch (caught) { Alert.alert('Unable to save', caught instanceof Error ? caught.message : 'Please try again.'); }
-    finally { setSaving(false); }
+    finally { saveInFlight.current=false;setSaving(false); }
   };
 
   const markTaken = async (item: Medication) => {
     if (!session || !elderly) return;
-    const { error } = await supabase.from('medication_logs').insert({ schedule_id: item.id, elderly_id: elderly.elderly_id, scheduled_time: new Date().toISOString(), taken_at: new Date().toISOString(), status: 'taken', recorded_by: session.user.id });
-    if (!error) await load();
-    Alert.alert(error ? 'Unable to record dose' : 'Dose recorded', error?.message ?? `${item.medication_name} was marked as taken.`);
+    if(item.frequency.toLowerCase()==='as needed'){
+      const {error}=await supabase.from('medication_logs').insert({schedule_id:item.id,elderly_id:elderly.elderly_id,scheduled_time:new Date().toISOString(),taken_at:new Date().toISOString(),status:'taken',recorded_by:session.user.id});
+      if(error)Alert.alert('Unable to record dose',error.message);else await load();return;
+    }
+    const doses=(item.times_of_day??[]).map(time=>{const [hour,minute]=time.split(':').map(Number);const date=new Date();date.setHours(hour,minute,0,0);return date;})
+      .filter(date=>Number.isFinite(date.getTime())&&date.getTime()<=Date.now()+300_000&&!medicationLogs.some(log=>log.schedule_id===item.id&&log.status==='taken'&&log.scheduled_time&&Math.floor(Date.parse(log.scheduled_time)/60000)===Math.floor(date.getTime()/60000))).sort((a,b)=>a.getTime()-b.getTime());
+    if(!doses.length){Alert.alert('No dose to confirm','The scheduled doses are already recorded, or the next dose is not due yet.');return;}
+    Alert.alert('Confirm the dose taken',`${item.medication_name}${item.dosage?` · ${item.dosage}`:''}. Select the scheduled dose you actually took.`,[
+      {text:'Cancel',style:'cancel'},...doses.slice(-2).map(date=>({text:date.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}),onPress:()=>void(async()=>{
+        const {error}=await supabase.rpc('mark_medication_taken',{p_schedule:item.id,p_scheduled:date.toISOString(),p_zone:Intl.DateTimeFormat().resolvedOptions().timeZone});
+        if(error)Alert.alert('Dose not recorded','Refresh the schedule and try again. The dose must match its scheduled day and time.');else await load();
+      })()})),
+    ]);
   };
 
   const remove = (kind: Tab, item: Editing) => Alert.alert(`Delete ${kind === 'Medications' ? 'medication' : kind === 'Appointments' ? 'appointment' : 'note'}?`, 'This action cannot be undone.', [{ text: 'Cancel', style: 'cancel' }, { text: 'Delete', style: 'destructive', onPress: async () => {

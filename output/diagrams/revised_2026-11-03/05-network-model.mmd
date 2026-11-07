@@ -1,0 +1,12 @@
+---
+title: ElderCareAI - Network Model
+---
+flowchart LR
+    C["Clients<br/>Watch, phone and admin"] <--> S["Server: Supabase<br/>Authentication and API"]
+    S <--> D[("Supabase database<br/>Health and care records")]
+    S <--> X["External services<br/>Gemini and Expo / FCM"]
+
+    classDef standard fill:#EBF7F8,stroke:#397F88,color:#202D2B,stroke-width:1.5px;
+    classDef data fill:#EFF7E9,stroke:#3C704A,color:#202D2B,stroke-width:1.5px;
+    class C,S,X standard;
+    class D data;

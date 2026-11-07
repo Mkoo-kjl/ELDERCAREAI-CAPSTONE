@@ -7,6 +7,8 @@ let mockUserId = 'caregiver-1';
 const mockProviderMounted = jest.fn();
 
 jest.mock('expo-font', () => ({ useFonts: () => [true, null] }));
+jest.mock('@/src/components/WatchCareObserver', () => ({ WatchCareObserver: () => null }));
+jest.mock('@/src/providers/SamsungHealthProvider', () => ({ SamsungHealthProvider: ({ children }: { children: React.ReactNode }) => children }));
 jest.mock('expo-notifications', () => ({
   getLastNotificationResponse: () => null,
   addNotificationResponseReceivedListener: () => ({ remove: jest.fn() }),

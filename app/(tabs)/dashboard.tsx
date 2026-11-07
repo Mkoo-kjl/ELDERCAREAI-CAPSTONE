@@ -10,6 +10,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GradientButton } from '@/src/components/GradientButton';
 import { LocationMapPreview } from '@/src/components/LocationMapPreview';
+import { stressIndexValue, stressIndexCaption } from '@/src/lib/stress-index';
+import {useCareRefresh} from '@/src/hooks/useCareRefresh';
 import { MetricCard } from '@/src/components/MetricCard';
 import { VitalDetailModal, type VitalMetricKey } from '@/src/components/VitalDetailModal';
 import { useMinuteClock } from '@/src/hooks/useMinuteClock';
@@ -17,7 +19,7 @@ import { medicationDoseStatus, medicationStatusPriority, startOfLocalDay, type M
 import { timeAgo } from '@/src/lib/format';
 import { sleepDurationContext } from '@/src/lib/sleep-score';
 import { vitalTimeLabel } from '@/src/lib/vital-time';
-import { watchSyncDelayed } from '@/src/lib/watch-sync';
+import { locationSourceLabel, watchMapPosition, watchMetricStatus } from '@/src/lib/galaxy-watch';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { useHealthData } from '@/src/providers/HealthDataProvider';
@@ -30,7 +32,6 @@ type MedicationPreview = { id: string; medication_name: string; dosage: string |
 type AppointmentPreview = { id: string; title: string; doctor_name: string | null; appointment_at: string; status: string | null };
 type NotePreview = { id: string; title: string | null; content: string; is_pinned: boolean; updated_at: string };
 type MedicationLogPreview = MedicationLogLike;
-type SyncLocationPreview = { latitude: number; longitude: number; recorded_at: string };
 
 function appointmentLabel(value: string) {
   const date = new Date(value);
@@ -46,34 +47,24 @@ export default function DashboardScreen() {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
   const { session, onboarding } = useAuth();
-  const { elderly, vital, history, sleepSessions, refreshing, error, syncState, lastGoogleHealthCheckAt, watchSync, watchSyncIssue, refresh } = useHealthData();
+  const { elderly, vital, history, sleepSessions, refreshing, error, syncState, lastSuccessfulSyncAt, refresh,
+    galaxyWatch, galaxyWatchStatus, galaxyHeartRateFresh, galaxyGpsFresh } = useHealthData();
   const caregiverId = session?.user.id;
   const elderlyId = elderly?.elderly_id;
-  const connected = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
+  const connected = onboarding?.wearable_status === 'connected' && onboarding?.wearable_provider === 'galaxy_watch';
   const [showPermission, setShowPermission] = useState(!connected);
   const [selectedMetric, setSelectedMetric] = useState<VitalMetricKey | null>(null);
-  const [showSyncHelp, setShowSyncHelp] = useState(false);
   const [doctor, setDoctor] = useState<DoctorContact | null>(null);
   const [caregiverName, setCaregiverName] = useState<string | null>(null);
   const [medications, setMedications] = useState<MedicationPreview[]>([]);
   const [medicationLogs, setMedicationLogs] = useState<MedicationLogPreview[]>([]);
   const [appointments, setAppointments] = useState<AppointmentPreview[]>([]);
   const [notes, setNotes] = useState<NotePreview[]>([]);
-  const [syncLocation, setSyncLocation] = useState<SyncLocationPreview | null>(null);
-
-  const checkedAgo = timeAgo(lastGoogleHealthCheckAt);
-  const watchSyncedAgo = timeAgo(watchSync?.lastSyncTime);
-  const watchDelayed = watchSyncDelayed(watchSync?.lastSyncTime, Date.now(), vital?.measurement_times?.heart_rate_bpm);
-  const healthSyncMessage = error ? (vital
-    ? 'Google Health could not be checked. Showing the last saved readings.'
-    : 'Health readings could not be loaded. Tap the sync icon to try again.') : null;
-  const watchIssueMessage = watchSyncIssue === 'permission_required'
-    ? 'Watch sync status needs Google Health permission. Reconnect the account to grant access.'
-    : watchSyncIssue === 'no_tracker'
-      ? 'No paired tracker was found for this Google Health account.'
-      : watchSyncIssue === 'unavailable'
-        ? 'Watch sync status is temporarily unavailable.'
-        : null;
+  const gpsPosition=watchMapPosition(galaxyWatch);
+  const syncLocation = gpsPosition?{...gpsPosition,recorded_at:gpsPosition.measured_at}:null;
+  const connectionHealthy = galaxyHeartRateFresh;
+  const checkedAgo = timeAgo(lastSuccessfulSyncAt);
+  const healthSyncMessage = error ? 'Watch data could not be refreshed. Showing the last received measurements.' : null;
   const hasCarePreview = Boolean(doctor || medications.length || appointments.length || notes.length);
   const pills = [
     elderly?.age != null ? `${elderly.age} yrs` : null,
@@ -91,11 +82,10 @@ export default function DashboardScreen() {
       setMedicationLogs([]);
       setAppointments([]);
       setNotes([]);
-      setSyncLocation(null);
       return;
     }
     const todayStart = startOfLocalDay().toISOString();
-    const [doctorResult, medicationResult, medicationLogResult, appointmentResult, notesResult, caregiverResult, locationResult] = await Promise.all([
+    const [doctorResult, medicationResult, medicationLogResult, appointmentResult, notesResult, caregiverResult] = await Promise.all([
       supabase.from('doctor_contacts')
         .select('id, full_name, phone, photo_url')
         .eq('caregiver_id', caregiverId)
@@ -127,17 +117,8 @@ export default function DashboardScreen() {
         .order('updated_at', { ascending: false })
         .limit(3),
       supabase.from('caregivers').select('full_name').eq('id', caregiverId).maybeSingle(),
-      supabase.from('wearable_sync_locations')
-        .select('latitude, longitude, recorded_at')
-        .eq('user_id', caregiverId)
-        .eq('elderly_id', elderlyId)
-        .order('recorded_at', { ascending: false })
-        .limit(1)
-        .maybeSingle(),
     ]);
     if (!caregiverResult.error) setCaregiverName(caregiverResult.data?.full_name ?? null);
-    if (!locationResult.error) setSyncLocation((locationResult.data as SyncLocationPreview | null) ?? null);
-    else console.warn('Unable to load last sync location:', locationResult.error.message);
     if (doctorResult.error) console.warn('Unable to load doctor contact:', doctorResult.error.message);
     else setDoctor((doctorResult.data as DoctorContact | null) ?? null);
     if (medicationResult.error) console.warn('Unable to load medications:', medicationResult.error.message);
@@ -160,6 +141,7 @@ export default function DashboardScreen() {
       else setAppointments(((recent.data as AppointmentPreview[]) ?? []).filter((item) => item.status !== 'completed').slice(0, 1));
     }
   }, [caregiverId, elderlyId]);
+  useCareRefresh(elderlyId,loadCarePreview);
 
   useFocusEffect(useCallback(() => {
     void refresh(false, true);
@@ -220,9 +202,9 @@ export default function DashboardScreen() {
         <View style={[styles.header, { paddingTop: insets.top + 14 }]}>
           <View style={styles.headerTop}>
             <View><Text style={[styles.brand, { color: theme.text }]}>ElderCare<Text style={styles.brandAccent}>AI</Text></Text><Text style={[styles.greeting, { color: theme.subtitle }]}>{greeting}{caregiverName ? `, ${caregiverName.split(' ')[0]}` : ''}</Text></View>
-            <View style={[styles.headerStatus, { backgroundColor: connected ? `${palette.accent}14` : `${palette.error}10` }]}>
-              <View style={[styles.dot, { backgroundColor: connected ? palette.accent : palette.error }]} />
-              <Text style={[styles.headerStatusText, { color: connected ? palette.accentDark : palette.error }]}>{connected ? 'Google connected' : 'Needs sync'}</Text>
+            <View style={[styles.headerStatus, { backgroundColor: connectionHealthy ? `${palette.accent}14` : `${palette.error}10` }]}>
+              <View style={[styles.dot, { backgroundColor: connectionHealthy ? palette.accent : palette.error }]} />
+              <Text style={[styles.headerStatusText, { color: connectionHealthy ? palette.accentDark : palette.error }]}>{galaxyWatchStatus}</Text>
             </View>
           </View>
           <WeekStrip appointmentDates={appointments.map((item) => item.appointment_at)} />
@@ -250,44 +232,30 @@ export default function DashboardScreen() {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Sync now"
-                accessibilityHint={connected ? 'Check Google Health for new patient readings' : 'Connect Google Health to sync patient readings'}
+                accessibilityHint={connected ? 'Reload the latest received watch data' : 'Connect Galaxy Watch'}
                 disabled={refreshing}
                 onPress={() => connected ? void refresh(true) : router.push('/setup/fitness?mode=edit')}
                 style={[styles.syncButton, { backgroundColor: theme.cardElevated, borderColor: theme.border, opacity: refreshing ? 0.55 : 1 }]}
               >
                 {refreshing ? <ActivityIndicator size="small" color={palette.primaryDark} /> : <Ionicons name="refresh" size={17} color={palette.primaryDark} />}
               </Pressable>
-              <View style={[styles.connectionPill, { backgroundColor: connected ? palette.mintSurface : palette.peachSurface }]}><View style={[styles.dot, { backgroundColor: connected ? palette.accentDark : palette.error }]} /><Text style={[styles.connectionText, { color: connected ? palette.accentDark : palette.error }]}>{connected ? 'Connected' : 'Disconnected'}</Text></View>
+              <View style={[styles.connectionPill, { backgroundColor: connectionHealthy ? palette.mintSurface : palette.peachSurface }]}><View style={[styles.dot, { backgroundColor: connectionHealthy ? palette.accentDark : palette.error }]} /><Text style={[styles.connectionText, { color: connectionHealthy ? palette.accentDark : palette.error }]}>{galaxyHeartRateFresh ? 'Live' : connected ? 'Not live' : 'Disconnected'}</Text></View>
             </View>
           </View>
           {healthSyncMessage ? <Text style={styles.error}>{healthSyncMessage}</Text> : null}
-          {watchDelayed ? (
-            <Pressable accessibilityRole="button" accessibilityLabel="See how to restore automatic watch syncing" onPress={() => setShowSyncHelp(true)} style={[styles.watchNotice, { backgroundColor: isDark ? theme.cardElevated : palette.peachSurface }]}>
-              <Ionicons name="watch-outline" size={19} color={palette.warning} />
-              <View style={styles.watchNoticeCopy}>
-                <Text style={[styles.watchNoticeTitle, { color: theme.text }]}>Watch sync delayed</Text>
-                <Text style={[styles.watchNoticeText, { color: theme.subtitle }]}>{watchSync?.deviceVersion ?? 'Paired watch'} last synced {watchSyncedAgo}. Check its phone connection.</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={17} color={theme.subtitle} />
-            </Pressable>
-          ) : watchSyncedAgo ? <Text style={[styles.watchFreshText, { color: theme.subtitle }]}>{watchSync?.deviceVersion ?? 'Watch'} last confirmed synced {watchSyncedAgo}</Text> : null}
-          {watchIssueMessage ? (
-            <Pressable accessibilityRole="button" accessibilityLabel="See watch sync details" onPress={() => setShowSyncHelp(true)} style={[styles.watchIssue, { backgroundColor: theme.cardElevated }]}>
-              <Ionicons name="information-circle-outline" size={17} color={palette.primaryDark} />
-              <Text style={[styles.watchIssueText, { color: theme.subtitle }]}>{watchIssueMessage}</Text>
-            </Pressable>
-          ) : null}
+          <Text style={[styles.watchFreshText, { color: theme.subtitle }]}>{galaxyWatchStatus}{galaxyWatch?.battery_percent != null ? ` · Watch battery ${galaxyWatch.battery_percent}%` : ''}. New vital measurements are saved automatically.</Text>
+          {galaxyWatch?.sensor_status?.sdk && !galaxyWatch.sensor_status.sdk.includes('connected') ? <Text style={[styles.watchFreshText, { color: theme.subtitle }]}>{galaxyWatch.sensor_status.sdk}</Text> : null}
           <View style={styles.grid}>
             <MetricCard fullWidth={stackVitals} icon="heart-outline" title="Heart rate" value={display(vital?.heart_rate_bpm)} unit="bpm" timestamp={vitalTimeLabel(vital, 'heart_rate_bpm')} color={palette.error} surface={palette.lemonSurface} onPress={() => setSelectedMetric('heart_rate_bpm')} />
-            <MetricCard fullWidth={stackVitals} icon="water-outline" title="Blood oxygen" value={display(vital?.spo2_percent, 1)} unit="%" timestamp={vitalTimeLabel(vital, 'spo2_percent')} color={palette.primaryDark} surface={palette.aquaSurface} onPress={() => setSelectedMetric('spo2_percent')} />
-            <MetricCard fullWidth={stackVitals} icon="moon-outline" title="Sleep" value={display(vital?.sleep_hours, 1)} unit="hours" annotation={sleepContext?.label} timestamp={vitalTimeLabel(vital, 'sleep_hours')} color={palette.purple} surface={palette.lavenderSurface} onPress={() => setSelectedMetric('sleep_hours')} />
-            <MetricCard fullWidth={stackVitals} icon="footsteps-outline" title="Steps (24h)" value={vital?.steps_count?.toLocaleString() ?? '--'} unit="steps" timestamp={vitalTimeLabel(vital, 'steps_count')} color={palette.accentDark} surface={palette.mintSurface} onPress={() => setSelectedMetric('steps_count')} />
-            <MetricCard fullWidth={stackVitals} icon="thermometer-outline" title="Overnight skin temp" value={display(vital?.skin_temp_celsius, 1)} unit="°C" timestamp={vitalTimeLabel(vital, 'skin_temp_celsius')} color={palette.warning} surface={palette.peachSurface} onPress={() => setSelectedMetric('skin_temp_celsius')} />
-            <MetricCard fullWidth={stackVitals} icon="leaf-outline" title="HRV" value={display(vital?.hrv_rmssd_ms)} unit="ms" timestamp={vitalTimeLabel(vital, 'hrv_rmssd_ms')} color={palette.pink} surface={palette.aquaSurface} onPress={() => setSelectedMetric('hrv_rmssd_ms')} />
+            <MetricCard fullWidth={stackVitals} icon="water-outline" title="Blood oxygen" value={display(vital?.spo2_percent, 1)} unit="%" annotation="Spot measurement" timestamp={vital?.spo2_percent == null ? 'Measure SpO₂ on watch' : vitalTimeLabel(vital, 'spo2_percent')} color={palette.primaryDark} surface={palette.aquaSurface} onPress={() => setSelectedMetric('spo2_percent')} />
+            <MetricCard fullWidth={stackVitals} icon="moon-outline" title="Sleep" value={display(vital?.sleep_hours, 1)} unit="hours" annotation={sleepContext?.label ?? 'Recorded sleep'} timestamp={vital?.sleep_hours!=null?vitalTimeLabel(vital,'sleep_hours'):watchMetricStatus(galaxyWatch,'sleep_hours')} color={palette.purple} surface={palette.lavenderSurface} onPress={() => setSelectedMetric('sleep_hours')} />
+            <MetricCard fullWidth={stackVitals} icon="footsteps-outline" title="Monitored steps" value={vital?.steps_count?.toLocaleString() ?? '--'} unit="steps" timestamp={vitalTimeLabel(vital, 'steps_count')} color={palette.accentDark} surface={palette.mintSurface} onPress={() => setSelectedMetric('steps_count')} />
+            <MetricCard fullWidth={stackVitals} icon="thermometer-outline" title="Skin temperature" value={display(vital?.skin_temp_celsius, 1)} unit="°C" timestamp={vitalTimeLabel(vital, 'skin_temp_celsius')} color={palette.warning} surface={palette.peachSurface} onPress={() => setSelectedMetric('skin_temp_celsius')} />
+            <MetricCard fullWidth={stackVitals} icon="leaf-outline" title="Stress level" value={stressIndexValue(vital)} annotation={stressIndexCaption(vital)} unit="/100" timestamp={vitalTimeLabel(vital, 'hrv_rmssd_ms')} color={palette.pink} surface={palette.aquaSurface} onPress={() => setSelectedMetric('hrv_rmssd_ms')} />
           </View>
-          {!vital ? <View style={[styles.empty, { backgroundColor: theme.cardElevated }]}><Ionicons name="analytics-outline" size={26} color={theme.subtitle} /><Text style={[styles.emptyTitle, { color: theme.text }]}>No health readings yet</Text><Text style={[styles.emptyText, { color: theme.subtitle }]}>Connect Google Health. Readings appear after the paired watch syncs.</Text></View> : null}
-          <Pressable accessibilityRole="button" accessibilityLabel="View last sync location" onPress={() => router.push('/location')} style={[styles.locationStrip, { backgroundColor: isDark ? theme.cardElevated : palette.aquaSurface }]}>
-            {syncLocation ? <View pointerEvents="none" style={styles.locationMap}><LocationMapPreview key={`${syncLocation.latitude}:${syncLocation.longitude}`} latitude={syncLocation.latitude} longitude={syncLocation.longitude} /></View> : null}
+          {!vital ? <View style={[styles.empty, { backgroundColor: theme.cardElevated }]}><Ionicons name="analytics-outline" size={26} color={theme.subtitle} /><Text style={[styles.emptyTitle, { color: theme.text }]}>No health readings yet</Text><Text style={[styles.emptyText, { color: theme.subtitle }]}>Wear Galaxy Watch, grant its sensor and location permissions, then tap Start monitoring on the watch.</Text></View> : null}
+          <Pressable accessibilityRole="button" accessibilityLabel="View watch location" onPress={() => router.push('/location')} style={[styles.locationStrip, { backgroundColor: isDark ? theme.cardElevated : palette.aquaSurface }]}>
+            {syncLocation ? <View pointerEvents="none" style={styles.locationMap}><LocationMapPreview key={galaxyWatch?.device_id??'watch'} latitude={syncLocation.latitude} longitude={syncLocation.longitude} recordedAt={syncLocation.recorded_at} accuracy={galaxyWatch?.accuracy_m} source={galaxyWatch?.location_source??'watch_gps'} /></View> : null}
             <LinearGradient
               pointerEvents="none"
               colors={isDark ? ['rgba(41,57,54,0.98)', 'rgba(41,57,54,0.83)', 'rgba(41,57,54,0.34)'] : ['rgba(235,247,248,0.98)', 'rgba(235,247,248,0.84)', 'rgba(235,247,248,0.24)']}
@@ -298,8 +266,8 @@ export default function DashboardScreen() {
             <View style={styles.locationContent}>
               <View style={styles.locationIcon}><CareArtwork kind="location" size={43} /></View>
               <View style={styles.locationCopy}>
-                <Text style={[styles.locationTitle, { color: theme.text }]}>Last sync location</Text>
-                <Text style={[styles.locationSubtitle, { color: theme.subtitle }]}>{syncLocation ? `Caregiver phone · ${timeAgo(syncLocation.recorded_at)}` : 'No phone sync location yet'}</Text>
+                <Text style={[styles.locationTitle, { color: theme.text }]}>Reported location</Text>
+                <Text style={[styles.locationSubtitle, { color: theme.subtitle }]}>{syncLocation ? `${galaxyGpsFresh ? locationSourceLabel(galaxyWatch) : 'Last known location'} · ${timeAgo(syncLocation.recorded_at)}` : galaxyWatch?.gps_status ?? 'Start monitoring on the watch'}</Text>
               </View>
               <Ionicons name="arrow-forward" size={19} color={theme.text} />
             </View>
@@ -341,27 +309,14 @@ export default function DashboardScreen() {
         </View>
       </ScrollView>
 
-      <VitalDetailModal visible={selectedMetric !== null} metric={selectedMetric} history={history} sleepSessions={sleepSessions} onClose={() => setSelectedMetric(null)} />
-
-      <Modal transparent visible={showSyncHelp} animationType="fade" onRequestClose={() => setShowSyncHelp(false)}>
-        <View style={styles.overlay}><View style={[styles.modal, { backgroundColor: theme.cardElevated, alignItems: 'stretch' }]}>
-          <Text style={[styles.modalTitle, { color: theme.text, marginTop: 0 }]}>Restore automatic watch sync</Text>
-          <Text style={[styles.syncHelpText, { color: theme.subtitle }]}>On the phone paired with the Inspire 3:</Text>
-          <Text style={[styles.syncHelpStep, { color: theme.text }]}>1. Keep Bluetooth on and the watch nearby.</Text>
-          <Text style={[styles.syncHelpStep, { color: theme.text }]}>2. In Android Settings, open Apps → Health → App battery usage. Allow background usage and choose Unrestricted.</Text>
-          <Text style={[styles.syncHelpStep, { color: theme.text }]}>3. In Apps → Health, allow Nearby devices and Background data. Turn off Battery Saver while testing.</Text>
-          <Text style={[styles.syncHelpStep, { color: theme.text }]}>4. If watch status is unavailable, reconnect the same Google account in ElderCareAI and allow the requested Google Health permissions.</Text>
-          <Text style={[styles.syncHelpText, { color: theme.subtitle }]}>New readings reach ElderCareAI automatically after Google Health syncs the watch. You do not need to refresh this app.</Text>
-          <Pressable accessibilityRole="button" onPress={() => setShowSyncHelp(false)} style={styles.syncHelpClose}><Text style={styles.syncHelpCloseText}>Done</Text></Pressable>
-        </View></View>
-      </Modal>
+      <VitalDetailModal visible={selectedMetric !== null} metric={selectedMetric} history={history} currentVital={vital} sensorStatus={selectedMetric ? watchMetricStatus(galaxyWatch, selectedMetric, vital) : undefined} sleepSessions={sleepSessions} onClose={() => setSelectedMetric(null)} />
 
       <Modal transparent visible={showPermission && !connected} animationType="fade" onRequestClose={() => setShowPermission(false)}>
         <View style={styles.overlay}><View style={[styles.modal, { backgroundColor: theme.cardElevated }]}>
           <View style={styles.modalIcon}><Ionicons name="fitness" size={32} color={palette.primaryDark} /></View>
-          <Text style={[styles.modalTitle, { color: theme.text }]}>Connect Google Health</Text>
-          <Text style={[styles.modalText, { color: theme.subtitle }]}>Your dashboard stays empty until you authorize read-only health data access. ElderCareAI never fabricates readings.</Text>
-          <GradientButton label="Review permissions" onPress={() => { setShowPermission(false); router.push('/setup/fitness?mode=edit'); }} colors={[palette.google, palette.googleDark]} />
+          <Text style={[styles.modalTitle, { color: theme.text }]}>Connect Galaxy Watch6</Text>
+          <Text style={[styles.modalText, { color: theme.subtitle }]}>Pair Galaxy Watch6, then start monitoring on the watch to receive patient measurements.</Text>
+          <GradientButton label="Connect watch" onPress={() => { setShowPermission(false); router.push('/setup/fitness?mode=edit'); }}  />
           <Pressable onPress={() => setShowPermission(false)} style={styles.notNow}><Text style={[styles.notNowText, { color: theme.subtitle }]}>Not now</Text></Pressable>
         </View></View>
       </Modal>

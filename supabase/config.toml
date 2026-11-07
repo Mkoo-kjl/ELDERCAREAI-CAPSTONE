@@ -1,22 +1,15 @@
 project_id = "eldercare-ai"
 
-[functions.google-health-oauth-start]
-verify_jwt = false
-
-[functions.google-health-oauth-callback]
-verify_jwt = false
-
-[functions.google-health-sync]
-verify_jwt = true
-
-[functions.google-health-webhook]
-verify_jwt = false
-
-[functions.google-health-disconnect]
-verify_jwt = false
-
 [functions.ai-care-assistant]
 verify_jwt = true
 
 [functions.admin-portal]
 verify_jwt = true
+
+# The handler validates either a caregiver JWT or a scoped watch credential.
+[functions.galaxy-watch]
+verify_jwt = false
+
+# Only the worker's server-side service credential is accepted by its handler.
+[functions.care-notification-worker]
+verify_jwt = false

@@ -1,0 +1,14 @@
+---
+title: ElderCareAI - Network Topology
+---
+flowchart TD
+    W["Galaxy Watch6"] ---|Internet| C["Cloud platform<br/>Supabase, AI and push services"]
+    C ---|Internet| P["Caregiver phone"]
+    C ---|Internet| A["Admin computer"]
+    W ---|Bluetooth pairing| P
+
+    classDef standard fill:#EBF7F8,stroke:#397F88,color:#202D2B,stroke-width:1.5px;
+    classDef cloud fill:#EFF7E9,stroke:#3C704A,color:#202D2B,stroke-width:1.5px;
+    class W,P,A standard;
+    class C cloud;
+    linkStyle 3 stroke:#65736E,stroke-dasharray:5 4;

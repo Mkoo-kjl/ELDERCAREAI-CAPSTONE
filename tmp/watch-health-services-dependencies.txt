@@ -1,0 +1,30 @@
+
+> Task :app:dependencies
+
+------------------------------------------------------------
+Project ':app'
+------------------------------------------------------------
+
+debugCompileClasspath - Compile classpath for '/debug'.
++--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20
+|    \--- org.jetbrains:annotations:13.0 -> 23.0.0
++--- androidx.health:health-services-client:1.1.0
+|    +--- androidx.annotation:annotation:1.8.1
+|    |    \--- androidx.annotation:annotation-jvm:1.8.1
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.7.10 -> 2.1.20 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 (*)
+|    \--- org.jspecify:jspecify:1.0.0
++--- org.jetbrains.kotlin:kotlin-stdlib:{strictly 2.1.20} -> 2.1.20 (c)
++--- androidx.health:health-services-client:{strictly 1.1.0} -> 1.1.0 (c)
++--- org.jetbrains:annotations:{strictly 23.0.0} -> 23.0.0 (c)
++--- androidx.annotation:annotation:{strictly 1.8.1} -> 1.8.1 (c)
++--- org.jspecify:jspecify:{strictly 1.0.0} -> 1.0.0 (c)
+\--- androidx.annotation:annotation-jvm:{strictly 1.8.1} -> 1.8.1 (c)
+
+(c) - A dependency constraint, not a dependency. The dependency affected by the constraint occurs elsewhere in the tree.
+(*) - Indicates repeated occurrences of a transitive dependency subtree. Gradle expands transitive dependency subtrees only once per project; repeat occurrences only display the root of the subtree, followed by this annotation.
+
+A web-based, searchable dependency report is available by adding the --scan option.
+
+BUILD SUCCESSFUL in 6s
+1 actionable task: 1 executed

@@ -1,0 +1,351 @@
+Project ElderCareAI {
+  database_type: 'PostgreSQL'
+  Note: '18 core tables verified on 7 November 2026. Supabase Auth and supporting internal tables are outside this diagram.'
+}
+
+Table public.caregivers {
+  id uuid [pk, not null, note: 'External FK: auth.users(id)']
+  full_name text [not null]
+  phone text
+  created_at timestamptz [not null, default: `now()`]
+  age integer
+  sex text
+  photo_url text
+  email text
+  updated_at timestamptz [not null, default: `now()`]
+}
+
+Table public.elderly_profiles {
+  elderly_id uuid [pk, not null, default: `gen_random_uuid()`]
+  caregiver_id uuid [not null]
+  full_name text [not null]
+  age integer
+  gender text
+  weight_kg numeric(5,2)
+  height_cm numeric(5,2)
+  blood_type text
+  medical_conditions text
+  medications text
+  emergency_contact text
+  created_at timestamptz [not null, default: `now()`]
+  photo_url text
+  date_of_birth date
+  emergency_contact_phone text
+  updated_at timestamptz [not null, default: `now()`]
+}
+
+Table public.wearable_devices {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  caregiver_id uuid [not null, note: 'External FK: auth.users(id)']
+  elderly_id uuid [not null]
+  device_name text [not null]
+  token_hash text [not null, unique]
+  expires_at timestamptz [not null, default: `(now() + '90 days'::interval)`]
+  revoked_at timestamptz
+  paired_at timestamptz [not null, default: `now()`]
+  last_seen_at timestamptz
+  last_history_at timestamptz
+  Note: 'Conditional unique indexes: CREATE UNIQUE INDEX wearable_devices_one_active_patient ON public.wearable_devices USING btree (elderly_id) WHERE (revoked_at IS NULL)'
+}
+
+Table public.wearable_live_state {
+  elderly_id uuid [pk, not null]
+  device_id uuid [not null]
+  heart_rate_bpm float8
+  heart_rate_measured_at timestamptz
+  latitude float8
+  longitude float8
+  accuracy_m float8
+  gps_measured_at timestamptz
+  battery_percent integer
+  monitoring boolean [not null, default: `false`]
+  status_at timestamptz [not null]
+  received_at timestamptz [not null, default: `now()`]
+  spo2_percent float8
+  spo2_measured_at timestamptz
+  skin_temp_celsius float8
+  skin_temp_measured_at timestamptz
+  hrv_rmssd_ms float8
+  hrv_measured_at timestamptz
+  steps_count integer
+  steps_measured_at timestamptz
+  location_source text
+  gps_status text
+  sensor_status jsonb [not null, default: `'{}'::jsonb`]
+  stress_score integer
+  stress_baseline_rmssd float8
+  stress_reference_count integer [not null, default: `0`]
+  sleep_hours float8
+  sleep_measured_at timestamptz
+}
+
+Table public.vital_sign_logs {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  elderly_id uuid [not null]
+  heart_rate_bpm numeric(6,2)
+  spo2_percent numeric(5,2)
+  stress_score integer
+  skin_temp_celsius numeric(5,2)
+  steps_count integer
+  active_minutes integer
+  overall_status text [default: `'normal'::text`]
+  ai_risk_score numeric(5,2)
+  source text [default: `'google_health'::text`]
+  recorded_at timestamptz [not null, default: `now()`]
+  synced_at timestamptz [default: `now()`]
+  sleep_hours numeric(5,2)
+  hrv_rmssd_ms numeric
+  measurement_times jsonb [not null, default: `'{}'::jsonb`]
+  sleep_history jsonb [not null, default: `'[]'::jsonb`]
+  watch_device_id uuid
+  watch_sample_id uuid
+  watch_metric text
+  watch_measured_at timestamptz
+  stress_baseline_rmssd float8
+  stress_reference_count integer
+  stress_model_version text
+  is_superseded boolean [not null, default: `false`]
+  measurement_origin text
+  source_device_id text
+  source_record_key text
+  source_group_key text
+  source_revision_at timestamptz
+  indexes {
+    (watch_device_id, watch_sample_id) [unique]
+  }
+  Note: 'Conditional unique indexes: CREATE UNIQUE INDEX samsung_health_revision_unique ON public.vital_sign_logs USING btree (elderly_id, source_device_id, source_record_key, source_revision_at) WHERE (measurement_origin = \'samsung_health\'::text); CREATE UNIQUE INDEX vital_watch_measurement_unique ON public.vital_sign_logs USING btree (watch_device_id, watch_metric, watch_measured_at) WHERE (measurement_origin IS DISTINCT FROM \'samsung_health\'::text)'
+}
+
+Table public.watch_location_points {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  elderly_id uuid [not null]
+  device_id uuid [not null]
+  latitude float8 [not null]
+  longitude float8 [not null]
+  accuracy_m float8 [not null]
+  location_source text [not null]
+  measured_at timestamptz [not null]
+  received_at timestamptz [not null, default: `now()`]
+  indexes {
+    (device_id, measured_at) [unique]
+  }
+}
+
+Table public.medication_schedules {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  elderly_id uuid [not null]
+  caregiver_id uuid [not null]
+  medication_name text [not null]
+  dosage text
+  form text
+  frequency text [not null]
+  times_of_day text[]
+  start_date date [not null, default: `CURRENT_DATE`]
+  end_date date
+  instructions text
+  prescribed_by text
+  is_active boolean [default: `true`]
+  reminder_enabled boolean [default: `true`]
+  color_tag text [default: `'#38BDF8'::text`]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+  timezone text [not null, default: `'Asia/Manila'::text`]
+}
+
+Table public.medication_logs {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  schedule_id uuid [not null]
+  elderly_id uuid [not null]
+  scheduled_time timestamptz [not null]
+  taken_at timestamptz
+  status text [default: `'pending'::text`]
+  notes text
+  recorded_by uuid
+  created_at timestamptz [default: `now()`]
+  dose_key text
+  watch_device_id uuid
+  Note: 'Conditional unique indexes: CREATE UNIQUE INDEX medication_dose_once ON public.medication_logs USING btree (schedule_id, dose_key) WHERE (dose_key IS NOT NULL)'
+}
+
+Table public.appointments {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  elderly_id uuid [not null]
+  caregiver_id uuid [not null]
+  title text [not null]
+  doctor_name text
+  location text
+  appointment_at timestamptz [not null]
+  duration_min integer [default: `30`]
+  notes text
+  status text [default: `'upcoming'::text`]
+  reminder_sent boolean [default: `false`]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table public.caregiver_notes {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  elderly_id uuid [not null]
+  caregiver_id uuid [not null]
+  title text
+  content text [not null]
+  is_pinned boolean [default: `false`]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table public.health_alerts {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  elderly_id uuid [not null]
+  alert_type text [not null]
+  severity text [not null]
+  title text [not null]
+  message text [not null]
+  metric_value numeric
+  metric_unit text
+  threshold_value numeric
+  is_read boolean [default: `false`]
+  is_resolved boolean [default: `false`]
+  resolved_at timestamptz
+  resolved_by uuid
+  ai_generated boolean [default: `false`]
+  triggered_at timestamptz [default: `now()`]
+  acknowledged_at timestamptz
+  acknowledged_by uuid [note: 'External FK: auth.users(id)']
+  emergency_event_id uuid
+  resolution_note text
+}
+
+Table public.alert_response_events {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  alert_id uuid [not null]
+  elderly_id uuid [not null]
+  actor_id uuid [note: 'External FK: auth.users(id)']
+  action text [not null]
+  note text
+  occurred_at timestamptz [not null, default: `now()`]
+  indexes {
+    (alert_id, action) [unique]
+  }
+}
+
+Table public.caregiver_notifications {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  caregiver_id uuid [not null]
+  elderly_id uuid
+  alert_id uuid
+  notification_type text [not null]
+  title text [not null]
+  body text [not null]
+  data jsonb
+  channel text [default: `'push'::text`]
+  is_read boolean [default: `false`]
+  read_at timestamptz
+  sent_at timestamptz [default: `now()`]
+  delivery_status text [default: `'sent'::text`]
+  event_key text
+  push_status text [not null, default: `'not_registered'::text`]
+  push_error text
+  Note: 'Conditional unique indexes: CREATE UNIQUE INDEX care_notification_event_unique ON public.caregiver_notifications USING btree (caregiver_id, event_key) WHERE (event_key IS NOT NULL)'
+}
+
+Table public.emergency_events {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  elderly_id uuid [not null]
+  event_type text [not null]
+  severity text [not null, default: `'high'::text`]
+  description text
+  location text
+  vital_snapshot jsonb
+  response_time_s integer
+  responded_by uuid
+  responded_at timestamptz
+  is_resolved boolean [default: `false`]
+  resolution_notes text
+  triggered_at timestamptz [default: `now()`]
+}
+
+Table public.ai_chatbot_sessions {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  elderly_id uuid [not null]
+  caregiver_id uuid [not null]
+  session_title text
+  context_type text [default: `'general'::text`]
+  total_messages integer [default: `0`]
+  is_active boolean [default: `true`]
+  started_at timestamptz [default: `now()`]
+  ended_at timestamptz
+}
+
+Table public.ai_chatbot_messages {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  session_id uuid [not null]
+  role text [not null]
+  content text [not null]
+  tokens_used integer
+  has_health_data boolean [default: `false`]
+  is_flagged boolean [default: `false`]
+  created_at timestamptz [default: `now()`]
+  evidence jsonb [not null, default: `'[]'::jsonb`]
+  evidence_summary jsonb
+}
+
+Table public.patient_safe_zones {
+  elderly_id uuid [pk, not null]
+  caregiver_id uuid [not null, note: 'External FK: auth.users(id)']
+  name text [not null]
+  latitude float8 [not null]
+  longitude float8 [not null]
+  radius_m integer [not null]
+  enabled boolean [not null, default: `false`]
+  revision uuid [not null, default: `gen_random_uuid()`]
+  updated_at timestamptz [not null, default: `now()`]
+}
+
+Table public.safe_zone_events {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  elderly_id uuid [not null]
+  zone_revision uuid [not null]
+  zone_name text [not null]
+  direction text [not null]
+  distance_m float8 [not null]
+  accuracy_m float8 [not null]
+  measured_at timestamptz [not null]
+  created_at timestamptz [not null, default: `now()`]
+  alert_id uuid
+}
+
+Ref: public.elderly_profiles.caregiver_id > public.caregivers.id
+Ref: public.wearable_devices.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.wearable_live_state.device_id > public.wearable_devices.id
+Ref: public.elderly_profiles.elderly_id - public.wearable_live_state.elderly_id
+Ref: public.vital_sign_logs.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.vital_sign_logs.watch_device_id > public.wearable_devices.id
+Ref: public.watch_location_points.device_id > public.wearable_devices.id
+Ref: public.watch_location_points.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.medication_schedules.caregiver_id > public.caregivers.id
+Ref: public.medication_schedules.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.medication_logs.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.medication_logs.recorded_by > public.caregivers.id
+Ref: public.medication_logs.schedule_id > public.medication_schedules.id
+Ref: public.medication_logs.watch_device_id > public.wearable_devices.id
+Ref: public.appointments.caregiver_id > public.caregivers.id
+Ref: public.appointments.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.caregiver_notes.caregiver_id > public.caregivers.id
+Ref: public.caregiver_notes.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.health_alerts.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.health_alerts.emergency_event_id > public.emergency_events.id
+Ref: public.health_alerts.resolved_by > public.caregivers.id
+Ref: public.alert_response_events.alert_id > public.health_alerts.id
+Ref: public.alert_response_events.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.caregiver_notifications.alert_id > public.health_alerts.id
+Ref: public.caregiver_notifications.caregiver_id > public.caregivers.id
+Ref: public.caregiver_notifications.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.emergency_events.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.emergency_events.responded_by > public.caregivers.id
+Ref: public.ai_chatbot_sessions.caregiver_id > public.caregivers.id
+Ref: public.ai_chatbot_sessions.elderly_id > public.elderly_profiles.elderly_id
+Ref: public.ai_chatbot_messages.session_id > public.ai_chatbot_sessions.id
+Ref: public.elderly_profiles.elderly_id - public.patient_safe_zones.elderly_id
+Ref: public.safe_zone_events.alert_id > public.health_alerts.id
+Ref: public.safe_zone_events.elderly_id > public.elderly_profiles.elderly_id

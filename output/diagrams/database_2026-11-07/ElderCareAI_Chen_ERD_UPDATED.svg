@@ -1,0 +1,540 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3920" height="2940" viewBox="0 0 3920 2940"><rect width="3920" height="2940" fill="white"/><style>text{font-family:Arial,Helvetica,sans-serif;fill:#203431}.edge{fill:none;stroke-linejoin:round;stroke-linecap:round}</style>
+<text x="80" y="70" font-size="30" text-anchor="start" font-weight="700">ElderCareAI Chen ERD</text>
+<text x="80" y="108" font-size="16" text-anchor="start" >18 core entities  |  Selected attributes  |  Relationships are named inside diamonds  |  7 November 2026</text>
+<text x="80" y="148" font-size="15" text-anchor="start" >Rectangle = entity     Oval = attribute     Underlined = primary key     FK = foreign key     1 and N show maximum cardinality</text>
+<path d="M460 352L202.66666666666669 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 352L460.00000000000006 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 352L717.3333333333334 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 408L202.66666666666669 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 408L460.00000000000006 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 408L717.3333333333334 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 352L1202.6666666666667 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 352L1460.0000000000002 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 352L1717.3333333333335 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 408L1202.6666666666667 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 408L1460.0000000000002 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 408L1717.3333333333335 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 352L2202.6666666666665 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 352L2460 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 352L2717.3333333333335 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 408L2202.6666666666665 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 408L2460 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 408L2717.3333333333335 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 352L3202.6666666666665 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 352L3460 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 352L3717.3333333333335 284" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 408L3202.6666666666665 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 408L3460 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 408L3717.3333333333335 476" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 912L202.66666666666669 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 912L460.00000000000006 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 912L717.3333333333334 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 968L202.66666666666669 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 968L460.00000000000006 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 968L717.3333333333334 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 912L1202.6666666666667 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 912L1460.0000000000002 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 912L1717.3333333333335 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 968L1202.6666666666667 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 968L1460.0000000000002 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 968L1717.3333333333335 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 912L2151.2 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 912L2305.6 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 912L2460 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 912L2614.3999999999996 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 912L2768.7999999999997 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 968L2151.2 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 968L2305.6 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 968L2460 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 968L2614.3999999999996 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 968L2768.7999999999997 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 912L3202.6666666666665 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 912L3460 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 912L3717.3333333333335 844" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 968L3202.6666666666665 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 968L3460 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 968L3717.3333333333335 1036" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 1472L202.66666666666669 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 1472L460.00000000000006 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 1472L717.3333333333334 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 1528L202.66666666666669 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 1528L460.00000000000006 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 1528L717.3333333333334 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 1472L1202.6666666666667 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 1472L1460.0000000000002 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 1472L1717.3333333333335 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 1528L1202.6666666666667 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 1528L1460.0000000000002 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 1528L1717.3333333333335 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 1472L2202.6666666666665 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 1472L2460 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 1472L2717.3333333333335 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 1528L2202.6666666666665 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 1528L2460 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 1528L2717.3333333333335 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 1472L3202.6666666666665 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 1472L3460 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 1472L3717.3333333333335 1404" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 1528L3202.6666666666665 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 1528L3460 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 1528L3717.3333333333335 1596" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 2032L202.66666666666669 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 2032L460.00000000000006 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 2032L717.3333333333334 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 2088L202.66666666666669 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 2088L460.00000000000006 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M460 2088L717.3333333333334 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2032L1202.6666666666667 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2032L1460.0000000000002 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2032L1717.3333333333335 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2088L1202.6666666666667 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2088L1460.0000000000002 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2088L1717.3333333333335 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2032L2202.6666666666665 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2032L2460 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2032L2717.3333333333335 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2088L2202.6666666666665 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2088L2460 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2088L2717.3333333333335 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 2032L3202.6666666666665 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 2032L3460 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 2032L3717.3333333333335 1964" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 2088L3202.6666666666665 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 2088L3460 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M3460 2088L3717.3333333333335 2156" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2592L1202.6666666666667 2524" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2592L1460.0000000000002 2524" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2592L1717.3333333333335 2524" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2648L1202.6666666666667 2716" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2648L1460.0000000000002 2716" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M1460 2648L1717.3333333333335 2716" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2592L2202.6666666666665 2524" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2592L2460 2524" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2592L2717.3333333333335 2524" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2648L2202.6666666666665 2716" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2648L2460 2716" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M2460 2648L2717.3333333333335 2716" class="edge" stroke="#A2BEAC" stroke-width="1.2"/>
+<path d="M 610 380 L 860 380 L 880 380" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1310 380 L 1060 380 L 1040 380" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 380 L 1860 380 L 1880 380" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 2310 380 L 2060 380 L 2040 380" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 2610 380 L 2860 380 L 2880 380" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 3310 380 L 3060 380 L 3040 380" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 380 L 1860 380 L 1860 660 L 2360 660 L 2380 660" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 2610 940 L 2860 940 L 2860 720 L 2460 720 L 2460 700" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 2610 380 L 2860 380 L 2860 660 L 3360 660 L 3380 660" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 3610 940 L 3860 940 L 3860 720 L 3460 720 L 3460 700" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1310 380 L 1060 380 L 1060 660 L 560 660 L 540 660" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 610 940 L 860 940 L 860 720 L 460 720 L 460 700" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 610 940 L 860 940 L 880 940" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1310 940 L 1060 940 L 1040 940" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1310 380 L 1060 380 L 1060 1220 L 560 1220 L 540 1220" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 610 1500 L 860 1500 L 860 1280 L 460 1280 L 460 1260" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 380 L 1860 380 L 1860 1160 L 1460 1160 L 1460 1180" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 1500 L 1860 1500 L 1860 1280 L 1460 1280 L 1460 1260" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 380 L 1860 380 L 1860 440 L 2060 440 L 2060 1220 L 2360 1220 L 2380 1220" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 2610 1500 L 2860 1500 L 2860 1280 L 2460 1280 L 2460 1260" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 380 L 1860 380 L 1860 560 L 3060 560 L 3060 1220 L 3360 1220 L 3380 1220" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 3610 1500 L 3860 1500 L 3860 1280 L 3460 1280 L 3460 1260" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 2060 L 1860 2060 L 1860 1780 L 3360 1780 L 3380 1780" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 3610 1500 L 3860 1500 L 3860 1720 L 3460 1720 L 3460 1740" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1310 380 L 1060 380 L 1060 1780 L 560 1780 L 540 1780" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 610 2060 L 860 2060 L 860 1840 L 460 1840 L 460 1820" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 610 2060 L 860 2060 L 880 2060" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1310 2060 L 1060 2060 L 1040 2060" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 380 L 1860 380 L 1860 440 L 1880 440 L 1880 1720 L 1460 1720 L 1460 1740" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 2060 L 1860 2060 L 1860 1840 L 1460 1840 L 1460 1820" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 2060 L 1860 2060 L 1880 2060" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 2310 2060 L 2060 2060 L 2040 2060" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 2060 L 1860 2060 L 1860 2340 L 3360 2340 L 3380 2340" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 3610 2060 L 3860 2060 L 3860 2280 L 3460 2280 L 3460 2300" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 380 L 1860 380 L 1860 440 L 1900 440 L 1900 2000 L 1860 2000 L 1860 2280 L 1460 2280 L 1460 2300" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 2620 L 1860 2620 L 1860 2400 L 1460 2400 L 1460 2380" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 1610 2620 L 1860 2620 L 1880 2620" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<path d="M 2310 2620 L 2060 2620 L 2040 2620" class="edge" stroke="#5A7884" stroke-width="1.7" opacity=".85"/>
+<rect x="310" y="352" width="300" height="56" fill="#DFF0DE" stroke="#397F88" stroke-width="2"/>
+<text x="460" y="386" font-size="17" text-anchor="middle" font-weight="700">caregivers</text>
+<ellipse cx="202.66666666666669" cy="262" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="202.66666666666669" y="266" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id FK</text>
+<ellipse cx="460.00000000000006" cy="262" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="460.00000000000006" y="266" font-size="12" text-anchor="middle" >full_name</text>
+<ellipse cx="717.3333333333334" cy="262" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="717.3333333333334" y="266" font-size="12" text-anchor="middle" >email</text>
+<ellipse cx="202.66666666666669" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="202.66666666666669" y="502" font-size="12" text-anchor="middle" >phone</text>
+<ellipse cx="460.00000000000006" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="460.00000000000006" y="502" font-size="12" text-anchor="middle" >age</text>
+<ellipse cx="717.3333333333334" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="717.3333333333334" y="502" font-size="12" text-anchor="middle" >sex</text>
+<rect x="1310" y="352" width="300" height="56" fill="#DFF0DE" stroke="#397F88" stroke-width="2"/>
+<text x="1460" y="386" font-size="17" text-anchor="middle" font-weight="700">elderly_profiles</text>
+<ellipse cx="1202.6666666666667" cy="262" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="266" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">elderly_id</text>
+<ellipse cx="1460.0000000000002" cy="262" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="266" font-size="12" text-anchor="middle" >caregiver_id FK</text>
+<ellipse cx="1717.3333333333335" cy="262" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="266" font-size="12" text-anchor="middle" >full_name</text>
+<ellipse cx="1202.6666666666667" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="502" font-size="12" text-anchor="middle" >date_of_birth</text>
+<ellipse cx="1460.0000000000002" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="502" font-size="12" text-anchor="middle" >medical_conditions</text>
+<ellipse cx="1717.3333333333335" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="502" font-size="12" text-anchor="middle" >emergency_contact_phone</text>
+<rect x="2310" y="352" width="300" height="56" fill="#DFF0DE" stroke="#3F779E" stroke-width="2"/>
+<text x="2460" y="386" font-size="17" text-anchor="middle" font-weight="700">wearable_devices</text>
+<ellipse cx="2202.6666666666665" cy="262" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2202.6666666666665" y="266" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="2460" cy="262" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="266" font-size="12" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="2717.3333333333335" cy="262" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2717.3333333333335" y="266" font-size="12" text-anchor="middle" >device_name</text>
+<ellipse cx="2202.6666666666665" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2202.6666666666665" y="502" font-size="12" text-anchor="middle" >paired_at</text>
+<ellipse cx="2460" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="502" font-size="12" text-anchor="middle" >expires_at</text>
+<ellipse cx="2717.3333333333335" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2717.3333333333335" y="502" font-size="12" text-anchor="middle" >revoked_at</text>
+<rect x="3310" y="352" width="300" height="56" fill="#DFF0DE" stroke="#3F779E" stroke-width="2"/>
+<text x="3460" y="386" font-size="17" text-anchor="middle" font-weight="700">wearable_live_state</text>
+<ellipse cx="3202.6666666666665" cy="262" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3202.6666666666665" y="266" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">elderly_id FK</text>
+<ellipse cx="3460" cy="262" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3460" y="266" font-size="12" text-anchor="middle" >device_id FK</text>
+<ellipse cx="3717.3333333333335" cy="262" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3717.3333333333335" y="266" font-size="12" text-anchor="middle" >heart_rate_bpm</text>
+<ellipse cx="3202.6666666666665" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3202.6666666666665" y="502" font-size="12" text-anchor="middle" >gps_measured_at</text>
+<ellipse cx="3460" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3460" y="502" font-size="12" text-anchor="middle" >monitoring</text>
+<ellipse cx="3717.3333333333335" cy="498" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3717.3333333333335" y="502" font-size="12" text-anchor="middle" >battery_percent</text>
+<rect x="310" y="912" width="300" height="56" fill="#DFF0DE" stroke="#756793" stroke-width="2"/>
+<text x="460" y="946" font-size="17" text-anchor="middle" font-weight="700">medication_schedules</text>
+<ellipse cx="202.66666666666669" cy="822" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="202.66666666666669" y="826" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="460.00000000000006" cy="822" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="460.00000000000006" y="826" font-size="12" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="717.3333333333334" cy="822" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="717.3333333333334" y="826" font-size="12" text-anchor="middle" >medication_name</text>
+<ellipse cx="202.66666666666669" cy="1058" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="202.66666666666669" y="1062" font-size="12" text-anchor="middle" >dosage</text>
+<ellipse cx="460.00000000000006" cy="1058" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="460.00000000000006" y="1062" font-size="12" text-anchor="middle" >times_of_day</text>
+<ellipse cx="717.3333333333334" cy="1058" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="717.3333333333334" y="1062" font-size="12" text-anchor="middle" >timezone</text>
+<rect x="1310" y="912" width="300" height="56" fill="#DFF0DE" stroke="#756793" stroke-width="2"/>
+<text x="1460" y="946" font-size="17" text-anchor="middle" font-weight="700">medication_logs</text>
+<ellipse cx="1202.6666666666667" cy="822" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="826" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="1460.0000000000002" cy="822" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="826" font-size="12" text-anchor="middle" >schedule_id FK</text>
+<ellipse cx="1717.3333333333335" cy="822" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="826" font-size="12" text-anchor="middle" >scheduled_time</text>
+<ellipse cx="1202.6666666666667" cy="1058" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="1062" font-size="12" text-anchor="middle" >taken_at</text>
+<ellipse cx="1460.0000000000002" cy="1058" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="1062" font-size="12" text-anchor="middle" >status</text>
+<ellipse cx="1717.3333333333335" cy="1058" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="1062" font-size="12" text-anchor="middle" >dose_key</text>
+<rect x="2310" y="912" width="300" height="56" fill="#DFF0DE" stroke="#3F779E" stroke-width="2"/>
+<text x="2460" y="946" font-size="17" text-anchor="middle" font-weight="700">vital_sign_logs</text>
+<ellipse cx="2151.2" cy="822" rx="71.2" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2151.2" y="826" font-size="11" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="2305.6" cy="822" rx="71.2" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2305.6" y="826" font-size="11" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="2460" cy="822" rx="71.2" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="826" font-size="11" text-anchor="middle" >heart_rate_bpm</text>
+<ellipse cx="2614.3999999999996" cy="822" rx="71.2" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2614.3999999999996" y="826" font-size="11" text-anchor="middle" >spo2_percent</text>
+<ellipse cx="2768.7999999999997" cy="822" rx="71.2" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2768.7999999999997" y="826" font-size="11" text-anchor="middle" >skin_temp_celsius</text>
+<ellipse cx="2151.2" cy="1058" rx="71.2" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2151.2" y="1062" font-size="11" text-anchor="middle" >hrv_rmssd_ms</text>
+<ellipse cx="2305.6" cy="1058" rx="71.2" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2305.6" y="1062" font-size="11" text-anchor="middle" >stress_score</text>
+<ellipse cx="2460" cy="1058" rx="71.2" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="1062" font-size="11" text-anchor="middle" >steps_count</text>
+<ellipse cx="2614.3999999999996" cy="1058" rx="71.2" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2614.3999999999996" y="1062" font-size="11" text-anchor="middle" >sleep_hours</text>
+<ellipse cx="2768.7999999999997" cy="1058" rx="71.2" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2768.7999999999997" y="1062" font-size="11" text-anchor="middle" >recorded_at</text>
+<rect x="3310" y="912" width="300" height="56" fill="#DFF0DE" stroke="#3F779E" stroke-width="2"/>
+<text x="3460" y="946" font-size="17" text-anchor="middle" font-weight="700">watch_location_points</text>
+<ellipse cx="3202.6666666666665" cy="822" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3202.6666666666665" y="826" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="3460" cy="822" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3460" y="826" font-size="12" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="3717.3333333333335" cy="822" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3717.3333333333335" y="826" font-size="12" text-anchor="middle" >device_id FK</text>
+<ellipse cx="3202.6666666666665" cy="1058" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3202.6666666666665" y="1062" font-size="12" text-anchor="middle" >latitude</text>
+<ellipse cx="3460" cy="1058" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3460" y="1062" font-size="12" text-anchor="middle" >longitude</text>
+<ellipse cx="3717.3333333333335" cy="1058" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3717.3333333333335" y="1062" font-size="12" text-anchor="middle" >measured_at</text>
+<rect x="310" y="1472" width="300" height="56" fill="#DFF0DE" stroke="#756793" stroke-width="2"/>
+<text x="460" y="1506" font-size="17" text-anchor="middle" font-weight="700">appointments</text>
+<ellipse cx="202.66666666666669" cy="1382" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="202.66666666666669" y="1386" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="460.00000000000006" cy="1382" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="460.00000000000006" y="1386" font-size="12" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="717.3333333333334" cy="1382" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="717.3333333333334" y="1386" font-size="12" text-anchor="middle" >title</text>
+<ellipse cx="202.66666666666669" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="202.66666666666669" y="1622" font-size="12" text-anchor="middle" >doctor_name</text>
+<ellipse cx="460.00000000000006" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="460.00000000000006" y="1622" font-size="12" text-anchor="middle" >appointment_at</text>
+<ellipse cx="717.3333333333334" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="717.3333333333334" y="1622" font-size="12" text-anchor="middle" >status</text>
+<rect x="1310" y="1472" width="300" height="56" fill="#DFF0DE" stroke="#756793" stroke-width="2"/>
+<text x="1460" y="1506" font-size="17" text-anchor="middle" font-weight="700">caregiver_notes</text>
+<ellipse cx="1202.6666666666667" cy="1382" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="1386" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="1460.0000000000002" cy="1382" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="1386" font-size="12" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="1717.3333333333335" cy="1382" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="1386" font-size="12" text-anchor="middle" >caregiver_id FK</text>
+<ellipse cx="1202.6666666666667" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="1622" font-size="12" text-anchor="middle" >title</text>
+<ellipse cx="1460.0000000000002" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="1622" font-size="12" text-anchor="middle" >content</text>
+<ellipse cx="1717.3333333333335" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="1622" font-size="12" text-anchor="middle" >is_pinned</text>
+<rect x="2310" y="1472" width="300" height="56" fill="#DFF0DE" stroke="#4F805C" stroke-width="2"/>
+<text x="2460" y="1506" font-size="17" text-anchor="middle" font-weight="700">patient_safe_zones</text>
+<ellipse cx="2202.6666666666665" cy="1382" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2202.6666666666665" y="1386" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">elderly_id FK</text>
+<ellipse cx="2460" cy="1382" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="1386" font-size="12" text-anchor="middle" >name</text>
+<ellipse cx="2717.3333333333335" cy="1382" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2717.3333333333335" y="1386" font-size="12" text-anchor="middle" >latitude</text>
+<ellipse cx="2202.6666666666665" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2202.6666666666665" y="1622" font-size="12" text-anchor="middle" >longitude</text>
+<ellipse cx="2460" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="1622" font-size="12" text-anchor="middle" >radius_m</text>
+<ellipse cx="2717.3333333333335" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2717.3333333333335" y="1622" font-size="12" text-anchor="middle" >enabled</text>
+<rect x="3310" y="1472" width="300" height="56" fill="#DFF0DE" stroke="#4F805C" stroke-width="2"/>
+<text x="3460" y="1506" font-size="17" text-anchor="middle" font-weight="700">safe_zone_events</text>
+<ellipse cx="3202.6666666666665" cy="1382" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3202.6666666666665" y="1386" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="3460" cy="1382" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3460" y="1386" font-size="12" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="3717.3333333333335" cy="1382" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3717.3333333333335" y="1386" font-size="12" text-anchor="middle" >alert_id FK</text>
+<ellipse cx="3202.6666666666665" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3202.6666666666665" y="1622" font-size="12" text-anchor="middle" >direction</text>
+<ellipse cx="3460" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3460" y="1622" font-size="12" text-anchor="middle" >distance_m</text>
+<ellipse cx="3717.3333333333335" cy="1618" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3717.3333333333335" y="1622" font-size="12" text-anchor="middle" >measured_at</text>
+<rect x="310" y="2032" width="300" height="56" fill="#DFF0DE" stroke="#A16B3E" stroke-width="2"/>
+<text x="460" y="2066" font-size="17" text-anchor="middle" font-weight="700">emergency_events</text>
+<ellipse cx="202.66666666666669" cy="1942" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="202.66666666666669" y="1946" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="460.00000000000006" cy="1942" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="460.00000000000006" y="1946" font-size="12" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="717.3333333333334" cy="1942" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="717.3333333333334" y="1946" font-size="12" text-anchor="middle" >event_type</text>
+<ellipse cx="202.66666666666669" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="202.66666666666669" y="2182" font-size="12" text-anchor="middle" >triggered_at</text>
+<ellipse cx="460.00000000000006" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="460.00000000000006" y="2182" font-size="12" text-anchor="middle" >is_resolved</text>
+<ellipse cx="717.3333333333334" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="717.3333333333334" y="2182" font-size="12" text-anchor="middle" >resolution_notes</text>
+<rect x="1310" y="2032" width="300" height="56" fill="#DFF0DE" stroke="#A16B3E" stroke-width="2"/>
+<text x="1460" y="2066" font-size="17" text-anchor="middle" font-weight="700">health_alerts</text>
+<ellipse cx="1202.6666666666667" cy="1942" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="1946" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="1460.0000000000002" cy="1942" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="1946" font-size="12" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="1717.3333333333335" cy="1942" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="1946" font-size="12" text-anchor="middle" >severity</text>
+<ellipse cx="1202.6666666666667" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="2182" font-size="12" text-anchor="middle" >acknowledged_at</text>
+<ellipse cx="1460.0000000000002" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="2182" font-size="12" text-anchor="middle" >is_resolved</text>
+<ellipse cx="1717.3333333333335" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="2182" font-size="12" text-anchor="middle" >resolution_note</text>
+<rect x="2310" y="2032" width="300" height="56" fill="#DFF0DE" stroke="#A16B3E" stroke-width="2"/>
+<text x="2460" y="2066" font-size="17" text-anchor="middle" font-weight="700">alert_response_events</text>
+<ellipse cx="2202.6666666666665" cy="1942" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2202.6666666666665" y="1946" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="2460" cy="1942" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="1946" font-size="12" text-anchor="middle" >alert_id FK</text>
+<ellipse cx="2717.3333333333335" cy="1942" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2717.3333333333335" y="1946" font-size="12" text-anchor="middle" >actor_id FK</text>
+<ellipse cx="2202.6666666666665" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2202.6666666666665" y="2182" font-size="12" text-anchor="middle" >action</text>
+<ellipse cx="2460" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="2182" font-size="12" text-anchor="middle" >note</text>
+<ellipse cx="2717.3333333333335" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2717.3333333333335" y="2182" font-size="12" text-anchor="middle" >occurred_at</text>
+<rect x="3310" y="2032" width="300" height="56" fill="#DFF0DE" stroke="#A16B3E" stroke-width="2"/>
+<text x="3460" y="2066" font-size="17" text-anchor="middle" font-weight="700">caregiver_notifications</text>
+<ellipse cx="3202.6666666666665" cy="1942" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3202.6666666666665" y="1946" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="3460" cy="1942" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3460" y="1946" font-size="12" text-anchor="middle" >caregiver_id FK</text>
+<ellipse cx="3717.3333333333335" cy="1942" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3717.3333333333335" y="1946" font-size="12" text-anchor="middle" >alert_id FK</text>
+<ellipse cx="3202.6666666666665" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3202.6666666666665" y="2182" font-size="12" text-anchor="middle" >notification_type</text>
+<ellipse cx="3460" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3460" y="2182" font-size="12" text-anchor="middle" >is_read</text>
+<ellipse cx="3717.3333333333335" cy="2178" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="3717.3333333333335" y="2182" font-size="12" text-anchor="middle" >push_status</text>
+<rect x="1310" y="2592" width="300" height="56" fill="#DFF0DE" stroke="#806A94" stroke-width="2"/>
+<text x="1460" y="2626" font-size="17" text-anchor="middle" font-weight="700">ai_chatbot_sessions</text>
+<ellipse cx="1202.6666666666667" cy="2502" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="2506" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="1460.0000000000002" cy="2502" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="2506" font-size="12" text-anchor="middle" >elderly_id FK</text>
+<ellipse cx="1717.3333333333335" cy="2502" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="2506" font-size="12" text-anchor="middle" >caregiver_id FK</text>
+<ellipse cx="1202.6666666666667" cy="2738" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1202.6666666666667" y="2742" font-size="12" text-anchor="middle" >session_title</text>
+<ellipse cx="1460.0000000000002" cy="2738" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1460.0000000000002" y="2742" font-size="12" text-anchor="middle" >started_at</text>
+<ellipse cx="1717.3333333333335" cy="2738" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="1717.3333333333335" y="2742" font-size="12" text-anchor="middle" >is_active</text>
+<rect x="2310" y="2592" width="300" height="56" fill="#DFF0DE" stroke="#806A94" stroke-width="2"/>
+<text x="2460" y="2626" font-size="17" text-anchor="middle" font-weight="700">ai_chatbot_messages</text>
+<ellipse cx="2202.6666666666665" cy="2502" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2202.6666666666665" y="2506" font-size="12" text-anchor="middle" text-decoration="underline" font-weight="700">id</text>
+<ellipse cx="2460" cy="2502" rx="122.66666666666667" ry="22" fill="#ECF6E9" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="2506" font-size="12" text-anchor="middle" >session_id FK</text>
+<ellipse cx="2717.3333333333335" cy="2502" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2717.3333333333335" y="2506" font-size="12" text-anchor="middle" >role</text>
+<ellipse cx="2202.6666666666665" cy="2738" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2202.6666666666665" y="2742" font-size="12" text-anchor="middle" >content</text>
+<ellipse cx="2460" cy="2738" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2460" y="2742" font-size="12" text-anchor="middle" >evidence</text>
+<ellipse cx="2717.3333333333335" cy="2738" rx="122.66666666666667" ry="22" fill="#F8FCF7" stroke="#84A68E" stroke-width="1.2"/>
+<text x="2717.3333333333335" y="2742" font-size="12" text-anchor="middle" >evidence_summary</text>
+<polygon points="960,340 1040,380 960,420 880,380" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="960" y="376" font-size="14" text-anchor="middle" font-weight="700">cares</text>
+<text x="960" y="394" font-size="14" text-anchor="middle" font-weight="700">for</text>
+<polygon points="1960,340 2040,380 1960,420 1880,380" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="1960" y="376" font-size="14" text-anchor="middle" font-weight="700">pairs</text>
+<text x="1960" y="394" font-size="14" text-anchor="middle" font-weight="700">with</text>
+<polygon points="2960,340 3040,380 2960,420 2880,380" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="2960" y="385" font-size="14" text-anchor="middle" font-weight="700">streams</text>
+<polygon points="2460,620 2540,660 2460,700 2380,660" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="2460" y="665" font-size="14" text-anchor="middle" font-weight="700">records</text>
+<polygon points="3460,620 3540,660 3460,700 3380,660" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="3460" y="665" font-size="14" text-anchor="middle" font-weight="700">sends</text>
+<polygon points="460,620 540,660 460,700 380,660" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="460" y="665" font-size="14" text-anchor="middle" font-weight="700">plans</text>
+<polygon points="960,900 1040,940 960,980 880,940" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="960" y="936" font-size="14" text-anchor="middle" font-weight="700">tracks</text>
+<text x="960" y="954" font-size="14" text-anchor="middle" font-weight="700">dose</text>
+<polygon points="460,1180 540,1220 460,1260 380,1220" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="460" y="1225" font-size="14" text-anchor="middle" font-weight="700">attends</text>
+<polygon points="1460,1180 1540,1220 1460,1260 1380,1220" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="1460" y="1216" font-size="14" text-anchor="middle" font-weight="700">has</text>
+<text x="1460" y="1234" font-size="14" text-anchor="middle" font-weight="700">notes</text>
+<polygon points="2460,1180 2540,1220 2460,1260 2380,1220" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="2460" y="1216" font-size="14" text-anchor="middle" font-weight="700">sets</text>
+<text x="2460" y="1234" font-size="14" text-anchor="middle" font-weight="700">zone</text>
+<polygon points="3460,1180 3540,1220 3460,1260 3380,1220" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="3460" y="1216" font-size="14" text-anchor="middle" font-weight="700">has</text>
+<text x="3460" y="1234" font-size="14" text-anchor="middle" font-weight="700">boundary</text>
+<polygon points="3460,1740 3540,1780 3460,1820 3380,1780" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="3460" y="1785" font-size="14" text-anchor="middle" font-weight="700">links</text>
+<polygon points="460,1740 540,1780 460,1820 380,1780" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="460" y="1776" font-size="14" text-anchor="middle" font-weight="700">requests</text>
+<text x="460" y="1794" font-size="14" text-anchor="middle" font-weight="700">help</text>
+<polygon points="960,2020 1040,2060 960,2100 880,2060" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="960" y="2065" font-size="14" text-anchor="middle" font-weight="700">raises</text>
+<polygon points="1460,1740 1540,1780 1460,1820 1380,1780" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="1460" y="1785" font-size="14" text-anchor="middle" font-weight="700">generates</text>
+<polygon points="1960,2020 2040,2060 1960,2100 1880,2060" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="1960" y="2056" font-size="14" text-anchor="middle" font-weight="700">has</text>
+<text x="1960" y="2074" font-size="14" text-anchor="middle" font-weight="700">response</text>
+<polygon points="3460,2300 3540,2340 3460,2380 3380,2340" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="3460" y="2345" font-size="14" text-anchor="middle" font-weight="700">notifies</text>
+<polygon points="1460,2300 1540,2340 1460,2380 1380,2340" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="1460" y="2345" font-size="14" text-anchor="middle" font-weight="700">discusses</text>
+<polygon points="1960,2580 2040,2620 1960,2660 1880,2620" fill="#E5EFF8" stroke="#5B879E" stroke-width="1.8"/>
+<text x="1960" y="2625" font-size="14" text-anchor="middle" font-weight="700">contains</text>
+<rect x="850" y="357" width="24" height="20" fill="white"/>
+<text x="862" y="372" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="1046" y="357" width="24" height="20" fill="white"/>
+<text x="1058" y="372" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="1850" y="357" width="24" height="20" fill="white"/>
+<text x="1862" y="372" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="2046" y="357" width="24" height="20" fill="white"/>
+<text x="2058" y="372" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="2850" y="357" width="24" height="20" fill="white"/>
+<text x="2862" y="372" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="3046" y="357" width="24" height="20" fill="white"/>
+<text x="3058" y="372" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="2350" y="637" width="24" height="20" fill="white"/>
+<text x="2362" y="652" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="2432" y="710" width="24" height="20" fill="white"/>
+<text x="2444" y="725" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="3350" y="637" width="24" height="20" fill="white"/>
+<text x="3362" y="652" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="3432" y="710" width="24" height="20" fill="white"/>
+<text x="3444" y="725" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="546" y="637" width="24" height="20" fill="white"/>
+<text x="558" y="652" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="432" y="710" width="24" height="20" fill="white"/>
+<text x="444" y="725" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="850" y="917" width="24" height="20" fill="white"/>
+<text x="862" y="932" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="1046" y="917" width="24" height="20" fill="white"/>
+<text x="1058" y="932" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="546" y="1197" width="24" height="20" fill="white"/>
+<text x="558" y="1212" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="432" y="1270" width="24" height="20" fill="white"/>
+<text x="444" y="1285" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="1432" y="1157" width="24" height="20" fill="white"/>
+<text x="1444" y="1172" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="1432" y="1270" width="24" height="20" fill="white"/>
+<text x="1444" y="1285" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="2350" y="1197" width="24" height="20" fill="white"/>
+<text x="2362" y="1212" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="2432" y="1270" width="24" height="20" fill="white"/>
+<text x="2444" y="1285" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="3350" y="1197" width="24" height="20" fill="white"/>
+<text x="3362" y="1212" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="3432" y="1270" width="24" height="20" fill="white"/>
+<text x="3444" y="1285" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="3350" y="1757" width="24" height="20" fill="white"/>
+<text x="3362" y="1772" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="3432" y="1717" width="24" height="20" fill="white"/>
+<text x="3444" y="1732" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="546" y="1757" width="24" height="20" fill="white"/>
+<text x="558" y="1772" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="432" y="1830" width="24" height="20" fill="white"/>
+<text x="444" y="1845" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="850" y="2037" width="24" height="20" fill="white"/>
+<text x="862" y="2052" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="1046" y="2037" width="24" height="20" fill="white"/>
+<text x="1058" y="2052" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="1432" y="1717" width="24" height="20" fill="white"/>
+<text x="1444" y="1732" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="1432" y="1830" width="24" height="20" fill="white"/>
+<text x="1444" y="1845" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="1850" y="2037" width="24" height="20" fill="white"/>
+<text x="1862" y="2052" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="2046" y="2037" width="24" height="20" fill="white"/>
+<text x="2058" y="2052" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="3350" y="2317" width="24" height="20" fill="white"/>
+<text x="3362" y="2332" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="3432" y="2277" width="24" height="20" fill="white"/>
+<text x="3444" y="2292" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="1432" y="2277" width="24" height="20" fill="white"/>
+<text x="1444" y="2292" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="1432" y="2390" width="24" height="20" fill="white"/>
+<text x="1444" y="2405" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<rect x="1850" y="2597" width="24" height="20" fill="white"/>
+<text x="1862" y="2612" font-size="14" text-anchor="middle" font-weight="700">1</text>
+<rect x="2046" y="2597" width="24" height="20" fill="white"/>
+<text x="2058" y="2612" font-size="14" text-anchor="middle" font-weight="700">N</text>
+<text x="80" y="2848" font-size="14" text-anchor="start" >This conceptual ERD shows 19 main declared relationships. The database design contains all 245 fields and all 34 foreign keys between the 18 core tables.</text>
+<text x="80" y="2877" font-size="14" text-anchor="start" >Optionality and supporting ownership links appear in the database design. A zone is optional; only one configured safe zone and one live-state row are stored per patient.</text>
+<text x="80" y="2906" font-size="14" text-anchor="start" >zone_revision and zone_name in safe_zone_events are historical snapshots. The diagram does not invent a foreign key from those snapshots to the current zone configuration.</text>
+</svg>

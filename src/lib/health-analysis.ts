@@ -1,4 +1,5 @@
 import type { VitalLog } from '@/src/providers/HealthDataProvider';
+import {vitalReviewWarnings,VITAL_REVIEW_RULES} from '@/src/lib/vital-review';
 
 export type AnalysisSeverity = 'positive' | 'info' | 'warning' | 'critical';
 export type AnalysisMetric = 'heart' | 'oxygen' | 'sleep' | 'steps' | 'temperature' | 'hrv' | 'data';
@@ -32,7 +33,7 @@ function standardDeviation(values: number[]) {
 function format(value: number, digits = 0) { return value.toFixed(digits); }
 
 export function buildHealthInsights(history: VitalLog[]): AnalysisResult[] {
-  if (!history.length) return [{ id: 'waiting', title: 'Waiting for synchronized readings', body: 'Connect Google Health and synchronize several readings to establish a personal baseline.', severity: 'info', metric: 'data' }];
+  if (!history.length) return [{ id: 'waiting', title: 'Waiting for synchronized readings', body: 'Start Galaxy Watch monitoring to collect readings for comparison.', severity: 'info', metric: 'data' }];
   const results: AnalysisResult[] = [];
   const heart = series(history, 'heart_rate_bpm');
   const oxygen = series(history, 'spo2_percent');
@@ -64,13 +65,13 @@ export function buildHealthInsights(history: VitalLog[]): AnalysisResult[] {
   }
   if (steps.length) {
     const recent = steps.slice(-7);
-    results.push({ id: 'steps-insight', metric: 'steps', title: 'Recent activity pattern', body: `${recent.length} synchronized activity snapshot${recent.length === 1 ? '' : 's'} average ${Math.round(mean(recent)).toLocaleString()} steps over each rolling 24-hour window.`, severity: 'info' });
+    results.push({ id: 'steps-insight', metric: 'steps', title: 'Recent activity pattern', body: `${recent.length} synchronized activity snapshot${recent.length === 1 ? '' : 's'} average ${Math.round(mean(recent)).toLocaleString()} steps recorded during monitoring today.`, severity: 'info' });
   }
   if (temperature.length >= 2) {
     const latest = temperature.at(-1)!;
     const baseline = mean(temperature.slice(-8, -1));
     const difference = latest - baseline;
-    results.push({ id: 'temperature-insight', metric: 'temperature', title: Math.abs(difference) >= 1 ? 'Nightly skin temperature shifted' : 'Skin-temperature trend', body: `Latest nightly value is ${format(latest, 1)} °C, ${Math.abs(difference).toFixed(1)} °C ${difference >= 0 ? 'above' : 'below'} the recent personal average.`, severity: Math.abs(difference) >= 1 ? 'warning' : 'info' });
+    results.push({ id: 'temperature-insight', metric: 'temperature', title: Math.abs(difference) >= 1 ? 'Skin temperature shifted' : 'Skin-temperature trend', body: `Latest skin measurement is ${format(latest, 1)} °C, ${Math.abs(difference).toFixed(1)} °C ${difference >= 0 ? 'above' : 'below'} the recent personal average.`, severity: Math.abs(difference) >= 1 ? 'warning' : 'info' });
   }
   if (hrv.length) {
     const latest = hrv.at(-1)!;
@@ -78,12 +79,12 @@ export function buildHealthInsights(history: VitalLog[]): AnalysisResult[] {
     results.push({
       id: 'hrv-insight',
       metric: 'hrv',
-      title: latest < 30 ? 'Low HRV reading' : 'HRV snapshot',
+      title: 'HRV snapshot',
       body: `Latest RMSSD HRV: ${format(latest)} ms. Recent recorded average: ${format(mean(recent))} ms.`,
-      severity: latest < 30 ? 'warning' : 'info',
+      severity: 'info',
     });
   }
-  return results.length ? results : [{ id: 'partial', title: 'Partial health data received', body: 'Google Health is connected, but the available records do not yet contain metrics that can be analyzed.', severity: 'info', metric: 'data' }];
+  return results.length ? results : [{ id: 'partial', title: 'Partial health data received', body: 'The available watch records do not yet contain metrics that can be analyzed.', severity: 'info', metric: 'data' }];
 }
 
 function predict(values: number[], clamp: [number, number]) {
@@ -122,17 +123,20 @@ export function buildHealthPredictions(history: VitalLog[]): AnalysisResult[] {
 }
 
 export function buildHealthAnomalies(history: VitalLog[]): AnalysisResult[] {
-  const latest = history[0];
-  if (!latest) return [{ id: 'anomaly-waiting', title: 'No readings to analyze', body: 'Synchronize Google Health before checking for anomalies.', severity: 'info', metric: 'data' }];
+  const latest = history[0] ? { ...history[0] } : null;
+  if (latest) for (const metric of ['heart_rate_bpm', 'spo2_percent', 'sleep_hours', 'steps_count', 'skin_temp_celsius', 'hrv_rmssd_ms'] as const)
+    latest[metric] = history.find((row) => row[metric] != null)?.[metric] ?? null;
+  if (!latest) return [{ id: 'anomaly-waiting', title: 'No readings to analyze', body: 'Start monitoring on Galaxy Watch before checking for anomalies.', severity: 'info', metric: 'data' }];
   const anomalies: AnalysisResult[] = [];
-  if (latest.spo2_percent !== null && latest.spo2_percent < 95) anomalies.push({ id: 'low-spo2', title: 'Low SpO₂ threshold crossed', body: `The latest SpO₂ is ${latest.spo2_percent.toFixed(1)}%, below the app’s 95% review threshold. Confirm the wearable reading and consider appropriate medical guidance.`, severity: 'critical', metric: 'oxygen' });
-  if (latest.heart_rate_bpm !== null && (latest.heart_rate_bpm > 110 || latest.heart_rate_bpm < 50)) anomalies.push({ id: 'heart-threshold', title: 'Heart-rate threshold crossed', body: `The latest heart rate is ${latest.heart_rate_bpm.toFixed(0)} bpm, outside the app’s 50–110 bpm review range. Context such as activity and symptoms matters.`, severity: 'critical', metric: 'heart' });
+  const review=vitalReviewWarnings(latest);
+  if (latest.spo2_percent !== null && review.some(warning=>warning.metric==='spo2_percent')) anomalies.push({ id: 'low-spo2', title: 'Low SpO₂ threshold crossed', body: `The latest SpO₂ is ${latest.spo2_percent.toFixed(1)}%, below the app’s ${VITAL_REVIEW_RULES.oxygenLow}% review threshold. Confirm the wearable reading and consider appropriate medical guidance.`, severity: 'critical', metric: 'oxygen' });
+  if (latest.heart_rate_bpm !== null && review.some(warning=>warning.metric==='heart_rate_bpm')) anomalies.push({ id: 'heart-threshold', title: 'Heart-rate threshold crossed', body: `The latest heart rate is ${latest.heart_rate_bpm.toFixed(0)} bpm, outside the app’s ${VITAL_REVIEW_RULES.heartRateLow}–${VITAL_REVIEW_RULES.heartRateHigh} bpm review range. Context such as activity and symptoms matters.`, severity: 'critical', metric: 'heart' });
   if (latest.sleep_hours !== null && latest.sleep_hours < 5) anomalies.push({ id: 'short-sleep', title: 'Very short recorded sleep', body: `The latest synchronized sleep duration is ${latest.sleep_hours.toFixed(1)} hours.`, severity: 'warning', metric: 'sleep' });
-  if (latest.hrv_rmssd_ms !== null && latest.hrv_rmssd_ms < 30) anomalies.push({ id: 'low-hrv', title: 'Low HRV reading', body: `The latest RMSSD HRV is ${latest.hrv_rmssd_ms.toFixed(0)} ms. HRV is best interpreted against the patient's own trend and does not diagnose stress or illness.`, severity: 'warning', metric: 'hrv' });
+
 
   const personalized: { key: NumericVitalKey; id: string; metric: AnalysisMetric; label: string; unit: string; minimumDelta: number }[] = [
     { key: 'heart_rate_bpm', id: 'heart-personal', metric: 'heart', label: 'Heart rate', unit: 'bpm', minimumDelta: 10 },
-    { key: 'skin_temp_celsius', id: 'temp-personal', metric: 'temperature', label: 'Nightly skin temperature', unit: '°C', minimumDelta: 0.8 },
+    { key: 'skin_temp_celsius', id: 'temp-personal', metric: 'temperature', label: 'Skin temperature', unit: '°C', minimumDelta: 0.8 },
   ];
   for (const item of personalized) {
     const values = series(history, item.key);

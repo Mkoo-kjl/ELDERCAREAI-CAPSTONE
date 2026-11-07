@@ -1,6 +1,6 @@
 # Unit Testing
 
-This table records the 63 Jest and React Native Testing Library cases in app-use order. Proponent and Date Tested are intentionally blank for the final report. "Passed" records the automated Jest run; mocked services are not live integration tests.
+This table records the 73 Jest and React Native Testing Library cases in case-ID order. Proponent and Date Tested are intentionally blank for the final report. "Passed" records the automated Jest run; mocked services are not live integration tests.
 
 | Proponent | Module Name | Unit Name | Date Tested | Test Case ID | Test Case Description | Expected Result | Actual Result | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -67,3 +67,13 @@ This table records the 63 Jest and React Native Testing Library cases in app-use
 |  | Doctor Contact Module | Doctor Settings |  | CASE-061 | Save a doctor without a name. | Save is blocked. | Performed as expected | Passed |
 |  | Doctor Contact Module | Doctor Settings |  | CASE-062 | Save a doctor with an invalid phone number. | Save is blocked. | Performed as expected | Passed |
 |  | Doctor Contact Module | Doctor Settings |  | CASE-063 | Save a valid doctor contact. | Doctor appears in Settings after save. | Performed as expected | Passed |
+|  | Data Management Module | Health Report Export |  | CASE-064 | Export health vitals without an older-adult profile. | Export is blocked and profile guidance appears. | Performed as expected | Passed |
+|  | Data Management Module | Health Report Export |  | CASE-065 | Export health vitals with no synchronized readings. | Empty-history guidance appears and no PDF is created. | Performed as expected | Passed |
+|  | Data Management Module | Health Report Export |  | CASE-066 | Export a synchronized health reading. | Patient-scoped recent history is sent to the PDF exporter. | Performed as expected | Passed |
+|  | Data Management Module | Health Report Export |  | CASE-067 | Return a database error while loading health readings. | Error is shown and no PDF is created. | Performed as expected | Passed |
+|  | Data Management Module | Medication Report Export |  | CASE-068 | Export an empty medication schedule. | Add-medication guidance appears and no PDF is created. | Performed as expected | Passed |
+|  | Data Management Module | Medication Report Export |  | CASE-069 | Export a saved medication schedule. | Caregiver- and patient-scoped schedules are sent to the PDF exporter. | Performed as expected | Passed |
+|  | Data Management Module | Medication Report Export |  | CASE-070 | Return a database error while loading medication schedules. | Error is shown and no PDF is created. | Performed as expected | Passed |
+|  | Data Management Module | Health Report Export |  | CASE-071 | Fail PDF generation after loading a health reading. | Caregiver sees the export error. | Performed as expected | Passed |
+|  | Doctor Contact Module | Doctor Settings |  | CASE-072 | Return a database error while saving a doctor contact. | Error appears and the edit form stays open. | Performed as expected | Passed |
+|  | Doctor Contact Module | Doctor Settings |  | CASE-073 | Edit a saved doctor contact. | Existing record is updated for the same caregiver and older adult. | Performed as expected | Passed |

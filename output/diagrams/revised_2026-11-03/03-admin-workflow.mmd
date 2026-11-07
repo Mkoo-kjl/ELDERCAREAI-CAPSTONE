@@ -1,0 +1,21 @@
+---
+title: ElderCareAI - Admin Workflow
+---
+flowchart TD
+    S(["Start"]) --> A["Sign in as administrator"]
+    A --> L{"Access<br/>allowed?"}
+    L -->|No| A
+    L -->|Yes| B["Open admin dashboard"]
+    B --> C["Review records or manage accounts<br/>Caregivers and older adults"]
+    C --> D["Review health data and alerts<br/>Export reports or check audit logs"]
+    D --> M{"More<br/>tasks?"}
+    M -->|Yes| B
+    M -->|No| E["Sign out"]
+    E --> F(["End"])
+
+    classDef standard fill:#EBF7F8,stroke:#397F88,color:#202D2B,stroke-width:1.5px;
+    classDef terminal fill:#397F88,stroke:#397F88,color:#FFFFFF,stroke-width:1.5px;
+    classDef decision fill:#EFF7E9,stroke:#3C704A,color:#202D2B,stroke-width:1.5px;
+    class A,B,C,D,E standard;
+    class L,M decision;
+    class S,F terminal;

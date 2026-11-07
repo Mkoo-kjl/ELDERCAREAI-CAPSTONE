@@ -1,0 +1,30 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+  id 'kotlin-parcelize'
+}
+
+group = 'expo.modules.samsunghealth'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.samsunghealth"
+  defaultConfig {
+    minSdkVersion 29
+    versionCode 1
+    versionName "1.0.0"
+  }
+}
+// The consuming app also resolves this transitive AAR. Register its directory
+// for every project rather than only for this library's compile configuration.
+def samsungSdkDir = file('libs')
+if (!new File(samsungSdkDir, 'samsung-health-data-api-1.1.0.aar').isFile()) {
+  throw new GradleException('Copy Samsung Health Data SDK 1.1.0 to modules/samsung-health/android/libs/samsung-health-data-api-1.1.0.aar before building.')
+}
+rootProject.allprojects {
+  repositories { flatDir { dirs samsungSdkDir } }
+}
+dependencies {
+  implementation(name:'samsung-health-data-api-1.1.0',ext:'aar')
+  implementation 'com.google.code.gson:gson:2.10.1'
+}

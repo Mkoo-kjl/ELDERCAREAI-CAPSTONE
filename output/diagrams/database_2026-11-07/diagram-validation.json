@@ -1,0 +1,53 @@
+{
+  "database": {
+    "width": 2736,
+    "height": 2808,
+    "tables": 18,
+    "fields": 245,
+    "foreignKeys": 34
+  },
+  "chen": {
+    "width": 3920,
+    "height": 2940,
+    "entities": 18,
+    "attributes": 112,
+    "diamonds": 19
+  },
+  "externalAuthReferences": [
+    {
+      "id": "caregivers_id_fkey",
+      "parent": "users",
+      "child": "caregivers",
+      "parentField": "id",
+      "childField": "id"
+    },
+    {
+      "id": "wearable_devices_caregiver_id_fkey",
+      "parent": "users",
+      "child": "wearable_devices",
+      "parentField": "id",
+      "childField": "caregiver_id"
+    },
+    {
+      "id": "health_alerts_acknowledged_by_fkey",
+      "parent": "users",
+      "child": "health_alerts",
+      "parentField": "id",
+      "childField": "acknowledged_by"
+    },
+    {
+      "id": "alert_response_events_actor_id_fkey",
+      "parent": "users",
+      "child": "alert_response_events",
+      "parentField": "id",
+      "childField": "actor_id"
+    },
+    {
+      "id": "patient_safe_zones_caregiver_id_fkey",
+      "parent": "users",
+      "child": "patient_safe_zones",
+      "parentField": "id",
+      "childField": "caregiver_id"
+    }
+  ]
+}

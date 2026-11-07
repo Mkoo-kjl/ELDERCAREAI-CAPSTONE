@@ -1,0 +1,4468 @@
+{
+  "captured_at": "2026-11-07T05:59:42.266269+00:00",
+  "latest_migration": "20261107000000",
+  "relations": [
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "full_name",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "phone",
+          "nullable": true,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "created_at",
+          "nullable": false,
+          "ordinal": 5,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "age",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "sex",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "photo_url",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "email",
+          "nullable": true,
+          "ordinal": 11,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "updated_at",
+          "nullable": false,
+          "ordinal": 12,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "caregivers_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "auth",
+          "ref_table": "users"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "caregivers_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX caregivers_pkey ON public.caregivers USING btree (id)",
+          "name": "caregivers_pkey"
+        }
+      ],
+      "kind": "r",
+      "name": "caregivers",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(auth.uid() = id)",
+          "command": "INSERT",
+          "name": "Caregivers can insert their own profile",
+          "roles": [
+            "public"
+          ],
+          "using": null
+        },
+        {
+          "check": null,
+          "command": "UPDATE",
+          "name": "Caregivers can update their own profile",
+          "roles": [
+            "public"
+          ],
+          "using": "(auth.uid() = id)"
+        },
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "Caregivers can view their own profile",
+          "roles": [
+            "public"
+          ],
+          "using": "(auth.uid() = id)"
+        },
+        {
+          "check": "(( SELECT auth.uid() AS uid) = id)",
+          "command": "ALL",
+          "name": "Caregivers manage their own profile",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(( SELECT auth.uid() AS uid) = id)"
+        }
+      ],
+      "realtime": false,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "caregiver_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "full_name",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "age",
+          "nullable": true,
+          "ordinal": 4,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "gender",
+          "nullable": true,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "weight_kg",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "numeric(5,2)"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "height_cm",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "numeric(5,2)"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "blood_type",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "medical_conditions",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "medications",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "emergency_contact",
+          "nullable": true,
+          "ordinal": 11,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "created_at",
+          "nullable": false,
+          "ordinal": 12,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "photo_url",
+          "nullable": true,
+          "ordinal": 13,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "date_of_birth",
+          "nullable": true,
+          "ordinal": 18,
+          "type": "date"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "emergency_contact_phone",
+          "nullable": true,
+          "ordinal": 19,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "updated_at",
+          "nullable": false,
+          "ordinal": 20,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "age"
+          ],
+          "definition": "CHECK (age >= 0)",
+          "kind": "c",
+          "name": "elderly_profiles_age_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "caregiver_id"
+          ],
+          "definition": "FOREIGN KEY (caregiver_id) REFERENCES caregivers(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "elderly_profiles_caregiver_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "caregivers"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "PRIMARY KEY (elderly_id)",
+          "kind": "p",
+          "name": "elderly_profiles_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX elderly_profiles_pkey ON public.elderly_profiles USING btree (elderly_id)",
+          "name": "elderly_profiles_pkey"
+        }
+      ],
+      "kind": "r",
+      "name": "elderly_profiles",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": null,
+          "command": "DELETE",
+          "name": "Caregivers can delete their linked elderly profiles",
+          "roles": [
+            "public"
+          ],
+          "using": "(auth.uid() = caregiver_id)"
+        },
+        {
+          "check": "(auth.uid() = caregiver_id)",
+          "command": "INSERT",
+          "name": "Caregivers can insert profiles for themselves",
+          "roles": [
+            "public"
+          ],
+          "using": null
+        },
+        {
+          "check": null,
+          "command": "UPDATE",
+          "name": "Caregivers can update their linked elderly profiles",
+          "roles": [
+            "public"
+          ],
+          "using": "(auth.uid() = caregiver_id)"
+        },
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "Caregivers can view their linked elderly profiles",
+          "roles": [
+            "public"
+          ],
+          "using": "(auth.uid() = caregiver_id)"
+        },
+        {
+          "check": "(( SELECT auth.uid() AS uid) = caregiver_id)",
+          "command": "ALL",
+          "name": "Caregivers manage their elderly profiles",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(( SELECT auth.uid() AS uid) = caregiver_id)"
+        }
+      ],
+      "realtime": false,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": false,
+      "client_insert": false,
+      "client_select": false,
+      "client_update": false,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "caregiver_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "device_name",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "token_hash",
+          "nullable": false,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "(now() + '90 days'::interval)",
+          "generated": "",
+          "identity": "",
+          "name": "expires_at",
+          "nullable": false,
+          "ordinal": 6,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "revoked_at",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "paired_at",
+          "nullable": false,
+          "ordinal": 8,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "last_seen_at",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "last_history_at",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "caregiver_id"
+          ],
+          "definition": "FOREIGN KEY (caregiver_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "wearable_devices_caregiver_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "auth",
+          "ref_table": "users"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "wearable_devices_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "wearable_devices_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "token_hash"
+          ],
+          "definition": "UNIQUE (token_hash)",
+          "kind": "u",
+          "name": "wearable_devices_token_hash_key",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX wearable_devices_one_active_patient ON public.wearable_devices USING btree (elderly_id) WHERE (revoked_at IS NULL)",
+          "name": "wearable_devices_one_active_patient"
+        },
+        {
+          "definition": "CREATE INDEX wearable_devices_patient ON public.wearable_devices USING btree (elderly_id)",
+          "name": "wearable_devices_patient"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX wearable_devices_pkey ON public.wearable_devices USING btree (id)",
+          "name": "wearable_devices_pkey"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX wearable_devices_token_hash_key ON public.wearable_devices USING btree (token_hash)",
+          "name": "wearable_devices_token_hash_key"
+        }
+      ],
+      "kind": "r",
+      "name": "wearable_devices",
+      "options": null,
+      "policies": [
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "Caregivers read their watch devices",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(( SELECT is_active_caregiver() AS is_active_caregiver) AND (caregiver_id = ( SELECT auth.uid() AS uid)) AND (EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = wearable_devices.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid))))))"
+        }
+      ],
+      "realtime": false,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": false,
+      "client_insert": false,
+      "client_select": true,
+      "client_update": false,
+      "columns": [
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "device_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "heart_rate_bpm",
+          "nullable": true,
+          "ordinal": 3,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "heart_rate_measured_at",
+          "nullable": true,
+          "ordinal": 4,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "latitude",
+          "nullable": true,
+          "ordinal": 5,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "longitude",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "accuracy_m",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "gps_measured_at",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "battery_percent",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "monitoring",
+          "nullable": false,
+          "ordinal": 10,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "status_at",
+          "nullable": false,
+          "ordinal": 11,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "received_at",
+          "nullable": false,
+          "ordinal": 12,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "spo2_percent",
+          "nullable": true,
+          "ordinal": 13,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "spo2_measured_at",
+          "nullable": true,
+          "ordinal": 14,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "skin_temp_celsius",
+          "nullable": true,
+          "ordinal": 15,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "skin_temp_measured_at",
+          "nullable": true,
+          "ordinal": 16,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "hrv_rmssd_ms",
+          "nullable": true,
+          "ordinal": 17,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "hrv_measured_at",
+          "nullable": true,
+          "ordinal": 18,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "steps_count",
+          "nullable": true,
+          "ordinal": 19,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "steps_measured_at",
+          "nullable": true,
+          "ordinal": 20,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "location_source",
+          "nullable": true,
+          "ordinal": 21,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "gps_status",
+          "nullable": true,
+          "ordinal": 22,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "'{}'::jsonb",
+          "generated": "",
+          "identity": "",
+          "name": "sensor_status",
+          "nullable": false,
+          "ordinal": 23,
+          "type": "jsonb"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "stress_score",
+          "nullable": true,
+          "ordinal": 24,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "stress_baseline_rmssd",
+          "nullable": true,
+          "ordinal": 25,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": "0",
+          "generated": "",
+          "identity": "",
+          "name": "stress_reference_count",
+          "nullable": false,
+          "ordinal": 26,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "sleep_hours",
+          "nullable": true,
+          "ordinal": 27,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "sleep_measured_at",
+          "nullable": true,
+          "ordinal": 28,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "battery_percent"
+          ],
+          "definition": "CHECK (battery_percent >= 0 AND battery_percent <= 100)",
+          "kind": "c",
+          "name": "wearable_live_state_battery_percent_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "location_source"
+          ],
+          "definition": "CHECK (location_source = ANY (ARRAY['watch_gps'::text, 'fused'::text, 'network'::text]))",
+          "kind": "c",
+          "name": "wearable_live_state_location_source_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "stress_score"
+          ],
+          "definition": "CHECK (stress_score >= 0 AND stress_score <= 100)",
+          "kind": "c",
+          "name": "wearable_live_state_stress_score_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "device_id"
+          ],
+          "definition": "FOREIGN KEY (device_id) REFERENCES wearable_devices(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "wearable_live_state_device_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "wearable_devices"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "wearable_live_state_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "PRIMARY KEY (elderly_id)",
+          "kind": "p",
+          "name": "wearable_live_state_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX wearable_live_state_pkey ON public.wearable_live_state USING btree (elderly_id)",
+          "name": "wearable_live_state_pkey"
+        }
+      ],
+      "kind": "r",
+      "name": "wearable_live_state",
+      "options": null,
+      "policies": [
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "Caregivers read their watch telemetry",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(( SELECT is_active_caregiver() AS is_active_caregiver) AND (EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = wearable_live_state.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid))))))"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER reset_watch_stress BEFORE UPDATE OF device_id ON wearable_live_state FOR EACH ROW EXECUTE FUNCTION reset_watch_stress_index()",
+          "name": "reset_watch_stress"
+        }
+      ]
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "heart_rate_bpm",
+          "nullable": true,
+          "ordinal": 3,
+          "type": "numeric(6,2)"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "spo2_percent",
+          "nullable": true,
+          "ordinal": 16,
+          "type": "numeric(5,2)"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "stress_score",
+          "nullable": true,
+          "ordinal": 18,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "skin_temp_celsius",
+          "nullable": true,
+          "ordinal": 21,
+          "type": "numeric(5,2)"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "steps_count",
+          "nullable": true,
+          "ordinal": 24,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "active_minutes",
+          "nullable": true,
+          "ordinal": 27,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": "'normal'::text",
+          "generated": "",
+          "identity": "",
+          "name": "overall_status",
+          "nullable": true,
+          "ordinal": 30,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "ai_risk_score",
+          "nullable": true,
+          "ordinal": 31,
+          "type": "numeric(5,2)"
+        },
+        {
+          "comment": null,
+          "default": "'google_health'::text",
+          "generated": "",
+          "identity": "",
+          "name": "source",
+          "nullable": true,
+          "ordinal": 32,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "recorded_at",
+          "nullable": false,
+          "ordinal": 33,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "synced_at",
+          "nullable": true,
+          "ordinal": 34,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "sleep_hours",
+          "nullable": true,
+          "ordinal": 35,
+          "type": "numeric(5,2)"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "hrv_rmssd_ms",
+          "nullable": true,
+          "ordinal": 36,
+          "type": "numeric"
+        },
+        {
+          "comment": null,
+          "default": "'{}'::jsonb",
+          "generated": "",
+          "identity": "",
+          "name": "measurement_times",
+          "nullable": false,
+          "ordinal": 37,
+          "type": "jsonb"
+        },
+        {
+          "comment": null,
+          "default": "'[]'::jsonb",
+          "generated": "",
+          "identity": "",
+          "name": "sleep_history",
+          "nullable": false,
+          "ordinal": 38,
+          "type": "jsonb"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "watch_device_id",
+          "nullable": true,
+          "ordinal": 39,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "watch_sample_id",
+          "nullable": true,
+          "ordinal": 40,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "watch_metric",
+          "nullable": true,
+          "ordinal": 41,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "watch_measured_at",
+          "nullable": true,
+          "ordinal": 42,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "stress_baseline_rmssd",
+          "nullable": true,
+          "ordinal": 43,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "stress_reference_count",
+          "nullable": true,
+          "ordinal": 44,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "stress_model_version",
+          "nullable": true,
+          "ordinal": 45,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "is_superseded",
+          "nullable": false,
+          "ordinal": 46,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "measurement_origin",
+          "nullable": true,
+          "ordinal": 47,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "source_device_id",
+          "nullable": true,
+          "ordinal": 48,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "source_record_key",
+          "nullable": true,
+          "ordinal": 49,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "source_group_key",
+          "nullable": true,
+          "ordinal": 50,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "source_revision_at",
+          "nullable": true,
+          "ordinal": 51,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "measurement_origin"
+          ],
+          "definition": "CHECK (measurement_origin = ANY (ARRAY['watch_sensor'::text, 'samsung_health'::text]))",
+          "kind": "c",
+          "name": "vital_sign_logs_measurement_origin_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "vital_sign_logs_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "watch_device_id"
+          ],
+          "definition": "FOREIGN KEY (watch_device_id) REFERENCES wearable_devices(id) ON DELETE SET NULL",
+          "kind": "f",
+          "name": "vital_sign_logs_watch_device_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "wearable_devices"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "vital_sign_logs_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE INDEX idx_vitals_elderly_recorded ON public.vital_sign_logs USING btree (elderly_id, recorded_at DESC)",
+          "name": "idx_vitals_elderly_recorded"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX samsung_health_revision_unique ON public.vital_sign_logs USING btree (elderly_id, source_device_id, source_record_key, source_revision_at) WHERE (measurement_origin = 'samsung_health'::text)",
+          "name": "samsung_health_revision_unique"
+        },
+        {
+          "definition": "CREATE INDEX vital_history_heart_rate_bpm ON public.vital_sign_logs USING btree (elderly_id, heart_rate_bpm, recorded_at) WHERE ((source = 'galaxy_watch'::text) AND (heart_rate_bpm IS NOT NULL))",
+          "name": "vital_history_heart_rate_bpm"
+        },
+        {
+          "definition": "CREATE INDEX vital_history_hrv_rmssd_ms ON public.vital_sign_logs USING btree (elderly_id, hrv_rmssd_ms, recorded_at) WHERE ((source = 'galaxy_watch'::text) AND (hrv_rmssd_ms IS NOT NULL))",
+          "name": "vital_history_hrv_rmssd_ms"
+        },
+        {
+          "definition": "CREATE INDEX vital_history_skin_temp_celsius ON public.vital_sign_logs USING btree (elderly_id, skin_temp_celsius, recorded_at) WHERE ((source = 'galaxy_watch'::text) AND (skin_temp_celsius IS NOT NULL))",
+          "name": "vital_history_skin_temp_celsius"
+        },
+        {
+          "definition": "CREATE INDEX vital_history_sleep_hours ON public.vital_sign_logs USING btree (elderly_id, sleep_hours, recorded_at) WHERE ((source = 'galaxy_watch'::text) AND (sleep_hours IS NOT NULL))",
+          "name": "vital_history_sleep_hours"
+        },
+        {
+          "definition": "CREATE INDEX vital_history_spo2_percent ON public.vital_sign_logs USING btree (elderly_id, spo2_percent, recorded_at) WHERE ((source = 'galaxy_watch'::text) AND (spo2_percent IS NOT NULL))",
+          "name": "vital_history_spo2_percent"
+        },
+        {
+          "definition": "CREATE INDEX vital_history_steps_count ON public.vital_sign_logs USING btree (elderly_id, steps_count, recorded_at) WHERE ((source = 'galaxy_watch'::text) AND (steps_count IS NOT NULL))",
+          "name": "vital_history_steps_count"
+        },
+        {
+          "definition": "CREATE INDEX vital_history_stress_score ON public.vital_sign_logs USING btree (elderly_id, stress_score, recorded_at) WHERE ((source = 'galaxy_watch'::text) AND (stress_score IS NOT NULL))",
+          "name": "vital_history_stress_score"
+        },
+        {
+          "definition": "CREATE INDEX vital_sign_logs_elderly_recorded_idx ON public.vital_sign_logs USING btree (elderly_id, recorded_at DESC)",
+          "name": "vital_sign_logs_elderly_recorded_idx"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX vital_sign_logs_pkey ON public.vital_sign_logs USING btree (id)",
+          "name": "vital_sign_logs_pkey"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX vital_watch_measurement_unique ON public.vital_sign_logs USING btree (watch_device_id, watch_metric, watch_measured_at) WHERE (measurement_origin IS DISTINCT FROM 'samsung_health'::text)",
+          "name": "vital_watch_measurement_unique"
+        },
+        {
+          "definition": "CREATE INDEX vital_watch_metric_history ON public.vital_sign_logs USING btree (elderly_id, watch_metric, recorded_at DESC) WHERE (source = 'galaxy_watch'::text)",
+          "name": "vital_watch_metric_history"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX vital_watch_sample_unique ON public.vital_sign_logs USING btree (watch_device_id, watch_sample_id)",
+          "name": "vital_watch_sample_unique"
+        }
+      ],
+      "kind": "r",
+      "name": "vital_sign_logs",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "Caregivers read elderly vitals",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = vital_sign_logs.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid)))))"
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers view own vital logs",
+          "roles": [
+            "public"
+          ],
+          "using": "(elderly_id IN ( SELECT elderly_profiles.elderly_id\n   FROM elderly_profiles\n  WHERE (elderly_profiles.caregiver_id = auth.uid())))"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER persist_vital_review AFTER INSERT ON vital_sign_logs FOR EACH ROW EXECUTE FUNCTION persist_vital_review()",
+          "name": "persist_vital_review"
+        },
+        {
+          "definition": "CREATE TRIGGER watch_stress_index AFTER INSERT ON vital_sign_logs FOR EACH ROW EXECUTE FUNCTION update_watch_stress_index()",
+          "name": "watch_stress_index"
+        }
+      ]
+    },
+    {
+      "client_delete": false,
+      "client_insert": false,
+      "client_select": true,
+      "client_update": false,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "device_id",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "latitude",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "longitude",
+          "nullable": false,
+          "ordinal": 5,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "accuracy_m",
+          "nullable": false,
+          "ordinal": 6,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "location_source",
+          "nullable": false,
+          "ordinal": 7,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "measured_at",
+          "nullable": false,
+          "ordinal": 8,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "received_at",
+          "nullable": false,
+          "ordinal": 9,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "accuracy_m"
+          ],
+          "definition": "CHECK (accuracy_m >= 0::double precision AND accuracy_m <= 100000::double precision)",
+          "kind": "c",
+          "name": "watch_location_points_accuracy_m_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "latitude"
+          ],
+          "definition": "CHECK (latitude >= '-90'::integer::double precision AND latitude <= 90::double precision)",
+          "kind": "c",
+          "name": "watch_location_points_latitude_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "location_source"
+          ],
+          "definition": "CHECK (location_source = ANY (ARRAY['watch_gps'::text, 'fused'::text, 'network'::text]))",
+          "kind": "c",
+          "name": "watch_location_points_location_source_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "longitude"
+          ],
+          "definition": "CHECK (longitude >= '-180'::integer::double precision AND longitude <= 180::double precision)",
+          "kind": "c",
+          "name": "watch_location_points_longitude_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "device_id"
+          ],
+          "definition": "FOREIGN KEY (device_id) REFERENCES wearable_devices(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "watch_location_points_device_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "wearable_devices"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "watch_location_points_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "watch_location_points_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "device_id",
+            "measured_at"
+          ],
+          "definition": "UNIQUE (device_id, measured_at)",
+          "kind": "u",
+          "name": "watch_location_points_device_id_measured_at_key",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX watch_location_points_device_id_measured_at_key ON public.watch_location_points USING btree (device_id, measured_at)",
+          "name": "watch_location_points_device_id_measured_at_key"
+        },
+        {
+          "definition": "CREATE INDEX watch_location_points_patient_time ON public.watch_location_points USING btree (elderly_id, measured_at DESC)",
+          "name": "watch_location_points_patient_time"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX watch_location_points_pkey ON public.watch_location_points USING btree (id)",
+          "name": "watch_location_points_pkey"
+        }
+      ],
+      "kind": "r",
+      "name": "watch_location_points",
+      "options": null,
+      "policies": [
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "Caregivers read their watch route",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(( SELECT is_active_caregiver() AS is_active_caregiver) AND (EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = watch_location_points.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid))))))"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER evaluate_watch_safe_zone AFTER INSERT ON watch_location_points FOR EACH ROW EXECUTE FUNCTION evaluate_watch_safe_zone()",
+          "name": "evaluate_watch_safe_zone"
+        }
+      ]
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "caregiver_id",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "medication_name",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "dosage",
+          "nullable": true,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "form",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "frequency",
+          "nullable": false,
+          "ordinal": 7,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "times_of_day",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "text[]"
+        },
+        {
+          "comment": null,
+          "default": "CURRENT_DATE",
+          "generated": "",
+          "identity": "",
+          "name": "start_date",
+          "nullable": false,
+          "ordinal": 9,
+          "type": "date"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "end_date",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "date"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "instructions",
+          "nullable": true,
+          "ordinal": 11,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "prescribed_by",
+          "nullable": true,
+          "ordinal": 12,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "true",
+          "generated": "",
+          "identity": "",
+          "name": "is_active",
+          "nullable": true,
+          "ordinal": 13,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "true",
+          "generated": "",
+          "identity": "",
+          "name": "reminder_enabled",
+          "nullable": true,
+          "ordinal": 14,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "'#38BDF8'::text",
+          "generated": "",
+          "identity": "",
+          "name": "color_tag",
+          "nullable": true,
+          "ordinal": 15,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "created_at",
+          "nullable": true,
+          "ordinal": 16,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "updated_at",
+          "nullable": true,
+          "ordinal": 17,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "'Asia/Manila'::text",
+          "generated": "",
+          "identity": "",
+          "name": "timezone",
+          "nullable": false,
+          "ordinal": 18,
+          "type": "text"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "caregiver_id"
+          ],
+          "definition": "FOREIGN KEY (caregiver_id) REFERENCES caregivers(id)",
+          "kind": "f",
+          "name": "medication_schedules_caregiver_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "caregivers"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "medication_schedules_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "medication_schedules_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE INDEX idx_med_sched_elderly ON public.medication_schedules USING btree (elderly_id, is_active)",
+          "name": "idx_med_sched_elderly"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX medication_schedules_pkey ON public.medication_schedules USING btree (id)",
+          "name": "medication_schedules_pkey"
+        }
+      ],
+      "kind": "r",
+      "name": "medication_schedules",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(caregiver_id = ( SELECT auth.uid() AS uid))",
+          "command": "ALL",
+          "name": "Caregivers manage medication schedules",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(caregiver_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers manage own medication schedules",
+          "roles": [
+            "public"
+          ],
+          "using": "(caregiver_id = auth.uid())"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "schedule_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "scheduled_time",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "taken_at",
+          "nullable": true,
+          "ordinal": 5,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "'pending'::text",
+          "generated": "",
+          "identity": "",
+          "name": "status",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "notes",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "recorded_by",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "created_at",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "dose_key",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "watch_device_id",
+          "nullable": true,
+          "ordinal": 11,
+          "type": "uuid"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "medication_logs_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "recorded_by"
+          ],
+          "definition": "FOREIGN KEY (recorded_by) REFERENCES caregivers(id)",
+          "kind": "f",
+          "name": "medication_logs_recorded_by_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "caregivers"
+        },
+        {
+          "columns": [
+            "schedule_id"
+          ],
+          "definition": "FOREIGN KEY (schedule_id) REFERENCES medication_schedules(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "medication_logs_schedule_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "medication_schedules"
+        },
+        {
+          "columns": [
+            "watch_device_id"
+          ],
+          "definition": "FOREIGN KEY (watch_device_id) REFERENCES wearable_devices(id)",
+          "kind": "f",
+          "name": "medication_logs_watch_device_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "wearable_devices"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "medication_logs_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE INDEX idx_med_logs_elderly ON public.medication_logs USING btree (elderly_id, scheduled_time DESC)",
+          "name": "idx_med_logs_elderly"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX medication_dose_once ON public.medication_logs USING btree (schedule_id, dose_key) WHERE (dose_key IS NOT NULL)",
+          "name": "medication_dose_once"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX medication_logs_pkey ON public.medication_logs USING btree (id)",
+          "name": "medication_logs_pkey"
+        }
+      ],
+      "kind": "r",
+      "name": "medication_logs",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(recorded_by = ( SELECT auth.uid() AS uid))",
+          "command": "INSERT",
+          "name": "Caregivers create medication logs",
+          "roles": [
+            "authenticated"
+          ],
+          "using": null
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers manage own medication logs",
+          "roles": [
+            "public"
+          ],
+          "using": "(elderly_id IN ( SELECT elderly_profiles.elderly_id\n   FROM elderly_profiles\n  WHERE (elderly_profiles.caregiver_id = auth.uid())))"
+        },
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "Caregivers read medication logs",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = medication_logs.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid)))))"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "caregiver_id",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "title",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "doctor_name",
+          "nullable": true,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "location",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "appointment_at",
+          "nullable": false,
+          "ordinal": 7,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "30",
+          "generated": "",
+          "identity": "",
+          "name": "duration_min",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "notes",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "'upcoming'::text",
+          "generated": "",
+          "identity": "",
+          "name": "status",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "reminder_sent",
+          "nullable": true,
+          "ordinal": 11,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "created_at",
+          "nullable": true,
+          "ordinal": 12,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "updated_at",
+          "nullable": true,
+          "ordinal": 13,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "caregiver_id"
+          ],
+          "definition": "FOREIGN KEY (caregiver_id) REFERENCES caregivers(id)",
+          "kind": "f",
+          "name": "appointments_caregiver_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "caregivers"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "appointments_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "appointments_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE INDEX appointments_caregiver_date_idx ON public.appointments USING btree (caregiver_id, appointment_at)",
+          "name": "appointments_caregiver_date_idx"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX appointments_pkey ON public.appointments USING btree (id)",
+          "name": "appointments_pkey"
+        },
+        {
+          "definition": "CREATE INDEX idx_appts_elderly ON public.appointments USING btree (elderly_id, appointment_at DESC)",
+          "name": "idx_appts_elderly"
+        }
+      ],
+      "kind": "r",
+      "name": "appointments",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(caregiver_id = ( SELECT auth.uid() AS uid))",
+          "command": "ALL",
+          "name": "Caregivers manage appointments",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(caregiver_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers manage own appointments",
+          "roles": [
+            "public"
+          ],
+          "using": "(caregiver_id = auth.uid())"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "caregiver_id",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "title",
+          "nullable": true,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "content",
+          "nullable": false,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "is_pinned",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "created_at",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "updated_at",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "caregiver_id"
+          ],
+          "definition": "FOREIGN KEY (caregiver_id) REFERENCES caregivers(id)",
+          "kind": "f",
+          "name": "caregiver_notes_caregiver_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "caregivers"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "caregiver_notes_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "caregiver_notes_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX caregiver_notes_pkey ON public.caregiver_notes USING btree (id)",
+          "name": "caregiver_notes_pkey"
+        },
+        {
+          "definition": "CREATE INDEX idx_notes_elderly ON public.caregiver_notes USING btree (elderly_id, created_at DESC)",
+          "name": "idx_notes_elderly"
+        }
+      ],
+      "kind": "r",
+      "name": "caregiver_notes",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(caregiver_id = ( SELECT auth.uid() AS uid))",
+          "command": "ALL",
+          "name": "Caregivers manage notes",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(caregiver_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers manage own notes",
+          "roles": [
+            "public"
+          ],
+          "using": "(caregiver_id = auth.uid())"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "alert_type",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "severity",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "title",
+          "nullable": false,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "message",
+          "nullable": false,
+          "ordinal": 6,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "metric_value",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "numeric"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "metric_unit",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "threshold_value",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "numeric"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "is_read",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "is_resolved",
+          "nullable": true,
+          "ordinal": 11,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "resolved_at",
+          "nullable": true,
+          "ordinal": 12,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "resolved_by",
+          "nullable": true,
+          "ordinal": 13,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "ai_generated",
+          "nullable": true,
+          "ordinal": 14,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "triggered_at",
+          "nullable": true,
+          "ordinal": 15,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "acknowledged_at",
+          "nullable": true,
+          "ordinal": 16,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "acknowledged_by",
+          "nullable": true,
+          "ordinal": 17,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "emergency_event_id",
+          "nullable": true,
+          "ordinal": 18,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "resolution_note",
+          "nullable": true,
+          "ordinal": 19,
+          "type": "text"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "resolution_note"
+          ],
+          "definition": "CHECK (length(resolution_note) <= 2000)",
+          "kind": "c",
+          "name": "health_alerts_resolution_note_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "acknowledged_by"
+          ],
+          "definition": "FOREIGN KEY (acknowledged_by) REFERENCES auth.users(id) ON DELETE SET NULL",
+          "kind": "f",
+          "name": "health_alerts_acknowledged_by_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "auth",
+          "ref_table": "users"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "health_alerts_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "emergency_event_id"
+          ],
+          "definition": "FOREIGN KEY (emergency_event_id) REFERENCES emergency_events(id) ON DELETE SET NULL",
+          "kind": "f",
+          "name": "health_alerts_emergency_event_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "emergency_events"
+        },
+        {
+          "columns": [
+            "resolved_by"
+          ],
+          "definition": "FOREIGN KEY (resolved_by) REFERENCES caregivers(id)",
+          "kind": "f",
+          "name": "health_alerts_resolved_by_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "caregivers"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "health_alerts_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE INDEX health_alerts_elderly_triggered_idx ON public.health_alerts USING btree (elderly_id, triggered_at DESC)",
+          "name": "health_alerts_elderly_triggered_idx"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX health_alerts_pkey ON public.health_alerts USING btree (id)",
+          "name": "health_alerts_pkey"
+        },
+        {
+          "definition": "CREATE INDEX idx_alerts_elderly ON public.health_alerts USING btree (elderly_id, is_resolved, triggered_at DESC)",
+          "name": "idx_alerts_elderly"
+        }
+      ],
+      "kind": "r",
+      "name": "health_alerts",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = health_alerts.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid)))))",
+          "command": "ALL",
+          "name": "Caregivers manage elderly alerts",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = health_alerts.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid)))))"
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers view own elderly alerts",
+          "roles": [
+            "public"
+          ],
+          "using": "(elderly_id IN ( SELECT elderly_profiles.elderly_id\n   FROM elderly_profiles\n  WHERE (elderly_profiles.caregiver_id = auth.uid())))"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER audit_alert_response AFTER UPDATE ON health_alerts FOR EACH ROW EXECUTE FUNCTION audit_alert_response()",
+          "name": "audit_alert_response"
+        },
+        {
+          "definition": "CREATE TRIGGER stamp_alert_response BEFORE UPDATE ON health_alerts FOR EACH ROW EXECUTE FUNCTION stamp_alert_response()",
+          "name": "stamp_alert_response"
+        }
+      ]
+    },
+    {
+      "client_delete": false,
+      "client_insert": false,
+      "client_select": true,
+      "client_update": false,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "alert_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "actor_id",
+          "nullable": true,
+          "ordinal": 4,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "action",
+          "nullable": false,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "note",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "occurred_at",
+          "nullable": false,
+          "ordinal": 7,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "action"
+          ],
+          "definition": "CHECK (action = ANY (ARRAY['acknowledged'::text, 'resolved'::text]))",
+          "kind": "c",
+          "name": "alert_response_events_action_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "note"
+          ],
+          "definition": "CHECK (length(note) <= 2000)",
+          "kind": "c",
+          "name": "alert_response_events_note_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "actor_id"
+          ],
+          "definition": "FOREIGN KEY (actor_id) REFERENCES auth.users(id) ON DELETE SET NULL",
+          "kind": "f",
+          "name": "alert_response_events_actor_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "auth",
+          "ref_table": "users"
+        },
+        {
+          "columns": [
+            "alert_id"
+          ],
+          "definition": "FOREIGN KEY (alert_id) REFERENCES health_alerts(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "alert_response_events_alert_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "health_alerts"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "alert_response_events_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "alert_response_events_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "alert_id",
+            "action"
+          ],
+          "definition": "UNIQUE (alert_id, action)",
+          "kind": "u",
+          "name": "alert_response_events_alert_id_action_key",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX alert_response_events_alert_id_action_key ON public.alert_response_events USING btree (alert_id, action)",
+          "name": "alert_response_events_alert_id_action_key"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX alert_response_events_pkey ON public.alert_response_events USING btree (id)",
+          "name": "alert_response_events_pkey"
+        }
+      ],
+      "kind": "r",
+      "name": "alert_response_events",
+      "options": null,
+      "policies": [
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "own_alert_response_events",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(( SELECT is_active_caregiver() AS is_active_caregiver) AND (EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = alert_response_events.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid))))))"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "caregiver_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": true,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "alert_id",
+          "nullable": true,
+          "ordinal": 4,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "notification_type",
+          "nullable": false,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "title",
+          "nullable": false,
+          "ordinal": 6,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "body",
+          "nullable": false,
+          "ordinal": 7,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "data",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "jsonb"
+        },
+        {
+          "comment": null,
+          "default": "'push'::text",
+          "generated": "",
+          "identity": "",
+          "name": "channel",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "is_read",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "read_at",
+          "nullable": true,
+          "ordinal": 11,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "sent_at",
+          "nullable": true,
+          "ordinal": 12,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "'sent'::text",
+          "generated": "",
+          "identity": "",
+          "name": "delivery_status",
+          "nullable": true,
+          "ordinal": 13,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "event_key",
+          "nullable": true,
+          "ordinal": 14,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "'not_registered'::text",
+          "generated": "",
+          "identity": "",
+          "name": "push_status",
+          "nullable": false,
+          "ordinal": 15,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "push_error",
+          "nullable": true,
+          "ordinal": 16,
+          "type": "text"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "alert_id"
+          ],
+          "definition": "FOREIGN KEY (alert_id) REFERENCES health_alerts(id)",
+          "kind": "f",
+          "name": "caregiver_notifications_alert_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "health_alerts"
+        },
+        {
+          "columns": [
+            "caregiver_id"
+          ],
+          "definition": "FOREIGN KEY (caregiver_id) REFERENCES caregivers(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "caregiver_notifications_caregiver_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "caregivers"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id)",
+          "kind": "f",
+          "name": "caregiver_notifications_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "caregiver_notifications_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX care_notification_event_unique ON public.caregiver_notifications USING btree (caregiver_id, event_key) WHERE (event_key IS NOT NULL)",
+          "name": "care_notification_event_unique"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX caregiver_notifications_pkey ON public.caregiver_notifications USING btree (id)",
+          "name": "caregiver_notifications_pkey"
+        },
+        {
+          "definition": "CREATE INDEX idx_notif_caregiver ON public.caregiver_notifications USING btree (caregiver_id, is_read, sent_at DESC)",
+          "name": "idx_notif_caregiver"
+        }
+      ],
+      "kind": "r",
+      "name": "caregiver_notifications",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(caregiver_id = ( SELECT auth.uid() AS uid))",
+          "command": "ALL",
+          "name": "Caregivers manage notifications",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(caregiver_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers view own notifications",
+          "roles": [
+            "public"
+          ],
+          "using": "(caregiver_id = auth.uid())"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER care_notification_push AFTER INSERT ON caregiver_notifications FOR EACH ROW EXECUTE FUNCTION queue_care_push()",
+          "name": "care_notification_push"
+        },
+        {
+          "definition": "CREATE TRIGGER link_emergency_alert AFTER INSERT ON caregiver_notifications FOR EACH ROW EXECUTE FUNCTION link_emergency_alert()",
+          "name": "link_emergency_alert"
+        }
+      ]
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "event_type",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "'high'::text",
+          "generated": "",
+          "identity": "",
+          "name": "severity",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "description",
+          "nullable": true,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "location",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "vital_snapshot",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "jsonb"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "response_time_s",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "responded_by",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "responded_at",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "is_resolved",
+          "nullable": true,
+          "ordinal": 11,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "resolution_notes",
+          "nullable": true,
+          "ordinal": 12,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "triggered_at",
+          "nullable": true,
+          "ordinal": 13,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "emergency_events_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "responded_by"
+          ],
+          "definition": "FOREIGN KEY (responded_by) REFERENCES caregivers(id)",
+          "kind": "f",
+          "name": "emergency_events_responded_by_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "caregivers"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "emergency_events_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX emergency_events_pkey ON public.emergency_events USING btree (id)",
+          "name": "emergency_events_pkey"
+        },
+        {
+          "definition": "CREATE INDEX idx_emergency_elderly ON public.emergency_events USING btree (elderly_id, triggered_at DESC)",
+          "name": "idx_emergency_elderly"
+        }
+      ],
+      "kind": "r",
+      "name": "emergency_events",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = emergency_events.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid)))))",
+          "command": "ALL",
+          "name": "Caregivers manage emergency events",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = emergency_events.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid)))))"
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers manage own emergency events",
+          "roles": [
+            "public"
+          ],
+          "using": "(elderly_id IN ( SELECT elderly_profiles.elderly_id\n   FROM elderly_profiles\n  WHERE (elderly_profiles.caregiver_id = auth.uid())))"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER sync_emergency_alert_response AFTER UPDATE OF is_resolved ON emergency_events FOR EACH ROW EXECUTE FUNCTION sync_emergency_alert_response()",
+          "name": "sync_emergency_alert_response"
+        }
+      ]
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "caregiver_id",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "session_title",
+          "nullable": true,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "'general'::text",
+          "generated": "",
+          "identity": "",
+          "name": "context_type",
+          "nullable": true,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": "0",
+          "generated": "",
+          "identity": "",
+          "name": "total_messages",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": "true",
+          "generated": "",
+          "identity": "",
+          "name": "is_active",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "started_at",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "ended_at",
+          "nullable": true,
+          "ordinal": 9,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "caregiver_id"
+          ],
+          "definition": "FOREIGN KEY (caregiver_id) REFERENCES caregivers(id)",
+          "kind": "f",
+          "name": "ai_chatbot_sessions_caregiver_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "caregivers"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "ai_chatbot_sessions_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "ai_chatbot_sessions_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX ai_chatbot_sessions_pkey ON public.ai_chatbot_sessions USING btree (id)",
+          "name": "ai_chatbot_sessions_pkey"
+        },
+        {
+          "definition": "CREATE INDEX idx_chat_sessions ON public.ai_chatbot_sessions USING btree (caregiver_id, started_at DESC)",
+          "name": "idx_chat_sessions"
+        }
+      ],
+      "kind": "r",
+      "name": "ai_chatbot_sessions",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(caregiver_id = ( SELECT auth.uid() AS uid))",
+          "command": "ALL",
+          "name": "Caregivers manage chatbot sessions",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(caregiver_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers manage own chat sessions",
+          "roles": [
+            "public"
+          ],
+          "using": "(caregiver_id = auth.uid())"
+        }
+      ],
+      "realtime": false,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": true,
+      "client_insert": true,
+      "client_select": true,
+      "client_update": true,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "session_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "role",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "content",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "tokens_used",
+          "nullable": true,
+          "ordinal": 5,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "has_health_data",
+          "nullable": true,
+          "ordinal": 6,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "is_flagged",
+          "nullable": true,
+          "ordinal": 7,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "created_at",
+          "nullable": true,
+          "ordinal": 8,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "'[]'::jsonb",
+          "generated": "",
+          "identity": "",
+          "name": "evidence",
+          "nullable": false,
+          "ordinal": 9,
+          "type": "jsonb"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "evidence_summary",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "jsonb"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "evidence"
+          ],
+          "definition": "CHECK (jsonb_typeof(evidence) = 'array'::text)",
+          "kind": "c",
+          "name": "ai_chatbot_messages_evidence_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "session_id"
+          ],
+          "definition": "FOREIGN KEY (session_id) REFERENCES ai_chatbot_sessions(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "ai_chatbot_messages_session_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "ai_chatbot_sessions"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "ai_chatbot_messages_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX ai_chatbot_messages_pkey ON public.ai_chatbot_messages USING btree (id)",
+          "name": "ai_chatbot_messages_pkey"
+        },
+        {
+          "definition": "CREATE INDEX idx_chat_messages ON public.ai_chatbot_messages USING btree (session_id, created_at)",
+          "name": "idx_chat_messages"
+        }
+      ],
+      "kind": "r",
+      "name": "ai_chatbot_messages",
+      "options": null,
+      "policies": [
+        {
+          "check": "( SELECT is_active_caregiver() AS is_active_caregiver)",
+          "command": "ALL",
+          "name": "Active caregiver access",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "( SELECT is_active_caregiver() AS is_active_caregiver)"
+        },
+        {
+          "check": "(EXISTS ( SELECT 1\n   FROM ai_chatbot_sessions s\n  WHERE ((s.id = ai_chatbot_messages.session_id) AND (s.caregiver_id = ( SELECT auth.uid() AS uid)))))",
+          "command": "ALL",
+          "name": "Caregivers manage chatbot messages",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(EXISTS ( SELECT 1\n   FROM ai_chatbot_sessions s\n  WHERE ((s.id = ai_chatbot_messages.session_id) AND (s.caregiver_id = ( SELECT auth.uid() AS uid)))))"
+        },
+        {
+          "check": null,
+          "command": "ALL",
+          "name": "Caregivers view own chat messages",
+          "roles": [
+            "public"
+          ],
+          "using": "(session_id IN ( SELECT ai_chatbot_sessions.id\n   FROM ai_chatbot_sessions\n  WHERE (ai_chatbot_sessions.caregiver_id = auth.uid())))"
+        }
+      ],
+      "realtime": false,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": false,
+      "client_insert": false,
+      "client_select": true,
+      "client_update": false,
+      "columns": [
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "caregiver_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "name",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "latitude",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "longitude",
+          "nullable": false,
+          "ordinal": 5,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "radius_m",
+          "nullable": false,
+          "ordinal": 6,
+          "type": "integer"
+        },
+        {
+          "comment": null,
+          "default": "false",
+          "generated": "",
+          "identity": "",
+          "name": "enabled",
+          "nullable": false,
+          "ordinal": 7,
+          "type": "boolean"
+        },
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "revision",
+          "nullable": false,
+          "ordinal": 8,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "updated_at",
+          "nullable": false,
+          "ordinal": 9,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "latitude"
+          ],
+          "definition": "CHECK (latitude >= '-90'::integer::double precision AND latitude <= 90::double precision)",
+          "kind": "c",
+          "name": "patient_safe_zones_latitude_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "longitude"
+          ],
+          "definition": "CHECK (longitude >= '-180'::integer::double precision AND longitude <= 180::double precision)",
+          "kind": "c",
+          "name": "patient_safe_zones_longitude_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "name"
+          ],
+          "definition": "CHECK (length(btrim(name)) >= 1 AND length(btrim(name)) <= 80)",
+          "kind": "c",
+          "name": "patient_safe_zones_name_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "radius_m"
+          ],
+          "definition": "CHECK (radius_m >= 100 AND radius_m <= 5000)",
+          "kind": "c",
+          "name": "patient_safe_zones_radius_m_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "caregiver_id"
+          ],
+          "definition": "FOREIGN KEY (caregiver_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "patient_safe_zones_caregiver_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "auth",
+          "ref_table": "users"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "patient_safe_zones_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "PRIMARY KEY (elderly_id)",
+          "kind": "p",
+          "name": "patient_safe_zones_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX patient_safe_zones_pkey ON public.patient_safe_zones USING btree (elderly_id)",
+          "name": "patient_safe_zones_pkey"
+        }
+      ],
+      "kind": "r",
+      "name": "patient_safe_zones",
+      "options": null,
+      "policies": [
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "own_patient",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(( SELECT is_active_caregiver() AS is_active_caregiver) AND (EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = patient_safe_zones.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid))))))"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "client_delete": false,
+      "client_insert": false,
+      "client_select": true,
+      "client_update": false,
+      "columns": [
+        {
+          "comment": null,
+          "default": "gen_random_uuid()",
+          "generated": "",
+          "identity": "",
+          "name": "id",
+          "nullable": false,
+          "ordinal": 1,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "elderly_id",
+          "nullable": false,
+          "ordinal": 2,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "zone_revision",
+          "nullable": false,
+          "ordinal": 3,
+          "type": "uuid"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "zone_name",
+          "nullable": false,
+          "ordinal": 4,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "direction",
+          "nullable": false,
+          "ordinal": 5,
+          "type": "text"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "distance_m",
+          "nullable": false,
+          "ordinal": 6,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "accuracy_m",
+          "nullable": false,
+          "ordinal": 7,
+          "type": "double precision"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "measured_at",
+          "nullable": false,
+          "ordinal": 8,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": "now()",
+          "generated": "",
+          "identity": "",
+          "name": "created_at",
+          "nullable": false,
+          "ordinal": 9,
+          "type": "timestamp with time zone"
+        },
+        {
+          "comment": null,
+          "default": null,
+          "generated": "",
+          "identity": "",
+          "name": "alert_id",
+          "nullable": true,
+          "ordinal": 10,
+          "type": "uuid"
+        }
+      ],
+      "comment": null,
+      "constraints": [
+        {
+          "columns": [
+            "direction"
+          ],
+          "definition": "CHECK (direction = ANY (ARRAY['outside'::text, 'inside'::text]))",
+          "kind": "c",
+          "name": "safe_zone_events_direction_check",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        },
+        {
+          "columns": [
+            "alert_id"
+          ],
+          "definition": "FOREIGN KEY (alert_id) REFERENCES health_alerts(id) ON DELETE SET NULL",
+          "kind": "f",
+          "name": "safe_zone_events_alert_id_fkey",
+          "ref_columns": [
+            "id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "health_alerts"
+        },
+        {
+          "columns": [
+            "elderly_id"
+          ],
+          "definition": "FOREIGN KEY (elderly_id) REFERENCES elderly_profiles(elderly_id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "safe_zone_events_elderly_id_fkey",
+          "ref_columns": [
+            "elderly_id"
+          ],
+          "ref_schema": "public",
+          "ref_table": "elderly_profiles"
+        },
+        {
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "safe_zone_events_pkey",
+          "ref_columns": null,
+          "ref_schema": null,
+          "ref_table": null
+        }
+      ],
+      "force_rls": false,
+      "indexes": [
+        {
+          "definition": "CREATE INDEX safe_zone_events_patient_time ON public.safe_zone_events USING btree (elderly_id, measured_at DESC)",
+          "name": "safe_zone_events_patient_time"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX safe_zone_events_pkey ON public.safe_zone_events USING btree (id)",
+          "name": "safe_zone_events_pkey"
+        }
+      ],
+      "kind": "r",
+      "name": "safe_zone_events",
+      "options": null,
+      "policies": [
+        {
+          "check": null,
+          "command": "SELECT",
+          "name": "own_patient",
+          "roles": [
+            "authenticated"
+          ],
+          "using": "(( SELECT is_active_caregiver() AS is_active_caregiver) AND (EXISTS ( SELECT 1\n   FROM elderly_profiles e\n  WHERE ((e.elderly_id = safe_zone_events.elderly_id) AND (e.caregiver_id = ( SELECT auth.uid() AS uid))))))"
+        }
+      ],
+      "realtime": true,
+      "rls": true,
+      "triggers": []
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   "expo": {
     "name": "ElderCareAI",
     "slug": "eldercare-ai",
-    "version": "1.0.0",
+    "version": "1.3.4",
     "orientation": "portrait",
     "scheme": "eldercareai",
     "icon": "./assets/images/eldercare-logo.png",
@@ -33,6 +33,8 @@
       "favicon": "./assets/images/eldercare-logo.png"
     },
     "plugins": [
+      ["expo-build-properties",{"android":{"minSdkVersion":29}}],
+      "expo-background-task",
       "expo-router",
       [
         "expo-notifications",
@@ -42,7 +44,8 @@
           "sounds": [
             "./assets/sounds/medication_reminder.wav",
             "./assets/sounds/appointment_reminder.wav",
-            "./assets/sounds/health_warning.wav"
+            "./assets/sounds/health_warning.wav",
+            "./assets/sounds/sos_alert.wav"
           ]
         }
       ],

@@ -1,0 +1,14 @@
+---
+title: ElderCareAI - AI Architecture
+---
+flowchart TD
+    A["Data sources<br/>Galaxy Watch6, Health history<br/>and care records"] --> B[("Supabase data<br/>Validated patient records")]
+    B --> C["Health analysis<br/>Trends and threshold rules"]
+    B --> D["Elle AI<br/>Recorded-data answers<br/>and Gemini explanations"]
+    C --> E["Caregiver app<br/>Dashboard, reports and alerts"]
+    D --> E
+
+    classDef standard fill:#EBF7F8,stroke:#397F88,color:#202D2B,stroke-width:1.5px;
+    classDef data fill:#EFF7E9,stroke:#3C704A,color:#202D2B,stroke-width:1.5px;
+    class A,C,D,E standard;
+    class B data;

@@ -1,5 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders, json } from '../_shared/cors.ts';
+import {parseVitalHistoryQuery,factualVitalHistoryAnswer} from '../_shared/vital-history.ts';
+import {buildEvidence,citedEvidence,stripEvidenceReferences} from '../_shared/care-evidence.ts';
 
 type Json = Record<string, any>;
 type ElleEmotion = 'happy' | 'neutral' | 'worried';
@@ -62,12 +64,14 @@ function summarizeVital(row: Json, timeZone: string) {
     heart_rate_bpm: row.heart_rate_bpm ?? null,
     spo2_percent: row.spo2_percent ?? null,
     hrv_rmssd_ms: row.hrv_rmssd_ms ?? null,
+    stress_score:row.stress_score??null,stress_model_version:row.stress_model_version??null,measurement_origin:row.measurement_origin??null,
     skin_temp_celsius: row.skin_temp_celsius ?? null,
     steps_count: row.steps_count ?? null,
     sleep_hours: row.sleep_hours ?? null,
     overall_status: row.overall_status ?? null,
     ai_risk_score: row.ai_risk_score ?? null,
     source: row.source ?? null,
+    measurement_times: row.measurement_times ?? null,
   };
 }
 
@@ -118,7 +122,7 @@ function buildCompletedHistory(rows: Json[]) {
     .filter((item) => item.role === 'user' || item.role === 'assistant')
     .map((item) => ({
       role: item.role === 'assistant' ? 'model' as const : 'user' as const,
-      parts: [{ text: clip(item.content, 900) ?? '' }],
+      parts: [{ text: stripEvidenceReferences(clip(item.content, 900) ?? '') }],
     }))
     .filter((item) => item.parts[0].text.length > 0);
 
@@ -264,7 +268,7 @@ Deno.serve(async (request) => {
   const geminiModels = modelCandidates(configuredGeminiModel, Deno.env.get('GEMINI_FALLBACK_MODELS')?.trim());
   const authorization = request.headers.get('Authorization');
 
-  if (!supabaseUrl || !publishableKey || !serviceRoleKey || !geminiKey) return json({ error: 'Server configuration is incomplete. Add GEMINI_API_KEY as a Supabase secret.' }, 500);
+  if (!supabaseUrl || !publishableKey || !serviceRoleKey) return json({ error: 'Server configuration is incomplete.' }, 500);
   if (!authorization) return json({ error: 'Authentication required.' }, 401);
 
   const payload = await request.json().catch(() => ({})) as Json;
@@ -316,9 +320,26 @@ Deno.serve(async (request) => {
     if (elderlyError) throw elderlyError;
 
     const elderlyId = elderly?.elderly_id as string | undefined;
+    const historyQuery=parseVitalHistoryQuery(message);
+    let historyZone=timeZone;
+    try{new Intl.DateTimeFormat('en-US',{timeZone:historyZone}).format();}catch{historyZone='UTC';}
+    const historyResult=elderlyId?await admin.rpc('watch_vital_history',{p_caregiver:userId,p_elderly:elderlyId,p_zone:historyZone,p_range:historyQuery.range,
+      p_start:historyQuery.start,p_end:historyQuery.end,p_metric:historyQuery.metric,p_threshold:historyQuery.threshold,p_comparison:historyQuery.comparison}):{data:null,error:null};
+    if(historyResult.error)throw historyResult.error;
+    const factualReply=historyResult.data?factualVitalHistoryAnswer(historyQuery,historyResult.data):null;
+    if(factualReply&&!insightMetric&&historyQuery.metric&&elderlyId){
+      const history=historyResult.data;
+      const witnesses=await admin.rpc('watch_vital_evidence',{p_caregiver:userId,p_elderly:elderlyId,p_metric:historyQuery.metric,p_threshold:historyQuery.threshold,p_comparison:historyQuery.comparison,p_from:history.from,p_until:history.until});
+      if(witnesses.error)throw witnesses.error;
+      const evidence=buildEvidence(witnesses.data??[],[historyQuery.metric],8);
+      return json({reply:factualReply,emotion:'neutral',hasHealthData:Number(history.metrics?.[historyQuery.metric]?.count)>0,model:'verified-database-history',history_scope:history.scope,evidence,
+        evidence_summary:{scope:history.scope,timezone:history.timezone,from:history.from,until:history.until,generated_at:history.generated_at,metric:historyQuery.metric,
+          sample_count:history.metrics?.[historyQuery.metric]?.count??0,matching_count:history.threshold?.count??0,threshold:historyQuery.threshold,comparison:historyQuery.comparison}});
+    }
+    if(!geminiKey)return json({error:'Elle general responses require GEMINI_API_KEY. Verified threshold-history questions can still be answered.'},500);
     const [vitalsResult, medicationResult, doctorContactResult, appointmentResult, notesResult, alertsResult, messagesResult] = await Promise.all([
       elderlyId
-        ? admin.from('vital_sign_logs').select('*').eq('elderly_id', elderlyId).order('recorded_at', { ascending: false }).limit(10)
+        ? Promise.all(INSIGHT_METRICS.map((metric) => admin.from('vital_sign_logs').select('*').eq('elderly_id', elderlyId).eq('source', 'galaxy_watch').eq('is_superseded',false).not(metric, 'is', null).order('recorded_at', { ascending: false }).limit(7))).then((results) => ({ data: results.flatMap((result) => result.data ?? []).sort((a, b) => Date.parse(b.recorded_at) - Date.parse(a.recorded_at)), error: results.find((result) => result.error)?.error ?? null }))
         : Promise.resolve({ data: [], error: null }),
       elderlyId
         ? admin.from('medication_schedules').select('medication_name, dosage, frequency, times_of_day, instructions, start_date, end_date, is_active').eq('caregiver_id', userId).eq('elderly_id', elderlyId).eq('is_active', true).order('created_at', { ascending: false }).limit(8)
@@ -344,6 +365,7 @@ Deno.serve(async (request) => {
     if (firstError) throw firstError;
 
     const vitalRows = (vitalsResult.data as Json[]) ?? [];
+    const evidencePool=buildEvidence(vitalRows);
     const metricReadings = insightMetric ? vitalRows.reduce<{ value: number; measured_at: string }[]>((readings, row) => {
       const value = row[insightMetric];
       const measuredAt = row.measurement_times?.[insightMetric] ?? row.recorded_at;
@@ -357,6 +379,9 @@ Deno.serve(async (request) => {
     const patientName = clip(elderly?.full_name ?? 'the patient', 120);
     const context = {
       generated_at: new Date().toISOString(),
+      complete_recorded_vital_history:historyResult.data,
+      source_reading_references:evidencePool,
+      wearable_context: 'Galaxy Watch6: wrist skin temperature is not core temperature. HRV is rolling RMSSD; the separately labeled stress index is an experimental, non-medical-grade personal HRV comparison. SpO2 comes from manual/foreground checks or imported Samsung Health records. Sleep is imported only after Samsung Health records and syncs it. Steps count monitoring periods. Sparse history rows represent individual valid delivered samples, not simultaneous measurements. Never infer missing measurements from a prior value.',
       caregiver_local_date: localToday,
       caregiver_time_zone: timeZone,
       caregiver: {
@@ -429,14 +454,18 @@ You are not a medical-grade AI, not a doctor, and not a substitute for professio
 Use the database snapshot to answer factual questions such as the caregiver's name, the patient's name, sleep today, vitals, saved doctor contact, medications, appointments, notes, and alerts.
 When discussing vitals, sleep, medications, alerts, symptoms, or health data, refer to "the patient" or the patient's name. Do not say "your vitals", "your sleep", "your heart rate", or similar phrasing unless the question is truly about the caregiver account.
 Do not invent missing data. If today's sleep or vitals are absent, say that today's reading is not available and mention the latest available reading if present.
+When mentioning a specific saved measurement, cite its matching source_reading_references reference in square brackets, for example [V1]. Only cite a reference supplied in this snapshot and ensure the metric, value and time match. These are source readings, not proof of a diagnosis. Do not invent record IDs, references, or citations for general advice. If a historical aggregate has no corresponding source reference, describe it as an aggregate check without inventing a citation.
+For historical peaks, threshold crossings, counts and ranges, use complete_recorded_vital_history. Its aggregates scan all saved matching rows, whereas recent_vitals and metric_insight contain only small recent samples. Do not claim an event never occurred from missing data; qualify answers as recorded measurements and note gaps. Sample counts are not independent episodes. Do not answer a narrower date or clock interval than the retrieved history scope; ask for an ISO date when an interval cannot be resolved. Stress scores are experimental, not medical grade.
 For urgent symptoms, severe distress, falls, chest pain, breathing trouble, very low oxygen, or immediate danger, tell the caregiver to call local emergency services now.
 Do not diagnose, prescribe, change doses, or tell the caregiver to stop/start medication. For medication questions, summarize schedules and advise following the prescriber's instructions.
 Keep responses concise, warm, and practical: usually 1 to 4 short sentences.`;
     const insightInstruction = insightMetric ? `\nFor this vital-card insight, answer in 1-2 sentences about metric_insight.metric. State the patient's actual latest reading first, then give meaningful context or a trend only when the distinct readings support it. Do not flatter generically or call any single reading "very good" without evidence. A sleep duration is not a sleep-quality score; do not infer sleep quality from hours alone. If metric_insight.readings is empty, say the reading is unavailable instead of trusting a value in the user's request.` : '';
 
     const { reply, model: answeredByModel } = await callGeminiWithFallback(geminiKey, geminiModels, systemInstruction + insightInstruction, contents);
+    const supported=citedEvidence(reply,evidencePool);
     return json({
-      reply,
+      reply:supported.reply,
+      evidence:supported.evidence,
       emotion: inferEmotion(message, reply),
       hasHealthData: hasHealthValues(vitalRows[0]),
       model: answeredByModel,

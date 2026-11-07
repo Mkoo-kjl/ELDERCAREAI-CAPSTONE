@@ -1,40 +1,24 @@
-import * as Notifications from 'expo-notifications';
 import { useFonts } from 'expo-font';
-import { router, Stack, type Href } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from '@/src/providers/AuthProvider';
 import { HealthDataProvider } from '@/src/providers/HealthDataProvider';
 import { ThemePreferenceProvider } from '@/src/providers/ThemePreferenceProvider';
-import { initializeNotifications } from '@/src/lib/notifications';
+import {CareNotificationObserver} from '@/src/components/CareNotificationObserver';
 import { appFontAssets } from '@/src/theme/typography';
-
-function NotificationObserver() {
-  useEffect(() => {
-    void initializeNotifications();
-    const openNotification = (notification: Notifications.Notification) => {
-      const url = notification.request.content.data?.url;
-      if (typeof url === 'string' && (url.startsWith('/care') || url.startsWith('/alerts'))) router.push(url as Href);
-    };
-    const previous = Notifications.getLastNotificationResponse();
-    if (previous?.notification) {
-      openNotification(previous.notification);
-      Notifications.clearLastNotificationResponse();
-    }
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => openNotification(response.notification));
-    return () => subscription.remove();
-  }, []);
-  return null;
-}
+import { WatchCareObserver } from '@/src/components/WatchCareObserver';
+import { SamsungHealthProvider } from '@/src/providers/SamsungHealthProvider';
 
 function AppNavigator({ isDark }: { isDark: boolean }) {
   const { session } = useAuth();
   return (
     <HealthDataProvider key={session?.user.id ?? 'signed-out'}>
-      <NotificationObserver />
+      <SamsungHealthProvider>
+      <CareNotificationObserver />
+      <WatchCareObserver />
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="index" />
@@ -47,9 +31,12 @@ function AppNavigator({ isDark }: { isDark: boolean }) {
         <Stack.Screen name="setup/location" />
         <Stack.Screen name="home" />
         <Stack.Screen name="location" />
+        <Stack.Screen name="alert-response" />
+        <Stack.Screen name="vital-evidence" />
         <Stack.Screen name="health-records" />
         <Stack.Screen name="(tabs)" />
       </Stack>
+      </SamsungHealthProvider>
     </HealthDataProvider>
   );
 }

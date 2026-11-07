@@ -99,7 +99,7 @@ export default function LoginScreen() {
             )}
           </Pressable>
 
-          <Text style={styles.accountHint}>Use the Google account connected to Google Health.</Text>
+          <Text style={styles.accountHint}>Sign in to access your caregiver account. Pair Galaxy Watch during setup.</Text>
 
           {!isSupabaseConfigured && !authError ? (
             <View style={styles.message}>

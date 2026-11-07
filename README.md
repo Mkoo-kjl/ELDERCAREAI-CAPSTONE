@@ -1,5 +1,9 @@
 # ElderCareAI
 
+## Galaxy Watch6 vitals and location
+
+The standalone Wear OS project is in [`wearos`](wearos/README.md). Open that folder in Android Studio. Its guide covers backend deployment, pairing, permissions, installation and physical-device verification. This version streams heart rate and the watch's GPS only; it does not collect the other health metrics. The backend migration must be applied before running the updated phone app.
+
 ## Landing website
 
 The standalone landing page is at [website/index.html](website/index.html). It works as a static site without starting the Expo app. See [website/README.md](website/README.md) for team photo placeholders and contact details.
@@ -14,7 +18,7 @@ app logic and React Native component behavior, not live service availability or
 pixel-level device appearance. Capture device UI screenshots separately for the
 relevant screen cases.
 
-Expo SDK 54 / React Native app for caregivers. It includes Supabase Google sign-in, persisted onboarding, real Google Health API v4 authorization/synchronization, foreground-only phone-location consent, a Leaflet last-sync map, health dashboards, data-driven health analysis, SOS/event logging, care-management CRUD, a Gemini-powered caregiver assistant, exports, and settings.
+Expo SDK 54 / React Native app for caregivers. It includes Supabase Google sign-in, persisted onboarding, direct Galaxy Watch6 sensor uploads, explicit watch monitoring, a Leaflet location map, health dashboards, data-driven health analysis, SOS/event logging, care-management CRUD, a Gemini-powered caregiver assistant, exports, and settings.
 
 ## Device notifications
 
@@ -60,27 +64,9 @@ Open the resulting EAS build link on the phone and install it over the old app. 
 
 ## 2. Configure Supabase and Google
 
-### Google Cloud / Google Auth Platform
+### Google sign-in
 
-1. Create an OAuth client of type **Web application**.
-2. Enable **Google Health API** in the same Google Cloud project.
-3. Add both exact **Authorized redirect URIs**, replacing the project ref:
-
-   `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`
-
-   `https://YOUR_PROJECT_REF.supabase.co/functions/v1/google-health-oauth-callback`
-
-4. Under **Google Auth Platform → Data Access**, add these Google Health API scopes:
-
-   - `https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly`
-   - `https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly`
-   - `https://www.googleapis.com/auth/googlehealth.sleep.readonly`
-   - `https://www.googleapis.com/auth/googlehealth.settings.readonly`
-
-5. Copy the Google Client ID and Client Secret into **Supabase Dashboard → Authentication → Providers → Google**, then enable Google.
-6. Configure the OAuth consent screen and add test users while the Google app is in testing mode.
-
-Do not add `eldercareai://auth/callback` to Google Cloud. Google returns to Supabase first; Supabase then deep-links back to the app.
+Create a Google OAuth Web application client for caregiver **sign-in**, enable it in Supabase Authentication, and register `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback` as its redirect. Health data comes directly from the paired Galaxy Watch. Sign-in uses the normal profile/email scopes.
 
 ### Supabase Auth URL configuration
 
@@ -114,33 +100,9 @@ npx supabase db push
 
 The onboarding migration extends the existing tables, creates `onboarding_progress`, creates the `profile-photos` Storage bucket and policies, and creates `wearable_sync_locations`. Later migrations add ownership-based RLS policies for vitals, medications, appointments, notes, alerts, notifications, emergencies, and chatbot data, plus doctor contacts, raw HRV storage, and the intro-screen completion flag. These migrations do not replace the schema supplied with the project. Supabase Auth stores the canonical Google email in `auth.users`; the trigger also ensures the user exists in `caregivers` and the app writes their completed details there.
 
-### Google Health Edge Functions
+### Galaxy Watch endpoint
 
-Store the OAuth web-client credentials as server-side Supabase secrets. Never put the client secret in `.env` or the mobile bundle.
-
-```bash
-npx supabase secrets set GOOGLE_HEALTH_CLIENT_ID=YOUR_WEB_CLIENT_ID.apps.googleusercontent.com GOOGLE_HEALTH_CLIENT_SECRET=YOUR_WEB_CLIENT_SECRET
-npx supabase functions deploy google-health-oauth-start
-npx supabase functions deploy google-health-oauth-callback --no-verify-jwt
-npx supabase functions deploy google-health-sync
-npx supabase functions deploy google-health-disconnect
-npx supabase secrets set GOOGLE_HEALTH_WEBHOOK_SECRET="Bearer YOUR_LONG_RANDOM_WEBHOOK_TOKEN"
-npx supabase functions deploy google-health-webhook --no-verify-jwt
-```
-
-The callback must be public because Google calls it without a Supabase user JWT. OAuth `state` and PKCE protect the callback, and tokens are written by the service role into the RLS-protected `google_health_tokens` table. Authenticated mobile clients cannot read that table.
-
-The connection and sync functions call these real v4 endpoints:
-
-- `GET https://health.googleapis.com/v4/users/me/identity`
-- `GET https://health.googleapis.com/v4/users/me/pairedDevices`
-- `GET https://health.googleapis.com/v4/users/me/dataTypes/{dataType}/dataPoints`
-
-The sync function requests `heart-rate`, `oxygen-saturation`, `daily-oxygen-saturation`, `sleep`, `steps`, `daily-sleep-temperature-derivations`, and `heart-rate-variability`, then writes one consolidated row to `vital_sign_logs`. HRV is stored as the raw RMSSD value from Google Health in milliseconds, without converting it into a synthetic score.
-
-To activate server-side updates, register an `AUTOMATIC` subscriber in the same Google Cloud project through the [Google Health Subscribers API](https://developers.google.com/health/webhooks). Use your Google Cloud **project number**, an HTTPS `endpointUri` of `https://YOUR_PROJECT_REF.supabase.co/functions/v1/google-health-webhook`, and the **same** `endpointAuthorization.secret` set as `GOOGLE_HEALTH_WEBHOOK_SECRET` above. Configure only data types supported by your project's Google Health webhook access. The Google Health API checks the endpoint twice at registration: the authorized verification request must return 200 or 201, and the unauthenticated one must return 401 or 403. The endpoint validates both the shared secret and Google's rotating public-key signature on actual notifications. Automatic subscriptions also require each user's consent to the corresponding scopes; registering the endpoint alone does not create new wearable data.
-
-The callback stores the Google Health `healthUserId` with each caregiver's OAuth tokens and performs one initial sync after connection. Subsequent automatic updates come from the webhook: it maps that ID to the caregiver, fetches the newest health points, and writes a vital row only when a value or its measurement timestamp changed. Supabase Realtime then pushes that row to the open app. `measurement_times` records the timestamp of each metric separately; `synced_at` is only the last successful API check. Existing historical rows without measurement timestamps display **Sample time unavailable** rather than falsely claiming they were measured just now.
+Follow [the watch setup guide](wearos/README.md) to install Samsung’s sensor SDK, apply the watch migrations and deploy `galaxy-watch`. Device credentials are scoped to the paired patient; no service key is placed in the watch app. The sensor-history migration retires the previous provider and clears its stored OAuth credentials while preserving existing medical history.
 
 ### Gemini care assistant Edge Function
 
@@ -212,9 +174,7 @@ For iOS, use `npx expo run:ios --device` on macOS or create an EAS iOS developme
 
 ## Location behavior
 
-The app requests only foreground/“when in use” location access. It does not register a background task, request background permission, or track continuously. After a real Google Health connection, granting consent records one phone-location event. A later successful foreground synchronization can record another event if permission remains granted. This is explicitly the phone’s location, never the watch’s claimed live GPS position.
-
-The Home screen links to a last-sync location screen. It renders the newest authorized `wearable_sync_locations` row with Leaflet inside `react-native-webview`, using OpenStreetMap tiles and attribution. No Google Maps API key is required. Leaflet tiles require an internet connection, and adding `react-native-webview` requires a new development build.
+The user starts a foreground monitoring session on Galaxy Watch. The watch requests satellite GPS and Wear OS fused location, which may use the paired phone. The map labels source, accuracy, actual measurement time and freshness. Old fixes are never relabeled as current. Location problems do not stop working heart-rate collection. No map API key is required; tiles need internet.
 
 ## Health analysis behavior
 
@@ -226,24 +186,21 @@ These calculations use synchronized database history and are no longer static ca
 
 ## Live dashboard and reports
 
-With the subscriber registered, Google Health notifications trigger a server-side sync even when the app is closed. While the app is open, Supabase Realtime updates the cards as soon as a changed row arrives. **The app does not periodically poll Google Health.** On app launch or return to the foreground, it silently reconciles from Google Health to catch up after a missed webhook or offline period. A caregiver-initiated **Sync now** or pull-to-refresh still shows a spinner. This is not a continuous Fitbit heart-rate stream: the watch must first upload a new reading to Google Health, and notification delivery depends on Google's availability and supported data types. Android background or battery restrictions on the Google Health app can delay that watch-to-cloud upload; ElderCareAI cannot force another app to sync its device.
+Supabase Realtime pushes watch measurements to the open caregiver app. Every delivered valid vital event is saved to the watch’s SQLite outbox, uploaded in batches approximately every five seconds, and inserted into `vital_sign_logs` with its own measurement time. Acknowledged samples leave the outbox; retries are deduplicated. Each metric has a separate history cache so frequent heart-rate events cannot evict a spot oxygen result.
 
-The app-initiated sync also reads Google Health's paired-device `lastSyncTime` (without returning device identifiers or MAC addresses). Home shows when the tracker last synced and, after an hour without a device sync, offers Android background-sync troubleshooting steps. A missing device-status permission does not block vitals. Google Health's `settings.readonly` scope is already requested during connection. The watch must be near the paired phone with Bluetooth and internet available. On that phone, allow the Google Health app's background battery usage and background data, grant Nearby devices, and disable Battery Saver while testing. These phone settings cannot be changed by ElderCareAI or its webhook.
+Supported readings are heart rate, wrist skin temperature, rolling RMSSD HRV from valid inter-beat intervals, monitored steps today, and spot SpO₂. Samsung Health Data SDK imports actual sleep sessions and available oxygen history from the explicitly selected patient's watch. The HRV card includes an experimental personal-baseline stress index labeled **not medical grade**; its provenance is saved with each new HRV event once calibrated. Skin temperature is not core temperature. Test builds require the respective Samsung developer modes; public distribution requires Samsung partner registration.
 
-To verify on a device, note a heart-rate value and its **Measured** time on Home, then obtain a *new* reading on the connected Fitbit and allow it to sync to Google Health. Confirm that a new/updated `vital_sign_logs` row has a later `measurement_times.heart_rate_bpm` value, and that the open Home screen changes its bpm/time without tapping refresh or showing the top pull indicator. If Google Health still returns the same 81 bpm sample, Home should keep 81 and show an increasing measurement age. Check the `google-health-webhook` function logs if no row appears; if a row appears but Home stays stale, check the Supabase Realtime publication and the caregiver's RLS access. A real end-to-end check requires the subscriber registration, deployed function, connected account, and a wearable-produced new reading.
+See [Galaxy data and self-build setup](docs/GALAXY_DATA_AND_BUILD.md) for the phone v1.2.3 and watch v1.4.1 commands, sleep permissions, background alerts, logging behavior and full-history Elle queries.
 
-Each Home vital card opens a detail sheet with Elle, the latest value, up to seven recent values, an explanation of the metric and its source, and a metric-specific caution. Overnight skin temperature is explicitly identified as a sleep-time skin measurement rather than current or core body temperature.
-
-Settings → Data Management generates shareable PDF files through `expo-print` and `expo-sharing`. Health and medication reports include branded headers, patient/profile details, generated timestamps, organized tables, summary totals, and safety notes.
+Settings → Data Management exports saved health and medication records to PDF. Earlier medical history remains available as historical records.
 
 ## Required values and redirect checklist
 
 - Mobile `.env`: `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- Supabase Edge Function secrets: `GOOGLE_HEALTH_CLIENT_ID`, `GOOGLE_HEALTH_CLIENT_SECRET`, `GOOGLE_HEALTH_WEBHOOK_SECRET`, `GEMINI_API_KEY`
+- Supabase Edge Function secrets: `GEMINI_API_KEY` (watch server credentials are managed by Supabase)
 - Supabase Auth redirect allow-list: `eldercareai://auth/callback`
 - Google OAuth web-client redirects:
   - `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`
-  - `https://YOUR_PROJECT_REF.supabase.co/functions/v1/google-health-oauth-callback`
 - Never ship `SUPABASE_SERVICE_ROLE_KEY` or the Google client secret in Expo environment variables.
 
 ## Useful checks

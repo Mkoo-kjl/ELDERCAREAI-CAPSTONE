@@ -25,5 +25,7 @@ Use the [unit testing table](UNIT_TEST_TABLE.md) for the case descriptions and r
 | CASE-045 to CASE-053 | Care Plan medication status; status calculations are logic-only and require suitable saved schedules/logs for a visual example. |
 | CASE-054 to CASE-059 | Care reminder settings/schedules; most assertions are logic-only, not device notification delivery. |
 | CASE-060 to CASE-063 | Settings > Doctor Contact, empty and saved states. |
+| CASE-064 to CASE-071 | Settings > Data Management and its alerts; confirm report generation or sharing separately on a device. PDF APIs and database responses are mocked in Jest. |
+| CASE-072 to CASE-073 | Settings > Doctor Contact error and edit states. Capture the alert or updated contact on a device; database responses are mocked in Jest. |
 
 The automated suite uses mocks for Supabase, Google sign-in, Gemini, and native notification APIs. Its pass result verifies the app logic and React Native component behavior asserted in each test; it does not verify production credentials, live database policies, real notification delivery, or pixel-level device layout.

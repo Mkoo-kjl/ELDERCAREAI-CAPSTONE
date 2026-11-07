@@ -4,6 +4,10 @@ import { Alert } from 'react-native';
 import AlertsScreen from '@/app/(tabs)/alerts';
 import { supabase } from '@/src/lib/supabase';
 
+jest.mock('@/src/lib/watch-push', () => ({ registerCarePush: jest.fn() }));
+jest.mock('@/src/lib/notifications', () => ({ openHealthSoundSettings: jest.fn() }));
+jest.mock('@/src/hooks/useCareRefresh', () => ({ useCareRefresh: jest.fn() }));
+
 jest.mock('expo-router', () => {
   const React = require('react');
   return {
@@ -65,7 +69,7 @@ afterEach(() => jest.restoreAllMocks());
 it('clears one saved notification without deleting health alerts', async () => {
   await render(<AlertsScreen />);
   await waitFor(() => expect(screen.getByText('Medication due')).toBeTruthy());
-  await act(async () => { fireEvent.press(screen.getByLabelText('Clear Medication due')); });
+  await act(async () => { await fireEvent.press(screen.getByLabelText('Clear Medication due')); });
   await waitFor(() => expect(screen.queryByText('Medication due')).toBeNull());
   expect(screen.getByText('Appointment soon')).toBeTruthy();
   expect(deleteCalls).toEqual([{ table: 'caregiver_notifications', filters: [['id', 'n1'], ['caregiver_id', 'caregiver-1']] }]);
@@ -75,7 +79,7 @@ it('confirms before clearing all of this caregiver\'s notifications', async () =
   const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
   await render(<AlertsScreen />);
   await waitFor(() => expect(screen.getByText('Medication due')).toBeTruthy());
-  fireEvent.press(screen.getByLabelText('Clear all notifications'));
+  await fireEvent.press(screen.getByLabelText('Clear all notifications'));
   expect(screen.getByText('Medication due')).toBeTruthy();
   const buttons = alertSpy.mock.calls[0][2];
   await act(async () => { buttons?.find((button) => button.text === 'Clear all')?.onPress?.(); });

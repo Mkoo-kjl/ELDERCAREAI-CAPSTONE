@@ -14,4 +14,4 @@ The supplied addresses ended with `@gmail`. The site uses `@gmail.com` so the em
 
 ## Images
 
-The logo, favicon, Fitbit Inspire 3 photo, and Inter font files are copied from the app's existing assets/dependencies. The two hero photographs were created with the built-in image generation tool for this website. Their prompts describe a candid Filipino older adult and caregiver in a softly lit home, with the people on the right in the desktop composition and lower in the mobile composition so the page title remains readable. The imagery is illustrative, not a photograph of a patient or team member.
+The logo, favicon, user-supplied Galaxy Watch6 photo, and Inter font files are copied from the app's existing assets/dependencies. The two hero photographs were created with the built-in image generation tool for this website. Their prompts describe a candid Filipino older adult and caregiver in a softly lit home, with the people on the right in the desktop composition and lower in the mobile composition so the page title remains readable. The imagery is illustrative, not a photograph of a patient or team member.

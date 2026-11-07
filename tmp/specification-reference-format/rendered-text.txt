@@ -1,0 +1,361 @@
+=== PAGE 1 ===
+ 
+Page 1 
+Implementation Budget / Cost Specification 
+The following budget covers one development laptop, one Android phone, one Galaxy Watch6, 
+one month of internet and electricity, and a project food allowance. Amounts are expressed in Philippine 
+pesos (PHP). 
+Item Cost Basis Amount 
+Laptop One unit ₱30,000.00 
+Android phone One unit ₱14,000.00 
+Samsung Galaxy Watch6 One unit ₱4,500.00 
+Hardware subtotal  ₱48,500.00 
+Visual Studio Code and Android Studio No-cost development tools ₱0.00 
+React Native, Expo and required SDKs Prototype development ₱0.00 
+Supabase Free-plan allowance ₱0.00 
+Firebase FCM and Expo Push Service No-cost messaging services ₱0.00 
+Gemini API and Expo build services Within available no-cost quotas ₱0.00 
+Software subtotal  ₱0.00 
+Internet connection One month ₱1,699.00 
+Electricity One month ₱3,000.00 
+Food allowance Project allowance ₱2,000.00 
+Operating and miscellaneous subtotal  ₱6,699.00 
+TOTAL IMPLEMENTATION BUDGET One-month budget basis ₱55,199.00 
+ 
+The laptop and phone amounts are retained from the proposed budget. The watch, internet and 
+electricity amounts reflect the revised project estimates. The food allowance is treated as a single project 
+expense. 
+Internet and electricity total ₱4,699.00 per month. For a longer implementation period, add 
+₱4,699.00 for each additional month. The one -month total does not include labor, repairs, store -
+publishing fees, or paid cloud/API usage beyond the budgeted no-cost allowances. 
+Zero-cost software entries describe the prototype budget, not unlimited service capacity or an 
+open-source license for every product. Review provider quotas before expanding the system. 
+Technical references: Supabase pricing; Firebase pricing; Expo service costs; Expo Push Service cost; Gemini API 
+pricing. Accessed 3 November 2026. 
+
+=== PAGE 2 ===
+ 
+Page 2 
+Software Specification 
+The system is to be implemented with the following software specifications: 
+Table 32 
+SOFTWARE SPECIFICATION AND HARDWARE SPECIFICATION 
+ElderCareAI: An AI-Driven IoT System for Elderly Monitoring and Caregiver Support 
+SOFTWARE DEVELOPMENT REQUIREMENT SPECIFICATION 
+Back-end: 
+DBMS PostgreSQL (Supabase) 
+Server-side Programming TypeScript / Deno-compatible Supabase Edge 
+Functions; PostgreSQL SQL functions 
+Cloud Service Supabase Cloud (Auth, Realtime, Storage) 
+AI Service Gemini API through server-side functions 
+Notification Service Expo Push Service and Firebase Cloud Messaging v1 
+Front-end: 
+Platform Technologies Custom Android APK with native modules 
+Programming / Scripting Language TypeScript / JavaScript 
+Software Framework React Native, Expo 
+UI Environment Android mobile phone 
+Administration Portal HTML, CSS and JavaScript in a modern web 
+browser 
+Watch and Health Integration: 
+Watch Application Kotlin, Android SDK and Wear OS 
+Live Sensor Integration Samsung Health Sensor SDK; watch GPS for 
+location 
+Health History Integration Samsung Health Data SDK: sleep and recorded 
+oxygen 
+Development Tools Visual Studio Code, Android Studio, Android SDK, 
+Gradle, JDK and Node.js 
+ 
+A custom APK supplies native health access and push support; Expo Go cannot load these 
+modules. Configure Google sign -in, Samsung SDK access, backend secrets and Firebase/Expo 
+credentials. Public Samsung SDK distribution has separate registration requirements. Retain compatible 
+signing credentials for updates. Node.js is a development tool; Edge Functions use a Deno -compatible 
+runtime. 
+Technical references: Expo custom native code; Supabase Edge Functions; Expo FCM v1 credentials. Accessed 3 
+November 2026. 
+
+=== PAGE 3 ===
+ 
+Page 3 
+Hardware Specification 
+The system is to be implemented with the following hardware specifications: 
+Component Minimum Requirement Recommended Requirement 
+Development CPU Compatible 64-bit processor; 
+virtualization support for emulator use 
+Recent Intel Core i5 / AMD Ryzen 5 
+class or better 
+Development 
+Memory (RAM) 
+8 GB RAM for Android Studio without 
+an emulator 
+16 GB for physical-device work; 32 GB 
+for heavier emulator use 
+Development 
+Storage 
+Space for Android Studio, SDKs, 
+Gradle caches and project files 
+SSD with at least 32 GB free for tools, 
+plus project and build space 
+Development 
+Display 
+1280 × 800 pixels; USB or wireless 
+debugging access 
+1920 × 1080 pixels or higher; stable 
+internet and USB access 
+Development 
+Operating System 
+64-bit Windows 10 supported by the 
+tools 
+A currently supported 64-bit Windows 
+release 
+Phone Operating 
+System Android 10 / API 29 or later Android 13 or later, with current 
+permission controls 
+Input Devices Touchscreen controls on the Android 
+phone and watch 
+Readable, accessible touch controls on 
+both devices 
+Output Devices Display, speaker and vibration Display, sound and vibration with 
+permitted Android push notifications 
+Wearable IoT 
+Device 
+Samsung Galaxy Watch6 with the 
+ElderCareAI Wear OS APK 
+Updated watch software and Health 
+Sensor Service; enabled sensor and 
+location permissions 
+Health and 
+Location Sensing 
+Supported heart rate, SpO₂, wrist skin-
+temperature, motion and GPS readings 
+Valid sensor contact and GPS fix; sleep 
+imported after recording and stress 
+derived from HRV 
+Phone Health 
+Integration 
+Samsung Health 6.30.2 or later and 
+Galaxy Wearable on the paired phone 
+Patient’s watch paired to the same 
+phone; required sleep and oxygen read 
+permissions granted 
+Bluetooth and 
+Messaging 
+Watch–phone pairing; Google Play 
+services on the phone for FCM 
+Stable pairing with notification 
+registration and permission enabled 
+Cloud Server Supabase Cloud with PostgreSQL Supabase Authentication, Realtime, 
+Storage and Edge Functions 
+Internet 
+Connection 
+Internet access for uploads and cloud 
+services 
+Stable Wi-Fi or mobile data for watch / 
+phone synchronization and caregiver 
+access 
+Power Supply Rechargeable phone and smartwatch 
+batteries with appropriate chargers 
+Routine charging; sufficient charge for 
+active sensor and GPS use 
+Administrator 
+Device 
+Laptop or desktop with a modern 
+browser and internet connection 
+Secure, updated browser access to the 
+administration portal 
+
+=== PAGE 4 ===
+ 
+Page 4 
+ 
+The development computer and runtime devices have different requirements, as identified in the 
+component labels. Sensor updates and GPS depend on permissions, contact, signal and connectivity; 
+active monitoring increases battery use. Other watch models require separate compatibility testing. 
+Technical references: Android Studio system requirements; Samsung Health Data SDK requirements. Accessed 3 
+November 2026. 
+Human Resource Specification 
+The research study, ElderCareAI, was designed to address the needs of the following users: 
+1.  Caregiver 
+The caregiver manages the assigned older adult’s profile, pairs the watch, reviews readings and 
+location, maintains medications and appointments, responds to alerts, and consults Elle AI. The caregiver 
+also enables notification permissions and checks whether displayed data is current. 
+2.  System Administrator 
+The administrator uses the web portal to manage authorized user accounts and patient records, 
+review stored monitoring data and audit activity, and generate system reports. Administrative privileges 
+must be restricted to approved personnel. 
+3.  Older Adult / Watch Wearer 
+The older adult wears the Galaxy Watch6, keeps it charged, and uses the watch’s monitoring, spot 
+oxygen, SOS and medication controls as needed. The caregiver can assist with setup and permissions. A 
+separate caregiver-style phone account is not required simply to wear the paired watch. 
+
+=== PAGE 5 ===
+ 
+Page 5 
+Program Specification 
+The system is to be implemented with the following program specifications: 
+Functional Requirements 
+ElderCareAI is expected to perform the following functionalities: 
+– Authentication and profiles. Provide caregiver Google sign -in and separate authenticated 
+administrator access. Maintain caregiver, patient and emergency -contact details with role -based 
+access. 
+– Watch integration. Pair the Galaxy Watch6 with the correct patient, request the necessary 
+permissions, display connection status and provide monitoring start/stop controls. 
+– Health monitoring. Display supported heart rate, oxygen, wrist skin temperature, steps, sleep and 
+derived stress/HRV information with units and individual measurement times. 
+– Vital-event history. Save every accepted new vital event with its original time and source. Retain 
+unacknowledged watch samples for retry and prevent duplicate retry records. Missing metrics remain 
+blank rather than being fabricated. 
+– Location tracking. Display the patient’s latest valid watch location and update the map when new 
+positions arrive. Indicate location age or accuracy so an old fix is not presented as current movement. 
+– Medications and appointments. Create, update and display care schedules, instructions and reminders. 
+Synchronize supported medication “Taken” actions between watch and app, with clear save and 
+reminder-setup feedback. 
+– Threshold alerts. Evaluate valid uploaded readings against the configured app review rules. Save 
+threshold warnings in Alerts and Notifications, apply duplicate/cooldown controls, and queue 
+caregiver push delivery. 
+– SOS and notifications. Allow a watch SOS request to create a caregiver alert. Deliver SOS, vital 
+warnings, medication reminders and appointment reminders through the configured notification 
+paths. SOS is an assistance request, not an automatic emergency-services dispatch. 
+– Health history import. Import permitted sleep and recorded oxygen data from the selected patient 
+watch through the phone’s health history integration. Retry failed uploads without inventing or 
+duplicating readings. 
+– Elle AI and analytics. Answer questions about saved patient history, summarize trends and provide 
+clearly qualified statistical insights. Distinguish missing data from a confirmed negative result; avoid 
+diagnosis or guaranteed health predictions. 
+– Reports. Provide patient vital-history and medication-schedule PDF exports, together with authorized 
+administrative reporting. 
+– Administration and settings. Support account and record management, audit review, device status, 
+notification preferences and sound settings. Expose clear permission, connectivity and 
+synchronization errors. 
+
+=== PAGE 6 ===
+ 
+Page 6 
+Data Collection and Update Behavior 
+Data Collection and Update Behavior 
+Heart rate 
+Updates from valid delivered watch sensor events while monitoring. New 
+accepted readings are logged individually, including values above the warning 
+threshold. 
+Blood oxygen 
+(SpO₂) 
+Manual spot measurements and optional automatic spot checks while the watch 
+app is in the foreground. Recorded overnight oxygen is imported when available; 
+this is not a continuous background oxygen stream. 
+Wrist skin 
+temperature 
+Uses valid supported skin-contact readings. This value is wrist skin temperature, 
+not core body temperature. 
+HRV / stress level 
+Rolling RMSSD HRV is calculated from valid beat intervals over about 30–60 
+seconds. A personal reference supports an experimental 0–100 stress estimate; no 
+score is invented while the baseline is insufficient. 
+Steps Uses step-counter updates while monitoring. Time when monitoring is off cannot 
+be assumed to have complete step coverage. 
+Sleep 
+Imports actual sleep sessions after they are available through the health-history 
+SDK. It does not stream second by second or guarantee delivery immediately on 
+waking. 
+ 
+Live updates are limited by sensor delivery, signal quality, connection state and upload success. 
+Each vital retains its own measurement time. The stress estimate is experimental and not medical grade. 
+Technical references: Samsung sensor data and on-demand limitations. Accessed 3 November 2026. 
+Automatic Vital Review Rules 
+The following are the current application review rules. They are not individualized medical limits 
+and should not be presented as a diagnosis or as proof that a patient is safe. 
+Metric Warning Condition Evaluation Basis 
+Heart rate Below 50 BPM or above 110 
+BPM 
+A valid new recorded sample. Exactly 110 BPM 
+does not meet the high-rate rule. 
+SpO₂ Below 95% An accepted spot or imported oxygen reading; 
+continuous coverage is not implied. 
+Sleep duration Recorded session below 5 hours Evaluated after the sleep record becomes 
+available and is imported. 
+Wrist skin 
+temperature 
+Change of at least 0.8°C AND at 
+least 2 standard deviations 
+Requires at least five recent same-watch 
+reference readings; uses up to seven readings 
+within 24 hours. 
+HRV, stress and 
+steps 
+No automatic threshold 
+configured 
+Displayed and recorded where available; these 
+values do not currently generate automatic 
+threshold warnings. 
+ 
+
+=== PAGE 7 ===
+ 
+Page 7 
+A qualifying reading can create a warning after upload. Repeated notices for an active live rule 
+are limited to one per hour; a return to range and a new crossing reset it. Imported records use 
+deduplication. Push work is triggered after database commit, with scheduled recovery. Android and 
+network conditions affect delivery. 
+Nonfunctional Requirements 
+ElderCareAI is designed to operate under the following parameters: 
+– Data quality. Validate values, timestamps and sensor quality. Mark missing or stale data clearly. 
+Consumer wearable readings and derived scores must not be represented as clinical -grade 
+measurements. 
+– Security and privacy. Use authenticated access, role checks, database row -level policies and 
+encrypted network communication. Keep privileged backend, AI and push credentials out of client 
+code. 
+– Reliability and integrity. Use event identifiers, acknowledgments and retries to reduce data loss and 
+duplicate history. Preserve independent measurement times and source details. 
+– Responsiveness. Display new accepted data and queue threshold alerts promptly. Sensor intervals, 
+continuous coverage and notification arrival times cannot be guaranteed. 
+– Background operation. Support Android push when the app is not open, using the correct APK, 
+credentials, registration and permission. Force-stop, offline state, battery policies, muted channels and 
+Do Not Disturb can affect delivery or sound. 
+– Usability and compatibility. Use readable labels, units, clear controls and understandable errors. 
+Validate supported Android phones, Galaxy Watch6 and modern-browser administrator access. 
+– Maintainability and capacity. Keep mobile, watch and backend modules organized and testable. 
+Monitor database growth, cloud quotas, failures and retry queues as the number of patients and 
+recorded samples increases. 
+
+=== PAGE 8 ===
+ 
+Page 8 
+List of modules 
+The table below presents the proposed module assignments. Each proponent is responsible for 
+implementing, testing and improving six modules of the updated ElderCareAI system. 
+An asterisk identifies use or participation, including wearing the watch. It does not grant 
+permissions. Participation totals overlap when modules serve several user groups. 
+Table 31 
+LIST OF MODULES 
+Proponents Modules Elderly Caregiver Admin 
+ Authentication & User Management Modules 
+Kristoffer James G. 
+Layos 
+Landing page and role dashboards  * * 
+Login, authentication and role control  * * 
+Profiles and settings  * * 
+Caregiver account management   * 
+Administrator access management   * 
+Security and audit logs   * 
+No. of Points (1 point per module) 0 3 6 
+ Health Monitoring Modules 
+John Wayne C. Planos 
+Watch pairing and sensor integration * *  
+Live vital signs and activity * *  
+Oxygen measurement and sleep history * *  
+HRV and experimental stress estimate * *  
+Medication and appointment care * *  
+Health history and PDF reports  * * 
+No. of Points (1 point per module) 5 6 1 
+ Emergency & Monitoring Modules 
+Melvence R. 
+Bagonggong 
+SOS and caregiver response * *  
+Automatic vital-threshold alerts  * * 
+GPS tracking and map updates * *  
+Caregiver push and reminder notifications  * * 
+Elle AI and health analytics  *  
+System reports and device-status 
+monitoring   * 
+No. of Points (1 point per module) 2 5 3 
+ 
+Total assigned modules: 18 (six per proponent). Participation totals: Elderly 7, Caregiver 14, 
+Administrator 10. 

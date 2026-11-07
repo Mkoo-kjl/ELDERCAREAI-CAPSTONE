@@ -25,6 +25,7 @@ export type OnboardingProgress = {
   caregiver_completed_at: string | null;
   elderly_completed_at: string | null;
   wearable_status: 'not_started' | 'connected' | 'authorized_no_device' | 'skipped' | 'error';
+  wearable_provider?: 'galaxy_watch';
   paired_device_count: number;
   wearable_completed_at: string | null;
   location_permission: 'not_requested' | 'granted' | 'denied';
@@ -111,7 +112,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setIsOnboardingLoading(true);
     const { data, error } = await supabase
       .from('onboarding_progress')
-      .select('user_id, intro_completed_at, caregiver_completed_at, elderly_completed_at, wearable_status, paired_device_count, wearable_completed_at, location_permission, location_consent_at, completed_at')
+      .select('user_id, intro_completed_at, caregiver_completed_at, elderly_completed_at, wearable_status, wearable_provider, paired_device_count, wearable_completed_at, location_permission, location_consent_at, completed_at')
       .eq('user_id', activeSession.user.id)
       .maybeSingle();
 
@@ -231,6 +232,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const signOut = useCallback(async () => {
     setAuthError(null);
+    try { const {unregisterCarePush}=await import('@/src/lib/watch-push'); await unregisterCarePush(); }
+    catch(error){setAuthError(error instanceof Error?error.message:'Unable to disable SOS notifications.');return;}
+    const {clearSamsungHealthLocalLink}=await import('@/src/lib/samsung-health-sync');
+    await clearSamsungHealthLocalLink();
     const { error } = await supabase.auth.signOut();
     if (error) setAuthError(error.message);
   }, []);

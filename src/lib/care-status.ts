@@ -78,7 +78,7 @@ export function medicationDoseStatus(item: MedicationLike, logs: MedicationLogLi
     };
   }
 
-  if (wasMedicationTakenToday(item.id, logs, now)) {
+  if ((item.times_of_day?.length??0)<=1 && wasMedicationTakenToday(item.id, logs, now)) {
     return {
       tone: 'taken',
       label: 'Taken today',
@@ -104,9 +104,15 @@ export function medicationDoseStatus(item: MedicationLike, logs: MedicationLogLi
   }
 
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const next = parsed.find((time) => time.minutes >= nowMinutes);
+  const pending=parsed.filter(time=>{
+    const at=new Date(now);at.setHours(Math.floor(time.minutes/60),time.minutes%60,0,0);
+    return !logs.some(log=>log.schedule_id===item.id && log.status==='taken' && log.scheduled_time &&
+      Math.floor(Date.parse(log.scheduled_time)/60000)===Math.floor(at.getTime()/60000));
+  });
+  if(!pending.length)return {tone:'taken',label:'Taken today',detail:'All scheduled doses recorded',summary:`${medName}: all scheduled doses were confirmed taken today.`,nextMinutes:null};
+  const next = pending.find((time) => time.minutes >= nowMinutes);
   if (!next) {
-    const last = parsed[parsed.length - 1];
+    const last = pending[pending.length - 1];
     const at = formatMedicationClock(last.time) ?? last.time;
     return {
       tone: 'missed',
