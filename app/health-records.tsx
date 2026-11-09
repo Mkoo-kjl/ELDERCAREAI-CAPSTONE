@@ -1,3 +1,4 @@
+import {CareImage} from '@/src/components/CareImage';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
@@ -13,7 +14,7 @@ import { getTheme, palette } from '@/src/theme/colors';
 import { fontFamily, typeScale } from '@/src/theme/typography';
 
 type Checkup = { id: string; title: string; appointment_at: string; doctor_name: string | null; location: string | null; notes: string | null };
-type Medication = { id: string; medication_name: string; dosage: string | null; frequency: string };
+type Medication = { id: string; medication_name: string; dosage: string | null; frequency: string;image_path?:string|null };
 
 function sameOrBeforeToday(date: Date) {
   const today = new Date();
@@ -55,7 +56,7 @@ export default function HealthRecordsScreen() {
       const [profile, visits, medicines] = await Promise.all([
         supabase.from('elderly_profiles').select('medical_conditions').eq('elderly_id', elderly.elderly_id).eq('caregiver_id', session.user.id).maybeSingle(),
         supabase.from('appointments').select('id, title, appointment_at, doctor_name, location, notes').eq('caregiver_id', session.user.id).eq('elderly_id', elderly.elderly_id).eq('status', 'completed').order('appointment_at', { ascending: false }),
-        supabase.from('medication_schedules').select('id, medication_name, dosage, frequency').eq('caregiver_id', session.user.id).eq('elderly_id', elderly.elderly_id).eq('is_active', true).order('medication_name'),
+        supabase.from('medication_schedules').select('id, medication_name, dosage, frequency, image_path').eq('caregiver_id', session.user.id).eq('elderly_id', elderly.elderly_id).eq('is_active', true).order('medication_name'),
       ]);
       const loadError = profile.error ?? visits.error ?? medicines.error;
       if (loadError) setError('Unable to load health records. Check your connection and try again.');
@@ -153,7 +154,7 @@ export default function HealthRecordsScreen() {
       {checkups.length ? checkups.map((item) => <Pressable key={item.id} accessibilityRole="button" accessibilityLabel={`Edit ${item.title}`} onPress={() => openCheckup(item)} style={[styles.visit, { backgroundColor: theme.cardElevated }]}><View style={styles.visitIcon}><Ionicons name="medkit-outline" size={21} color={palette.primaryDark} /></View><View style={styles.visitCopy}><Text style={[styles.visitTitle, { color: theme.text }]}>{item.title}</Text><Text style={[styles.meta, { color: theme.subtitle }]}>{new Date(item.appointment_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}{item.doctor_name ? ` · ${item.doctor_name}` : ''}</Text><Text numberOfLines={2} style={[styles.body, { color: theme.subtitle }]}>{item.notes}</Text></View><Ionicons name="chevron-forward" size={17} color={theme.subtitle} /></Pressable>) : <View style={[styles.panel, { backgroundColor: theme.cardElevated }]}><Text style={[styles.body, { color: theme.subtitle }]}>No completed checkups recorded yet.</Text></View>}
 
       <View style={styles.sectionHeader}><Text style={[styles.sectionTitle, { color: theme.text }]}>Medications</Text><Pressable accessibilityRole="button" accessibilityLabel="Manage medications" onPress={() => router.push('/care?tab=Medications')}><Text style={styles.manageText}>Manage</Text></Pressable></View>
-      <View style={[styles.panel, { backgroundColor: theme.cardElevated }]}>{medications.length ? medications.map((item) => <View key={item.id} style={styles.medicineRow}><Ionicons name="medical-outline" size={18} color={palette.primaryDark} /><View style={styles.medicineCopy}><Text style={[styles.medicineName, { color: theme.text }]}>{item.medication_name}</Text><Text style={[styles.meta, { color: theme.subtitle }]}>{[item.dosage, item.frequency].filter(Boolean).join(' · ')}</Text></View></View>) : <Text style={[styles.body, { color: theme.subtitle }]}>No active medication schedules yet.</Text>}</View>
+      <View style={[styles.panel, { backgroundColor: theme.cardElevated }]}>{medications.length ? medications.map((item) => <View key={item.id} style={styles.medicineRow}><CareImage path={item.image_path} size={44}/><View style={styles.medicineCopy}><Text style={[styles.medicineName, { color: theme.text }]}>{item.medication_name}</Text><Text style={[styles.meta, { color: theme.subtitle }]}>{[item.dosage, item.frequency].filter(Boolean).join(' · ')}</Text></View></View>) : <Text style={[styles.body, { color: theme.subtitle }]}>No active medication schedules yet.</Text>}</View>
     </ScrollView>}
 
     <Modal visible={formOpen} transparent animationType="slide" onRequestClose={() => setFormOpen(false)}><KeyboardAvoidingView style={styles.overlay} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}><View style={[styles.sheet, { backgroundColor: theme.cardElevated, paddingBottom: Math.max(insets.bottom, 18) }]}><View style={styles.sheetHeader}><Text style={[styles.sheetTitle, { color: theme.text }]}>{editingCheckup ? 'Edit checkup' : 'Add checkup'}</Text><Pressable accessibilityRole="button" accessibilityLabel="Cancel checkup" onPress={() => setFormOpen(false)}><Ionicons name="close" size={22} color={theme.text} /></Pressable></View><ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'} contentContainerStyle={styles.sheetContent}>

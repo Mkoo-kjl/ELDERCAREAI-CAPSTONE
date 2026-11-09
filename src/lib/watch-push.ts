@@ -6,6 +6,7 @@ import {supabase} from '@/src/lib/supabase';
 import {cancelAllCareNotifications,ensureNotificationPermission,hasNotificationPermission,initializeNotifications} from '@/src/lib/notifications';
 const tokenKey='eldercare:watch-push-token';
 const enabledKey='eldercare:care-push-enabled';
+const ownerKey='eldercare:care-push-owner';
 export async function registerCarePush(userId:string,requestPermission=true){
   if(Platform.OS==='web'||!(requestPermission?await ensureNotificationPermission():await hasNotificationPermission()))
     throw Error('Allow notifications to receive background care alerts.');
@@ -20,6 +21,7 @@ export async function registerCarePush(userId:string,requestPermission=true){
   const timezone=Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Manila';
   const {error}=await supabase.rpc('register_care_push_v2',{p_token:token,p_timezone:timezone});
   if(error)throw Error('Could not register background notifications. Update the backend and try again while signed in.');
+  await AsyncStorage.setItem(ownerKey,userId);
   await AsyncStorage.setItem(tokenKey,token);
   await AsyncStorage.setItem(enabledKey,'1');
   await cancelAllCareNotifications();
@@ -30,12 +32,20 @@ export async function refreshCarePushRegistration(userId:string){
   return registerCarePush(userId,false).catch(()=>false);
 }
 export async function isCarePushRegistered(){
-  return (await AsyncStorage.getItem(enabledKey))==='1'&&Boolean(await AsyncStorage.getItem(tokenKey))&&await hasNotificationPermission();
+  try{
+    const token=await AsyncStorage.getItem(tokenKey);
+    if(!token||(await AsyncStorage.getItem(enabledKey))!=='1'||!await hasNotificationPermission())return false;
+    const {data}=await supabase.auth.getSession();const user=data.session?.user.id;
+    if(!user||(await AsyncStorage.getItem(ownerKey))!==user)return false;
+    const registration=await supabase.from('caregiver_push_tokens').select('updated_at').eq('token',token).eq('caregiver_id',user).maybeSingle();
+    return !registration.error&&Boolean(registration.data);
+  }catch{return false;}
 }
 export async function unregisterCarePush(){
   const token=await AsyncStorage.getItem(tokenKey);
   if(token){const {error}=await supabase.from('caregiver_push_tokens').delete().eq('token',token);if(error)throw Error('Could not unregister care notifications. Check internet and retry sign out.');}
   await AsyncStorage.removeItem(tokenKey);
   await AsyncStorage.removeItem(enabledKey);
+  await AsyncStorage.removeItem(ownerKey);
   await cancelAllCareNotifications();
 }

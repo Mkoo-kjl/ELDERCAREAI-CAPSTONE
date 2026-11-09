@@ -1,0 +1,85 @@
+---
+title: ElderCareAI Program Workflow
+---
+flowchart TD
+  start(["START"])
+  login["Sign in as caregiver"]
+  auth{"Sign in successful?"}
+  retry["Check details and retry"]
+  profile{"Profiles complete?"}
+  setup["Complete caregiver and patient setup"]
+  watch{"Galaxy Watch6 ready?"}
+  pair["Pair watch and allow permissions"]
+  dashboard["Open caregiver dashboard"]
+  monitor["Start watch monitoring"]
+  data{"Fresh watch data available?"}
+  waiting["Show waiting or offline status"]
+  save["Save patient-scoped vitals and GPS"]
+  vitals["Update vitals, history and insights"]
+  location["Update watch map and safe zone"]
+  threshold{"Vital threshold crossed?"}
+  accuracy{"GPS fix reliable?"}
+  vital_alert["Save vital alert and notify"]
+  zone{"Outside safe zone?"}
+  location_alert["Save location alert and notify"]
+  due{"Care reminder due?"}
+  remind["Queue each medication or visit alert"]
+  action{"Caregiver chooses action?"}
+  care["Manage medications, visits and prescription draft"]
+  insights["Review trends, Elle and history"]
+  sos{"SOS confirmed?"}
+  rx{"Prescription verified?"}
+  rx_save["Save corrected medication schedule"]
+  emergency["Save SOS and show priority contacts"]
+  continue{"Continue monitoring?"}
+  finish(["FINISH"])
+  start --> login
+  login --> auth
+  auth -->|No| retry
+  retry -->|Retry| login
+  auth -->|Yes| profile
+  profile -->|No| setup
+  setup -->|Retry| profile
+  profile -->|Yes| watch
+  watch -->|No| pair
+  pair -->|Retry| watch
+  watch -->|Yes| dashboard
+  dashboard --> monitor
+  monitor --> data
+  data -->|No| waiting
+  waiting -->|Retry| monitor
+  data -->|Yes| save
+  save -->|Vitals| vitals
+  save -->|Location| location
+  vitals --> threshold
+  threshold -->|Yes| vital_alert
+  threshold -->|No| due
+  vital_alert --> due
+  location --> accuracy
+  accuracy -->|Yes| zone
+  accuracy -->|No| due
+  zone -->|Yes| location_alert
+  zone -->|No| due
+  location_alert --> due
+  due -->|Yes| remind
+  remind --> action
+  due -->|No| action
+  action -->|Care plan| care
+  action -->|Review| insights
+  action -->|SOS| sos
+  care --> rx
+  rx -->|Yes| rx_save
+  rx -->|No| continue
+  rx_save --> continue
+  insights --> continue
+  sos -->|Yes| emergency
+  sos -->|No| continue
+  emergency --> continue
+  continue -->|Yes| monitor
+  continue -->|No| finish
+  classDef terminal fill:#AAEF9B,stroke:#173D42,color:#142D31;
+  classDef decision fill:#FFFFFF,stroke:#173D42,color:#142D31;
+  classDef action fill:#FFFFFF,stroke:#173D42,color:#142D31;
+  class start,finish terminal;
+  class auth,profile,watch,data,threshold,accuracy,zone,due,action,sos,rx,continue decision;
+  class login,retry,setup,pair,dashboard,monitor,waiting,save,vitals,location,vital_alert,location_alert,remind,care,insights,rx_save,emergency action;

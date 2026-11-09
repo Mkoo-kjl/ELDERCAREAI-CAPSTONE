@@ -1,3 +1,4 @@
+import {CareScheduleObserver} from '@/src/components/CareScheduleObserver';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -17,7 +18,7 @@ function AppNavigator({ isDark }: { isDark: boolean }) {
   return (
     <HealthDataProvider key={session?.user.id ?? 'signed-out'}>
       <SamsungHealthProvider>
-      <CareNotificationObserver />
+      <CareNotificationObserver /><CareScheduleObserver />
       <WatchCareObserver />
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>

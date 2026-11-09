@@ -1,0 +1,322 @@
+PASS __tests__/samsung-health-sync.test.ts
+PASS __tests__/galaxy-watch.test.ts
+PASS __tests__/health-records.test.tsx (12.303 s)
+PASS __tests__/notification-sounds.test.tsx
+PASS __tests__/watch-sos-observer.test.tsx
+PASS __tests__/settings-permissions.test.tsx
+PASS __tests__/safe-zone-panel.test.tsx
+PASS __tests__/care-usability.test.ts
+PASS __tests__/admin-recovery.test.js
+PASS __tests__/account-health-history.test.tsx
+PASS __tests__/care-images-analytics.test.tsx
+PASS __tests__/vital-auto-sync.test.tsx
+PASS __tests__/notifications-clear.test.tsx
+PASS __tests__/alert-response.test.tsx
+PASS __tests__/home-care-preview.test.tsx
+PASS __tests__/monitoring-chart.test.tsx
+PASS __tests__/CASE-021.test.tsx
+PASS __tests__/medication-editor.test.tsx
+PASS __tests__/CASE-024.test.tsx
+PASS __tests__/CASE-020.test.tsx
+PASS __tests__/admin-security.test.ts
+PASS __tests__/CASE-023.test.tsx
+PASS __tests__/CASE-019.test.tsx
+PASS __tests__/health-records-route.test.tsx
+PASS __tests__/CASE-022.test.tsx
+PASS __tests__/vital-detail-insight.test.tsx
+PASS __tests__/CASE-063.test.tsx
+PASS __tests__/care-evidence.test.ts
+PASS __tests__/CASE-018.test.tsx
+PASS __tests__/samsung-health-provider.test.tsx
+PASS __tests__/CASE-014.test.tsx
+PASS __tests__/CASE-062.test.tsx
+PASS __tests__/CASE-017.test.tsx
+PASS __tests__/CASE-015.test.tsx
+PASS __tests__/CASE-016.test.tsx
+PASS __tests__/CASE-061.test.tsx
+PASS __tests__/care-save-flow.test.tsx
+PASS __tests__/emergency-contacts.test.tsx
+PASS __tests__/CASE-060.test.tsx
+PASS __tests__/watch-location-screen.test.tsx
+PASS __tests__/watch-gps-track.test.tsx
+PASS __tests__/CASE-038.test.tsx
+PASS __tests__/CASE-040.test.tsx
+PASS __tests__/live-location-map.test.tsx
+PASS __tests__/CASE-039.test.tsx
+PASS __tests__/care-notification-observer.test.tsx
+PASS __tests__/CASE-043.test.tsx
+  ● Console
+
+    console.warn
+      expo-notifications: Android Push notifications (remote notifications) functionality provided by expo-notifications was removed from Expo Go with the release of SDK 53. Use a development build instead of Expo Go. Read more at https://docs.expo.dev/develop/development-builds/introduction/.
+
+    > 1 | import * as Notifications from 'expo-notifications';
+        | ^
+      2 | import Constants from 'expo-constants';
+      3 | import {Platform} from 'react-native';
+      4 | import AsyncStorage from '@react-native-async-storage/async-storage';
+
+      at warn (node_modules/expo-notifications/src/warnOfExpoGoPushUsage.ts:14:15)
+      at addPushTokenListener (node_modules/expo-notifications/src/TokenEmitter.ts:44:24)
+      at Object.<anonymous> (node_modules/expo-notifications/src/DevicePushTokenAutoRegistration.fx.ts:104:23)
+      at Object.require (node_modules/expo-notifications/src/getExpoPushTokenAsync.ts:5:1)
+      at Object.require (node_modules/expo-notifications/src/index.ts:16:1)
+      at Object.require (src/lib/watch-push.ts:1:1)
+      at Object.require (src/components/MedicationEditor.tsx:13:1)
+      at Object.require (C:\ELDERCAREAI-CAPSTONE\app\(tabs)../care.tsx:2:1)
+      at Object.require (__tests__/CASE-043.test.tsx:5:1)
+
+PASS __tests__/CASE-037.test.tsx
+PASS __tests__/chatbot-evidence.test.tsx
+PASS __tests__/CASE-036.test.tsx
+PASS __tests__/CASE-003.test.tsx
+PASS __tests__/CASE-044.test.tsx
+  ● Console
+
+    console.warn
+      expo-notifications: Android Push notifications (remote notifications) functionality provided by expo-notifications was removed from Expo Go with the release of SDK 53. Use a development build instead of Expo Go. Read more at https://docs.expo.dev/develop/development-builds/introduction/.
+
+    > 1 | import * as Notifications from 'expo-notifications';
+        | ^
+      2 | import Constants from 'expo-constants';
+      3 | import {Platform} from 'react-native';
+      4 | import AsyncStorage from '@react-native-async-storage/async-storage';
+
+      at warn (node_modules/expo-notifications/src/warnOfExpoGoPushUsage.ts:14:15)
+      at addPushTokenListener (node_modules/expo-notifications/src/TokenEmitter.ts:44:24)
+      at Object.<anonymous> (node_modules/expo-notifications/src/DevicePushTokenAutoRegistration.fx.ts:104:23)
+      at Object.require (node_modules/expo-notifications/src/getExpoPushTokenAsync.ts:5:1)
+      at Object.require (node_modules/expo-notifications/src/index.ts:16:1)
+      at Object.require (src/lib/watch-push.ts:1:1)
+      at Object.require (src/components/MedicationEditor.tsx:13:1)
+      at Object.require (C:\ELDERCAREAI-CAPSTONE\app\(tabs)../care.tsx:2:1)
+      at Object.require (__tests__/CASE-044.test.tsx:5:1)
+
+PASS __tests__/vital-history.test.ts
+PASS __tests__/CASE-042.test.tsx
+  ● Console
+
+    console.warn
+      expo-notifications: Android Push notifications (remote notifications) functionality provided by expo-notifications was removed from Expo Go with the release of SDK 53. Use a development build instead of Expo Go. Read more at https://docs.expo.dev/develop/development-builds/introduction/.
+
+    > 1 | import * as Notifications from 'expo-notifications';
+        | ^
+      2 | import Constants from 'expo-constants';
+      3 | import {Platform} from 'react-native';
+      4 | import AsyncStorage from '@react-native-async-storage/async-storage';
+
+      at warn (node_modules/expo-notifications/src/warnOfExpoGoPushUsage.ts:14:15)
+      at addPushTokenListener (node_modules/expo-notifications/src/TokenEmitter.ts:44:24)
+      at Object.<anonymous> (node_modules/expo-notifications/src/DevicePushTokenAutoRegistration.fx.ts:104:23)
+      at Object.require (node_modules/expo-notifications/src/getExpoPushTokenAsync.ts:5:1)
+      at Object.require (node_modules/expo-notifications/src/index.ts:16:1)
+      at Object.require (src/lib/watch-push.ts:1:1)
+      at Object.require (src/components/MedicationEditor.tsx:13:1)
+      at Object.require (C:\ELDERCAREAI-CAPSTONE\app\(tabs)../care.tsx:2:1)
+      at Object.require (__tests__/CASE-042.test.tsx:5:1)
+
+PASS __tests__/vital-evidence.test.tsx
+PASS __tests__/CASE-002.test.tsx
+PASS __tests__/CASE-041.test.tsx
+PASS __tests__/CASE-004.test.tsx
+PASS __tests__/sleep-history.test.ts
+PASS __tests__/CASE-001.test.tsx
+PASS __tests__/CASE-059.test.tsx
+PASS __tests__/intro-layout.test.tsx
+PASS __tests__/care-ui-updates.test.tsx
+PASS __tests__/CASE-058.test.tsx
+PASS __tests__/care-picker.test.tsx
+PASS __tests__/CASE-057.test.tsx
+PASS __tests__/watch-care-status.test.ts
+PASS __tests__/sleep-score.test.tsx
+PASS __tests__/CASE-055.test.tsx
+PASS integration testing/INT-022.test.tsx
+PASS __tests__/CASE-054.test.tsx
+PASS integration testing/INT-019.test.tsx
+PASS integration testing/INT-025.test.tsx
+PASS __tests__/CASE-056.test.tsx
+PASS __tests__/CASE-032.test.tsx
+PASS __tests__/care-timeline.test.tsx
+PASS __tests__/CASE-033.test.tsx
+PASS __tests__/CASE-069.test.tsx
+  ● Console
+
+    console.error
+      The current testing environment is not configured to support act(...)
+
+      236 |       await exportMedicationReportPdf({ patient: elderly, caregiverName: caregiver?.full_name ?? 'Caregiver', medications: data });
+      237 |     } catch (caught) { Alert.alert('Unable to export report', caught instanceof Error ? caught.message : 'Please try again.'); }
+    > 238 |     finally { setExporting(null); }
+          |               ^
+      239 |   };
+      240 |
+      241 |   const connected = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
+
+      at isConcurrentActEnvironment (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15344:17)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:17861:7)
+      at scheduleUpdateOnFiber (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15445:11)
+      at dispatchSetStateInternal (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:7016:13)
+      at dispatchSetState (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:6973:7)
+      at setExporting (C:\ELDERCAREAI-CAPSTONE\app\(tabs)../profile.tsx:238:15)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS integration testing/INT-017.test.tsx
+PASS __tests__/CASE-073.test.tsx
+PASS __tests__/CASE-035.test.tsx
+PASS integration testing/INT-014.test.tsx
+PASS __tests__/CASE-031.test.tsx
+PASS __tests__/CASE-029.test.tsx
+PASS __tests__/CASE-030.test.tsx
+PASS integration testing/INT-018.test.tsx
+PASS __tests__/CASE-034.test.tsx
+PASS integration testing/INT-016.test.tsx
+PASS integration testing/INT-015.test.tsx
+PASS __tests__/CASE-066.test.tsx
+  ● Console
+
+    console.error
+      The current testing environment is not configured to support act(...)
+
+      225 |     }
+      226 |     catch (caught) { Alert.alert('Unable to export report', caught instanceof Error ? caught.message : 'Please try again.'); }
+    > 227 |     finally { setExporting(null); }
+          |               ^
+      228 |   };
+      229 |   const exportMedications = async () => {
+      230 |     if (!session || !elderly) return;
+
+      at isConcurrentActEnvironment (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15344:17)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:17861:7)
+      at scheduleUpdateOnFiber (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15445:11)
+      at dispatchSetStateInternal (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:7016:13)
+      at dispatchSetState (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:6973:7)
+      at setExporting (C:\ELDERCAREAI-CAPSTONE\app\(tabs)../profile.tsx:227:15)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS __tests__/CASE-028.test.tsx
+PASS integration testing/INT-023.test.tsx
+PASS __tests__/CASE-006.test.tsx
+PASS __tests__/CASE-008.test.tsx
+PASS __tests__/CASE-007.test.tsx
+PASS __tests__/CASE-009.test.tsx
+PASS __tests__/CASE-046.test.tsx
+PASS integration testing/INT-021.test.tsx
+PASS __tests__/CASE-072.test.tsx
+PASS integration testing/INT-013.test.tsx
+PASS __tests__/CASE-025.test.tsx
+PASS __tests__/typography.test.tsx
+PASS __tests__/CASE-005.test.tsx
+PASS __tests__/CASE-010.test.tsx
+PASS __tests__/care-push-payload.test.ts
+PASS __tests__/CASE-047.test.tsx
+PASS __tests__/CASE-011.test.tsx
+PASS __tests__/vital-warning-notifications.test.ts
+PASS __tests__/CASE-026.test.tsx
+PASS integration testing/INT-024.test.tsx
+PASS __tests__/notification-route.test.ts
+PASS __tests__/CASE-027.test.tsx
+PASS __tests__/CASE-013.test.tsx
+PASS __tests__/CASE-012.test.tsx
+PASS __tests__/CASE-053.test.tsx
+PASS integration testing/INT-012.test.tsx
+PASS integration testing/INT-011.test.tsx
+PASS integration testing/INT-020.test.tsx
+PASS __tests__/mobile-evidence-build.test.ts
+PASS __tests__/CASE-049.test.tsx
+PASS __tests__/CASE-068.test.tsx
+  ● Console
+
+    console.error
+      The current testing environment is not configured to support act(...)
+
+      236 |       await exportMedicationReportPdf({ patient: elderly, caregiverName: caregiver?.full_name ?? 'Caregiver', medications: data });
+      237 |     } catch (caught) { Alert.alert('Unable to export report', caught instanceof Error ? caught.message : 'Please try again.'); }
+    > 238 |     finally { setExporting(null); }
+          |               ^
+      239 |   };
+      240 |
+      241 |   const connected = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
+
+      at isConcurrentActEnvironment (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15344:17)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:17861:7)
+      at scheduleUpdateOnFiber (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15445:11)
+      at dispatchSetStateInternal (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:7016:13)
+      at dispatchSetState (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:6973:7)
+      at setExporting (C:\ELDERCAREAI-CAPSTONE\app\(tabs)../profile.tsx:238:15)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS __tests__/CASE-065.test.tsx
+PASS __tests__/CASE-071.test.tsx
+  ● Console
+
+    console.error
+      The current testing environment is not configured to support act(...)
+
+      225 |     }
+      226 |     catch (caught) { Alert.alert('Unable to export report', caught instanceof Error ? caught.message : 'Please try again.'); }
+    > 227 |     finally { setExporting(null); }
+          |               ^
+      228 |   };
+      229 |   const exportMedications = async () => {
+      230 |     if (!session || !elderly) return;
+
+      at isConcurrentActEnvironment (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15344:17)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:17861:7)
+      at scheduleUpdateOnFiber (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15445:11)
+      at dispatchSetStateInternal (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:7016:13)
+      at dispatchSetState (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:6973:7)
+      at setExporting (C:\ELDERCAREAI-CAPSTONE\app\(tabs)../profile.tsx:227:15)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+PASS integration testing/INT-002.test.tsx
+PASS __tests__/CASE-048.test.tsx
+PASS __tests__/CASE-045.test.tsx
+PASS __tests__/CASE-052.test.tsx
+PASS __tests__/CASE-064.test.tsx
+PASS __tests__/CASE-050.test.tsx
+PASS integration testing/INT-003.test.tsx
+PASS integration testing/INT-010.test.tsx
+PASS __tests__/CASE-051.test.tsx
+PASS __tests__/CASE-070.test.tsx
+  ● Console
+
+    console.error
+      The current testing environment is not configured to support act(...)
+
+      236 |       await exportMedicationReportPdf({ patient: elderly, caregiverName: caregiver?.full_name ?? 'Caregiver', medications: data });
+      237 |     } catch (caught) { Alert.alert('Unable to export report', caught instanceof Error ? caught.message : 'Please try again.'); }
+    > 238 |     finally { setExporting(null); }
+          |               ^
+      239 |   };
+      240 |
+      241 |   const connected = onboarding?.wearable_status === 'connected' || onboarding?.wearable_status === 'authorized_no_device';
+
+      at isConcurrentActEnvironment (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15344:17)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:17861:7)
+      at scheduleUpdateOnFiber (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:15445:11)
+      at dispatchSetStateInternal (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:7016:13)
+      at dispatchSetState (node_modules/test-renderer/node_modules/react-reconciler/cjs/react-reconciler.development.js:6973:7)
+      at setExporting (C:\ELDERCAREAI-CAPSTONE\app\(tabs)../profile.tsx:238:15)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS __tests__/CASE-067.test.tsx
+PASS integration testing/INT-008.test.tsx
+PASS integration testing/INT-007.test.tsx
+PASS integration testing/INT-006.test.tsx
+PASS integration testing/INT-005.test.tsx
+PASS integration testing/INT-004.test.tsx
+PASS integration testing/INT-009.test.tsx
+PASS integration testing/INT-001.test.tsx
+
+Test Suites: 141 passed, 141 total
+Tests:       272 passed, 272 total
+Snapshots:   0 total
+Time:        112.088 s
+Ran all test suites.
+Test results written to: tmp\care-ui-tests-final.json

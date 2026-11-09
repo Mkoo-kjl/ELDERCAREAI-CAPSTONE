@@ -1,0 +1,9 @@
+PASS __tests__/care-usability.test.ts
+PASS __tests__/notification-sounds.test.tsx
+PASS __tests__/care-timeline.test.tsx (13.672 s)
+
+Test Suites: 3 passed, 3 total
+Tests:       25 passed, 25 total
+Snapshots:   0 total
+Time:        18.954 s
+Ran all test suites within paths "__tests__/care-timeline.test.tsx", "__tests__/notification-sounds.test.tsx", "__tests__/care-usability.test.ts".

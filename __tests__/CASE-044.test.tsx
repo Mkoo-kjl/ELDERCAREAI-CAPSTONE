@@ -1,3 +1,4 @@
+jest.mock('@/src/hooks/useCareRefresh',()=>({useCareRefresh:()=>{}}));
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 

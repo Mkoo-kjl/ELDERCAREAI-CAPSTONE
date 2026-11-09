@@ -1,0 +1,8 @@
+PASS __tests__/care-images-analytics.test.tsx (28.19 s)
+PASS integration testing/INT-021.test.tsx (8.814 s)
+
+Test Suites: 2 passed, 2 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        43.604 s
+Ran all test suites matching /__tests__\\care-images-analytics.test.tsx|integration testing\\INT-021.test.tsx/i.

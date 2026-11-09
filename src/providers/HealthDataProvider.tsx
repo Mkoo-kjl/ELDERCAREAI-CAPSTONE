@@ -16,6 +16,7 @@ export type ElderlyProfile = {
   blood_type: string | null;
   medical_conditions: string | null;
   medications: string | null;
+  emergency_contacts?: unknown;
   emergency_contact: string | null;
   emergency_contact_phone: string | null;
   photo_url: string | null;
@@ -37,6 +38,7 @@ export type VitalLog = {
   hrv_rmssd_ms: number | null;
   skin_temp_celsius: number | null;
   steps_count: number | null;
+  steps_day?:string|null;
   sleep_hours: number | null;
   overall_status: string | null;
   ai_risk_score: number | null;
@@ -85,7 +87,7 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
     if (!userId) return;
     const atStart = revision.current;
     const { data: profile, error: profileError } = await supabase.from('elderly_profiles')
-      .select('elderly_id, full_name, age, gender, weight_kg, height_cm, blood_type, medical_conditions, medications, emergency_contact, emergency_contact_phone, photo_url')
+      .select('elderly_id, full_name, age, gender, weight_kg, height_cm, blood_type, medical_conditions, medications, emergency_contact, emergency_contact_phone, emergency_contacts, photo_url')
       .eq('caregiver_id', userId).order('created_at').limit(1).maybeSingle();
     if (activeUser.current !== userId) return;
     if (profileError) throw profileError;

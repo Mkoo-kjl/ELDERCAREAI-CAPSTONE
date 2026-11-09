@@ -1,3 +1,5 @@
+import {VitalStatusBadge} from './VitalStatusBadge';
+import type {VitalStatus} from '@/src/lib/vital-status';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
@@ -6,9 +8,9 @@ import { AppText as Text } from '@/src/components/AppText';
 import { getTheme } from '@/src/theme/colors';
 import { fontFamily, typeScale } from '@/src/theme/typography';
 
-type Props = { icon: ComponentProps<typeof Ionicons>['name']; title: string; value: string; unit: string; timestamp: string; color: string; surface?: string; fullWidth?: boolean; annotation?: string; onPress?: () => void };
+type Props = { status?: VitalStatus; icon: ComponentProps<typeof Ionicons>['name']; title: string; value: string; unit: string; timestamp: string; color: string; surface?: string; fullWidth?: boolean; annotation?: string; onPress?: () => void };
 
-export function MetricCard({ icon, title, value, unit, timestamp, color, surface, fullWidth, annotation, onPress }: Props) {
+export function MetricCard({ icon, title, value, unit, timestamp, color, surface, fullWidth, annotation, onPress, status }: Props) {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
   return (
@@ -19,6 +21,7 @@ export function MetricCard({ icon, title, value, unit, timestamp, color, surface
       </View>
       <Text numberOfLines={2} style={[styles.title, { color: theme.text }]}>{title}</Text>
       <View style={styles.valueRow}><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.62} style={[styles.value, { color: theme.text }]}>{value}</Text><Text numberOfLines={1} style={[styles.unit, { color: theme.subtitle }]}>{unit}</Text></View>
+      {status ? <VitalStatusBadge status={status}/> : null}
       {annotation ? <Text style={[styles.annotation, { color }]}>{annotation}</Text> : null}
       <Text numberOfLines={1} style={[styles.timestamp, { color: theme.subtitle }]}>{timestamp}</Text>
     </Pressable>

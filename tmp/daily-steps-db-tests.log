@@ -1,0 +1,26 @@
+PASS all watch migrations execute on PostgreSQL
+PASS pairing is single-use
+PASS authenticated uploads, duplicate vital history and duplicate route handling
+PASS independent measurement times and protection against older uploads
+PASS every vital event, independent metrics, idempotent replay and atomic invalid-batch rejection
+PASS caregiver isolation, hidden credentials, and blocked client writes
+PASS SOS authenticates the device and atomically creates one event, alert and notification on retries
+PASS per-dose Taken replay, phone/watch deduplication, schedule/time checks and cross-patient denial
+PASS experimental stress scale uses a personal baseline, clamps 0–100 and withholds a score for invalid zero HRV
+PASS saved stress provenance and complete-history peaks beyond recent samples, with scoped patient access
+PASS sleep and oxygen import, exact retry deduplication, retained revisions, current-only history and source/patient isolation
+PASS dispatch transport failure preserves the measured vital and durable alert for retry
+PASS strict vital thresholds, saved alerts/notifications/push jobs, crossing recovery, cooldown, stale-reading rejection and sleep/skin rules
+PASS event-triggered worker dispatch and device-specific audible channel capability
+PASS medication/appointment scheduling, retry deduplication and cancellation before push
+PASS queued notifications stop targeting a phone after its token is unregistered
+PASS a phone token assigned to a different caregiver cannot receive its former account’s queued alerts
+PASS suspended caregivers and revoked watches cannot upload
+PASS pairing attempt limit persists across failed requests
+PASS owner-only acknowledgment, final notes, idempotent response history and linked SOS resolution
+PASS safe-zone ownership, radius validation, GPS-only confirmation, boundary jitter, stale/out-of-order fixes, return events, pause and obsolete-push cancellation
+PASS 50 m zones: minimum enforced, inside at 25 m accuracy, boundary jitter withheld, poor GPS rejected, confirmed exit queues one push, return cancels obsolete push
+PASS 10/20 m zones: accurate inside/exit/return confirmation, uncertainty withheld, poor GPS rejected, exit push queued and obsolete push cancelled
+PASS evidence is selected from authorized matching rows with bounded samples and no invented record IDs
+PASS no-new-table care migration: simultaneous appointments/medications, NULL status, 15-minute advance, deduplication, end-date exclusion, private-file ownership
+PASS daily steps: no new tables or deleted history, daily max/update, Manila midnight, duplicate and archived replays, late uploads, distinct BPM events, owner-only date filtering

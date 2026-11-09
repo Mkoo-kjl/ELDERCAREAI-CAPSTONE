@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+import ts from 'typescript';
+const module={exports:{}};
+vm.runInNewContext(ts.transpileModule(await readFile('supabase/functions/_shared/care-push.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{module,exports:module.exports,Date});
+const {carePushPayload}=module.exports;
+const messages=['medication','appointment','vital','sos'].flatMap(kind=>['a','b'].map(id=>carePushPayload({notification_id:`${kind}-${id}`,token:'fixture',title:'Reminder',body:'Fixture',kind,channel_version:2})));
+assert.equal(new Set(messages.map(message=>message.tag)).size,8);
+assert.equal(new Set(messages.map(message=>message.collapseId)).size,8);
+assert.ok(messages.every(message=>message.priority==='high'&&message.sound.endsWith('.wav')));
+assert.equal(carePushPayload({notification_id:'medication-a',kind:'medication',channel_version:2}).tag,messages[0].tag);
+assert.equal(carePushPayload({notification_id:'old',kind:'medication',channel_version:1}).sound,'default');
+console.log('PASS push payload: simultaneous events keep distinct tags/collapse IDs; retries retain identity; medication/appointment/vital/SOS sounds and old-channel compatibility preserved');

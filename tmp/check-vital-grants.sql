@@ -1,0 +1,1 @@
+select c.relrowsecurity,has_table_privilege('authenticated','public.vital_sign_logs','SELECT') can_read from pg_class c where c.oid='public.vital_sign_logs'::regclass; select policyname,roles,cmd from pg_policies where schemaname='public' and tablename='vital_sign_logs';

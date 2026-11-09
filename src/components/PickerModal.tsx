@@ -1,3 +1,4 @@
+import {formatCareTime} from '@/src/lib/care-time';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
@@ -101,7 +102,7 @@ export function PickerModal({ visible, value, onChange, onClose, mode = 'datetim
             <View style={styles.optionGrid}>{Array.from({ length: 12 }, (_, index) => yearStart + index).map((year) => <Option key={year} label={`${year}`} selected={viewMonth.getFullYear() === year} disabled={year < (minDate?.getFullYear() ?? 1) || year > (maxDate?.getFullYear() ?? 9999)} onPress={() => { setViewMonth(new Date(year, viewMonth.getMonth(), 1)); setPage('calendar'); }} />)}</View>
           </> : null}
           {page === 'time' ? <>
-            <Text style={[styles.timePreview, { color: theme.text }]}>{value.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}</Text>
+            <Text style={[styles.timePreview, { color: theme.text }]}>{formatCareTime(`${value.getHours()}:${String(value.getMinutes()).padStart(2,'0')}`)}</Text>
             <Text style={[styles.sectionLabel, { color: theme.subtitle }]}>HOUR</Text>
             <View style={styles.optionGrid}>{Array.from({ length: 12 }, (_, index) => index + 1).map((hour) => <Option key={hour} label={`${hour}`} selected={selectedHour === hour} onPress={() => chooseTime(hour, selectedMinute, value.getHours() >= 12)} />)}</View>
             <Text style={[styles.sectionLabel, { color: theme.subtitle }]}>MINUTE</Text>

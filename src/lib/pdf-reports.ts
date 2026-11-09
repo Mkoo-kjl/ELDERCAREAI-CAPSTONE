@@ -1,3 +1,4 @@
+import {formatCareTime} from './care-time';
 import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Print from 'expo-print';
@@ -58,7 +59,7 @@ export async function exportHealthReportPdf({ patient, caregiverName, history }:
 }
 
 export async function exportMedicationReportPdf({ patient, caregiverName, medications }: { patient: ElderlyProfile; caregiverName: string; medications: MedicationReportRow[] }) {
-  const rows = medications.map((item) => `<tr><td><strong>${escapeHtml(item.medication_name)}</strong><br><span style="color:#64748B">${shown(item.form)}</span></td><td>${shown(item.dosage)}</td><td>${escapeHtml(item.frequency)}<br><span style="color:#64748B">${item.times_of_day?.length ? escapeHtml(item.times_of_day.join(', ')) : 'No times listed'}</span></td><td>${shown(item.start_date)}<br>to ${shown(item.end_date)}</td><td>${shown(item.instructions)}</td><td>${shown(item.prescribed_by)}</td><td class="status ${item.is_active ? 'normal' : ''}">${item.is_active ? 'Active' : 'Inactive'}</td></tr>`).join('');
+  const rows = medications.map((item) => `<tr><td><strong>${escapeHtml(item.medication_name)}</strong><br><span style="color:#64748B">${shown(item.form)}</span></td><td>${shown(item.dosage)}</td><td>${escapeHtml(item.frequency)}<br><span style="color:#64748B">${item.times_of_day?.length ? escapeHtml(item.times_of_day.map(formatCareTime).join(', ')) : 'No times listed'}</span></td><td>${shown(item.start_date)}<br>to ${shown(item.end_date)}</td><td>${shown(item.instructions)}</td><td>${shown(item.prescribed_by)}</td><td class="status ${item.is_active ? 'normal' : ''}">${item.is_active ? 'Active' : 'Inactive'}</td></tr>`).join('');
   const activeCount = medications.filter((item) => item.is_active).length;
   const content = `<div class="section-title">Medication schedule</div><table><thead><tr><th>Medication</th><th>Dosage</th><th>Schedule</th><th>Date range</th><th>Instructions</th><th>Prescriber</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table><div class="receipt"><div class="receipt-row"><span class="receipt-label">Medications listed</span><span class="receipt-value">${medications.length}</span></div><div class="receipt-row"><span class="receipt-label">Active schedules</span><span class="receipt-value">${activeCount}</span></div><div class="receipt-row"><span class="receipt-label">Inactive schedules</span><span class="receipt-value">${medications.length - activeCount}</span></div></div>`;
   const logoDataUri = await elderCareLogoDataUri();

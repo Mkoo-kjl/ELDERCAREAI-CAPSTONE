@@ -1,3 +1,4 @@
+jest.mock('@/src/hooks/useCareRefresh',()=>({useCareRefresh:()=>{}}));
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
@@ -27,7 +28,7 @@ describe('Care plan screen', () => {
     await render(<CareScreen />);
     await fireEvent.press(screen.getByLabelText('Add Medication'));
     await fireEvent.press(screen.getByText('Save'));
-    expect(Alert.alert).toHaveBeenCalledWith('Missing information', 'Add a name or title.');
+    expect(screen.getByText('Enter the medication name exactly as prescribed.')).toBeTruthy();
     expect(supabase.from).not.toHaveBeenCalled();
   });
 });

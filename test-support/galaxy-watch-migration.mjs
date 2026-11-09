@@ -1,3 +1,5 @@
+import {testDailySteps} from './daily-steps-cases.mjs';
+import {testCareUsability} from './care-usability-cases.mjs';
 // Isolated PostgreSQL check, never connects to the user's Supabase database.
 // npm install --prefix tmp/watch-db-check --no-package-lock --ignore-scripts @electric-sql/pglite
 // node test-support/galaxy-watch-migration.mjs
@@ -18,6 +20,13 @@ try {
     create role authenticated;
     create role service_role bypassrls;
     create schema auth;
+    create schema storage;
+    create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+    create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);
+    alter table storage.objects enable row level security;
+    create function storage.foldername(text) returns text[] language sql immutable as $$ select string_to_array($1,'/') $$;
+    grant usage on schema storage to authenticated;
+    grant select,insert,delete on storage.objects to authenticated;
     create schema vault; create schema net;
     create table vault.decrypted_secrets(name text primary key,decrypted_secret text);
     insert into vault.decrypted_secrets values ('eldercare_project_url','https://unit-test.invalid'),('eldercare_care_worker_key','test-only-worker-key');
@@ -38,7 +47,7 @@ try {
     create table public.elderly_profiles(elderly_id uuid primary key, caregiver_id uuid, created_at timestamptz default now(), full_name text default 'Test patient');
     create table public.medication_schedules(id uuid primary key,elderly_id uuid,caregiver_id uuid,medication_name text,dosage text,frequency text,
       times_of_day text[],start_date date,end_date date,is_active boolean default true,reminder_enabled boolean default true,created_at timestamptz default now(),updated_at timestamptz default now());
-    create table public.appointments(id uuid primary key,elderly_id uuid,caregiver_id uuid,title text,doctor_name text,location text,appointment_at timestamptz,status text default 'upcoming');
+    create table public.appointments(id uuid primary key,elderly_id uuid,caregiver_id uuid,title text,doctor_name text,location text,appointment_at timestamptz,status text default 'upcoming',notes text,reminder_sent boolean default false);
     create table public.caregiver_notes(id uuid primary key);
     create table public.medication_logs(id uuid primary key default gen_random_uuid(),schedule_id uuid,elderly_id uuid,scheduled_time timestamptz,
       taken_at timestamptz,status text,recorded_by uuid,notes text);
@@ -56,6 +65,11 @@ try {
       wearable_completed_at timestamptz, updated_at timestamptz);
     create table public.vital_sign_logs(id uuid primary key default gen_random_uuid(), elderly_id uuid,
       heart_rate_bpm double precision, spo2_percent double precision, skin_temp_celsius double precision, hrv_rmssd_ms double precision, steps_count integer, sleep_hours double precision, sleep_history jsonb not null default '[]'::jsonb, source text, recorded_at timestamptz, synced_at timestamptz, measurement_times jsonb);
+    alter table public.vital_sign_logs enable row level security;
+    grant select on public.vital_sign_logs to authenticated;
+    create policy own_patient_vitals on public.vital_sign_logs for select to authenticated using (
+      exists(select 1 from public.elderly_profiles e where e.elderly_id=vital_sign_logs.elderly_id and e.caregiver_id=auth.uid()) and public.is_active_caregiver()
+    );
     create publication supabase_realtime;
     insert into auth.users values ('${caregiver}'), ('${other}');
     insert into public.user_access values ('${caregiver}', 'caregiver', 'active'), ('${other}', 'caregiver', 'active');
@@ -77,6 +91,9 @@ try {
   await db.exec(await readFile(new URL('../supabase/migrations/20261107000000_care_workflow_safe_zones_evidence.sql', import.meta.url), 'utf8'));
   await db.exec(await readFile(new URL('../supabase/migrations/20261107010000_safe_zone_fifty_meter_radius.sql', import.meta.url), 'utf8'));
   await db.exec(await readFile(new URL('../supabase/migrations/20261107020000_safe_zone_small_radius.sql', import.meta.url), 'utf8'));
+  const tableCount=(await db.query("select count(*) n from information_schema.tables where table_schema='public'")).rows[0].n;
+  await db.exec(await readFile(new URL('../supabase/migrations/20261108000000_care_usability_and_reminders.sql', import.meta.url), 'utf8'));
+  assert.equal((await db.query("select count(*) n from information_schema.tables where table_schema='public'")).rows[0].n,tableCount,'Care update must not add public tables');
   console.log('PASS all watch migrations execute on PostgreSQL');
   await db.query("insert into galaxy_watch_pairings values ($1,$2,$3,now()+interval '10 minutes',now())", ['code', caregiver, patient]);
   await db.exec('set role service_role');
@@ -330,4 +347,6 @@ try {
   console.log('PASS pairing attempt limit persists across failed requests');
   await db.exec('reset role');
   await testCareWorkflow(db,{caregiver,other,patient,otherPatient});
-} catch(error) { console.error('FAIL',error.message,error.where??'',error.position??'',error.internalPosition??'',error.internalQuery??''); process.exitCode=1; } finally { await db.close(); }
+  await testCareUsability(db,{caregiver,other,patient,otherPatient});
+  await testDailySteps(db,{caregiver,other});
+} catch(error) { console.error('FAIL',error.stack??error.message,error.where??'',error.position??'',error.internalPosition??'',error.internalQuery??''); process.exitCode=1; } finally { await db.close(); }

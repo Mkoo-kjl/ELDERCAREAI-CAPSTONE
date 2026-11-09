@@ -24,7 +24,7 @@ describe('Health analysis', () => {
   test('CASE-032 four readings yield a labeled statistical trend', () => {
     const history = [70, 72, 74, 76].map((heart, index) => reading(index, { heart_rate_bpm: heart }));
     const forecast = buildHealthPredictions(history).find((item) => item.id === 'heart-forecast');
-    expect(forecast?.body).toContain('4 distinct readings');
+    expect(forecast?.body).toContain('4 recorded readings');
     expect(forecast?.confidence).toBe('Low');
   });
 });

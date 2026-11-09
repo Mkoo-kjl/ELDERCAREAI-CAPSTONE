@@ -1,0 +1,385 @@
+{
+  "source": "https://docs.google.com/forms/d/e/1FAIpQLSeWWdIAS3daYZtX9PabfqQPeXQhb89Wub4e80OlzdS9Cbuafw/viewform",
+  "title": "(FOR ELDERLY)ElderCareAI: An AI-Driven IoT System for Elderly Monitoring and Caregiver Support",
+  "fields": [
+    {
+      "code": "A01",
+      "section": "A: Demographics",
+      "summary": "Age band",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "60-69 years old",
+        "70–79 years old",
+        "80 years old and above"
+      ]
+    },
+    {
+      "code": "A02",
+      "section": "A: Demographics",
+      "summary": "Sex",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Male",
+        "Female"
+      ]
+    },
+    {
+      "code": "A03",
+      "section": "A: Demographics",
+      "summary": "Length of residence",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Less than 1 year",
+        "1–3 years",
+        "4–6 years",
+        "7 years and above"
+      ]
+    },
+    {
+      "code": "A04",
+      "section": "A: Demographics",
+      "summary": "Reported health conditions",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Heart condition",
+        "Diabetes",
+        "Hypertension (High Blood Pressure)",
+        "Respiratory condition"
+      ]
+    },
+    {
+      "code": "A05",
+      "section": "A: Demographics",
+      "summary": "Comfort wearing a wrist tracker",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Very Comfortable",
+        "Comfortable",
+        "Neutral",
+        "Uncomfortable",
+        "Very Uncomfortable"
+      ]
+    },
+    {
+      "code": "SA01",
+      "section": "A: Sincerity checks",
+      "summary": "Claim of accurate demographic answers",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "SA02",
+      "section": "A: Sincerity checks",
+      "summary": "Care taken when reading items",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "SA03",
+      "section": "A: Sincerity checks",
+      "summary": "Attention-check item",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "B01",
+      "section": "B: Current care",
+      "summary": "Regular vital checks by caregiver",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "B02",
+      "section": "B: Current care",
+      "summary": "Feeling closely monitored",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "B03",
+      "section": "B: Current care",
+      "summary": "Prompt updates about health changes",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "B04",
+      "section": "B: Current care",
+      "summary": "Safety under existing care",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "B05",
+      "section": "B: Current care",
+      "summary": "Delays obtaining urgent medical attention",
+      "sampled": true,
+      "note": "Agreement indicates a concern or problem; no reverse scoring applied.",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "B06",
+      "section": "B: Current care",
+      "summary": "Adequacy of existing monitoring",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "B07",
+      "section": "B: Current care",
+      "summary": "Problems with existing monitoring",
+      "sampled": true,
+      "note": "Agreement indicates a concern or problem; no reverse scoring applied.",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "SB01",
+      "section": "B: Sincerity checks",
+      "summary": "Claim of honest current-care responses",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "SB02",
+      "section": "B: Sincerity checks",
+      "summary": "Care taken when reading current-care items",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "SB03",
+      "section": "B: Sincerity checks",
+      "summary": "Attention-check item",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "C01",
+      "section": "C: Proposed wearable",
+      "summary": "Willingness to wear a monitoring smartwatch",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "C02",
+      "section": "C: Proposed wearable",
+      "summary": "Expected benefit for caregiver monitoring",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "C03",
+      "section": "C: Proposed wearable",
+      "summary": "Reassurance from real-time abnormal-reading alerts",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "C04",
+      "section": "C: Proposed wearable",
+      "summary": "Expected safety and wellbeing benefit",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "C05",
+      "section": "C: Proposed wearable",
+      "summary": "Concern about all-day wearable use",
+      "sampled": true,
+      "note": "Agreement indicates a concern or problem; no reverse scoring applied.",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "C06",
+      "section": "C: Proposed wearable",
+      "summary": "Benefit of emergency alerts to caregivers",
+      "sampled": true,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "SC01",
+      "section": "C: Sincerity checks",
+      "summary": "Claim that responses reflect personal opinions",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "SC02",
+      "section": "C: Sincerity checks",
+      "summary": "Care taken when considering wearable statements",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "SC03",
+      "section": "C: Sincerity checks",
+      "summary": "Attention-check item",
+      "sampled": false,
+      "note": "",
+      "options": [
+        "Strongly Agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly DIsagree"
+      ]
+    },
+    {
+      "code": "RECOMMENDATIONS",
+      "section": "Recommendations",
+      "summary": "Recommendations",
+      "sampled": false,
+      "note": "",
+      "options": []
+    }
+  ]
+}

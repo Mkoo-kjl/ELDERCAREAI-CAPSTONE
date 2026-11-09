@@ -1,12 +1,15 @@
-import { act,Alert, AsyncStorage, medication, prepareCareWorkflow, pressText, showCare, waitFor } from '../test-support/integration/care-workflow-harness';
+import { Notifications, change, prepareCareWorkflow, pressLabel, pressText, showCare, waitFor } from '../test-support/integration/care-workflow-harness';
 
-test('INT-015 deleting a medication deactivates it and cancels its reminder', async () => {
-  const { writes } = prepareCareWorkflow({ medication_schedules: [medication] });
+test('INT-016 saving an appointment schedules a named patient reminder', async () => {
+  const { writes } = prepareCareWorkflow();
   await showCare();
-  await waitFor(() => expect(AsyncStorage.setItem).toHaveBeenCalled());
-  await pressText('Delete');
-  const actions = (Alert.alert as jest.Mock).mock.calls.at(-1)?.[2];
-  await act(async()=>{await actions[1].onPress();});
-  await waitFor(() => expect(writes).toContainEqual(expect.objectContaining({ table: 'medication_schedules', operation: 'update', payload: { is_active: false } })));
-  expect(AsyncStorage.removeItem).toHaveBeenCalledWith('eldercare-notification:medication:med-1');
+  await pressText('Appointments');
+  await pressLabel('Add Appointment');
+  await change('Title', 'Cardiology visit');
+  await change('Doctor name', 'Dr. Kevin');
+  await pressText('Save');
+  await waitFor(() => expect(writes).toContainEqual(expect.objectContaining({ table: 'appointments', operation: 'insert' })));
+  await waitFor(() => expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(expect.objectContaining({
+    content: expect.objectContaining({ title: 'Appointment now: Cardiology visit', body: expect.stringContaining('Maria') }),
+  })));
 });

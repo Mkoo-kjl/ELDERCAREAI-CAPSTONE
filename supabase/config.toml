@@ -6,6 +6,9 @@ verify_jwt = true
 [functions.admin-portal]
 verify_jwt = true
 
+[functions.prescription-draft]
+verify_jwt = true
+
 # The handler validates either a caregiver JWT or a scoped watch credential.
 [functions.galaxy-watch]
 verify_jwt = false

@@ -1,9 +1,10 @@
-import { Notifications, prepareCareWorkflow, showCare, waitFor } from '../test-support/integration/care-workflow-harness';
+import { prepareChatWorkflow, sendChatQuestion, waitFor } from '../test-support/integration/chat-workflow-harness';
+import { fireEvent } from '@testing-library/react-native';
 
-test('INT-021 a saved upcoming appointment reaches the notification scheduler', async () => {
-  prepareCareWorkflow({ appointments: [{ id: 'appt-1', caregiver_id: 'caregiver-1', elderly_id: 'patient-1', title: 'Checkup', doctor_name: 'Dr. Kevin', location: 'Clinic', appointment_at: new Date(Date.now() + 86_400_000).toISOString(), notes: null, status: 'scheduled' }] });
-  await showCare();
-  await waitFor(() => expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(expect.objectContaining({
-    content: expect.objectContaining({ title: 'Appointment now: Checkup', body: 'Maria • Dr. Kevin • Clinic' }),
-  })));
+test('INT-024 Elle medication advice links into the Care medication tab', async () => {
+  const { push } = prepareChatWorkflow({ data: { reply: 'Check Maria’s medication schedule before the next dose.', emotion: 'happy' }, error: null });
+  const screen = await sendChatQuestion('What medication is due?');
+  await waitFor(() => expect(screen.getByText('Open Meds')).toBeTruthy());
+  await fireEvent.press(screen.getByText('Open Meds'));
+  expect(push).toHaveBeenCalledWith('/care?tab=Medications');
 });

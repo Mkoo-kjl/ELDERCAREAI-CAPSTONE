@@ -1,0 +1,52 @@
+---
+title: ElderCareAI Administrator Workflow
+---
+flowchart TD
+  start(["START"])
+  login["Sign in as administrator"]
+  auth{"Sign in successful?"}
+  retry["Check details and retry"]
+  role{"Active admin role?"}
+  denied["Access denied"]
+  denied_end(["FINISH"])
+  dashboard["Open admin dashboard"]
+  accounts["Review caregiver and patient records"]
+  monitor["Review sync, alerts and security"]
+  change{"Change an account?"}
+  confirm{"Change confirmed?"}
+  save["Save change and audit action"]
+  report{"Export or change access?"}
+  valid{"Valid and confirmed?"}
+  export["Export CSV or update access"]
+  more{"Another admin task?"}
+  finish(["FINISH"])
+  start --> login
+  login --> auth
+  auth -->|No| retry
+  retry -->|Retry| login
+  auth -->|Yes| role
+  role -->|No| denied
+  denied --> denied_end
+  role -->|Yes| dashboard
+  dashboard -->|Accounts| accounts
+  dashboard -->|Monitor / reports| monitor
+  accounts --> change
+  change -->|Yes| confirm
+  confirm -->|Yes| save
+  change -->|No| more
+  confirm -->|No| more
+  save --> more
+  monitor --> report
+  report -->|Yes| valid
+  valid -->|Yes| export
+  report -->|No| more
+  valid -->|No| more
+  export --> more
+  more -->|Yes| dashboard
+  more -->|No| finish
+  classDef terminal fill:#AAEF9B,stroke:#173D42,color:#142D31;
+  classDef decision fill:#FFFFFF,stroke:#173D42,color:#142D31;
+  classDef action fill:#FFFFFF,stroke:#173D42,color:#142D31;
+  class start,denied_end,finish terminal;
+  class auth,role,change,confirm,report,valid,more decision;
+  class login,retry,denied,dashboard,accounts,monitor,save,export action;

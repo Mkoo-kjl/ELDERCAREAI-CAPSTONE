@@ -1,3 +1,5 @@
+import {CareImage} from '@/src/components/CareImage';
+import {vitalStatus} from '@/src/lib/vital-status';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -28,7 +30,7 @@ import { fontFamily, typeScale } from '@/src/theme/typography';
 
 function display(value: number | null | undefined, digits = 0) { return value === null || value === undefined ? '--' : value.toFixed(digits); }
 type DoctorContact = { id: string; full_name: string; phone: string; photo_url: string | null };
-type MedicationPreview = { id: string; medication_name: string; dosage: string | null; frequency: string; times_of_day: string[] | null };
+type MedicationPreview = { id: string; medication_name: string; dosage: string | null; frequency: string; times_of_day: string[] | null;image_path?:string|null;start_date?:string|null;end_date?:string|null;timezone?:string };
 type AppointmentPreview = { id: string; title: string; doctor_name: string | null; appointment_at: string; status: string | null };
 type NotePreview = { id: string; title: string | null; content: string; is_pinned: boolean; updated_at: string };
 type MedicationLogPreview = MedicationLogLike;
@@ -92,7 +94,7 @@ export default function DashboardScreen() {
         .eq('elderly_id', elderlyId)
         .maybeSingle(),
       supabase.from('medication_schedules')
-        .select('id, medication_name, dosage, frequency, times_of_day')
+        .select('id, medication_name, dosage, frequency, times_of_day, image_path, start_date, end_date, timezone')
         .eq('caregiver_id', caregiverId)
         .eq('elderly_id', elderlyId)
         .eq('is_active', true)
@@ -246,12 +248,12 @@ export default function DashboardScreen() {
           <Text style={[styles.watchFreshText, { color: theme.subtitle }]}>{galaxyWatchStatus}{galaxyWatch?.battery_percent != null ? ` · Watch battery ${galaxyWatch.battery_percent}%` : ''}. New vital measurements are saved automatically.</Text>
           {galaxyWatch?.sensor_status?.sdk && !galaxyWatch.sensor_status.sdk.includes('connected') ? <Text style={[styles.watchFreshText, { color: theme.subtitle }]}>{galaxyWatch.sensor_status.sdk}</Text> : null}
           <View style={styles.grid}>
-            <MetricCard fullWidth={stackVitals} icon="heart-outline" title="Heart rate" value={display(vital?.heart_rate_bpm)} unit="bpm" timestamp={vitalTimeLabel(vital, 'heart_rate_bpm')} color={palette.error} surface={palette.lemonSurface} onPress={() => setSelectedMetric('heart_rate_bpm')} />
-            <MetricCard fullWidth={stackVitals} icon="water-outline" title="Blood oxygen" value={display(vital?.spo2_percent, 1)} unit="%" annotation="Spot measurement" timestamp={vital?.spo2_percent == null ? 'Measure SpO₂ on watch' : vitalTimeLabel(vital, 'spo2_percent')} color={palette.primaryDark} surface={palette.aquaSurface} onPress={() => setSelectedMetric('spo2_percent')} />
-            <MetricCard fullWidth={stackVitals} icon="moon-outline" title="Sleep" value={display(vital?.sleep_hours, 1)} unit="hours" annotation={sleepContext?.label ?? 'Recorded sleep'} timestamp={vital?.sleep_hours!=null?vitalTimeLabel(vital,'sleep_hours'):watchMetricStatus(galaxyWatch,'sleep_hours')} color={palette.purple} surface={palette.lavenderSurface} onPress={() => setSelectedMetric('sleep_hours')} />
-            <MetricCard fullWidth={stackVitals} icon="footsteps-outline" title="Monitored steps" value={vital?.steps_count?.toLocaleString() ?? '--'} unit="steps" timestamp={vitalTimeLabel(vital, 'steps_count')} color={palette.accentDark} surface={palette.mintSurface} onPress={() => setSelectedMetric('steps_count')} />
-            <MetricCard fullWidth={stackVitals} icon="thermometer-outline" title="Skin temperature" value={display(vital?.skin_temp_celsius, 1)} unit="°C" timestamp={vitalTimeLabel(vital, 'skin_temp_celsius')} color={palette.warning} surface={palette.peachSurface} onPress={() => setSelectedMetric('skin_temp_celsius')} />
-            <MetricCard fullWidth={stackVitals} icon="leaf-outline" title="Stress level" value={stressIndexValue(vital)} annotation={stressIndexCaption(vital)} unit="/100" timestamp={vitalTimeLabel(vital, 'hrv_rmssd_ms')} color={palette.pink} surface={palette.aquaSurface} onPress={() => setSelectedMetric('hrv_rmssd_ms')} />
+            <MetricCard fullWidth={stackVitals} status={vitalStatus('heart_rate_bpm',vital,history)} icon="heart-outline" title="Heart rate" value={display(vital?.heart_rate_bpm)} unit="bpm" timestamp={vitalTimeLabel(vital, 'heart_rate_bpm')} color={palette.error} surface={palette.lemonSurface} onPress={() => setSelectedMetric('heart_rate_bpm')} />
+            <MetricCard fullWidth={stackVitals} status={vitalStatus('spo2_percent',vital,history)} icon="water-outline" title="Blood oxygen" value={display(vital?.spo2_percent, 1)} unit="%" annotation="Spot measurement" timestamp={vital?.spo2_percent == null ? 'Measure SpO₂ on watch' : vitalTimeLabel(vital, 'spo2_percent')} color={palette.primaryDark} surface={palette.aquaSurface} onPress={() => setSelectedMetric('spo2_percent')} />
+            <MetricCard fullWidth={stackVitals} status={vitalStatus('sleep_hours',vital,history)} icon="moon-outline" title="Sleep" value={display(vital?.sleep_hours, 1)} unit="hours" annotation={sleepContext?.label ?? 'Recorded sleep'} timestamp={vital?.sleep_hours!=null?vitalTimeLabel(vital,'sleep_hours'):watchMetricStatus(galaxyWatch,'sleep_hours')} color={palette.purple} surface={palette.lavenderSurface} onPress={() => setSelectedMetric('sleep_hours')} />
+            <MetricCard fullWidth={stackVitals} status={vitalStatus('steps_count',vital,history)} icon="footsteps-outline" title="Monitored steps" value={vital?.steps_count?.toLocaleString() ?? '--'} unit="steps" timestamp={vitalTimeLabel(vital, 'steps_count')} color={palette.accentDark} surface={palette.mintSurface} onPress={() => setSelectedMetric('steps_count')} />
+            <MetricCard fullWidth={stackVitals} status={vitalStatus('skin_temp_celsius',vital,history)} icon="thermometer-outline" title="Skin temperature" value={display(vital?.skin_temp_celsius, 1)} unit="°C" timestamp={vitalTimeLabel(vital, 'skin_temp_celsius')} color={palette.warning} surface={palette.peachSurface} onPress={() => setSelectedMetric('skin_temp_celsius')} />
+            <MetricCard fullWidth={stackVitals} status={vitalStatus('hrv_rmssd_ms',vital,history)} icon="leaf-outline" title="Stress level" value={stressIndexValue(vital)} annotation={stressIndexCaption(vital)} unit="/100" timestamp={vitalTimeLabel(vital, 'hrv_rmssd_ms')} color={palette.pink} surface={palette.aquaSurface} onPress={() => setSelectedMetric('hrv_rmssd_ms')} />
           </View>
           {!vital ? <View style={[styles.empty, { backgroundColor: theme.cardElevated }]}><Ionicons name="analytics-outline" size={26} color={theme.subtitle} /><Text style={[styles.emptyTitle, { color: theme.text }]}>No health readings yet</Text><Text style={[styles.emptyText, { color: theme.subtitle }]}>Wear Galaxy Watch, grant its sensor and location permissions, then tap Start monitoring on the watch.</Text></View> : null}
           <Pressable accessibilityRole="button" accessibilityLabel="View watch location" onPress={() => router.push('/location')} style={[styles.locationStrip, { backgroundColor: isDark ? theme.cardElevated : palette.aquaSurface }]}>
@@ -275,7 +277,7 @@ export default function DashboardScreen() {
           <View style={styles.careSection}>
             <View style={styles.sectionRow}><Text style={[styles.sectionTitle, { color: theme.text }]}>Care plan</Text><Pressable onPress={() => router.push('/care')}><Text style={styles.manageText}>Manage</Text></Pressable></View>
             {appointments.map((item) => <CarePreviewRow key={item.id} kind="appointment" title={item.title} subtitle={`${new Date(item.appointment_at).getTime() >= Date.now() ? 'Appointment on' : 'Previous appointment'} ${appointmentLabel(item.appointment_at)}`} onPress={() => router.push('/care?tab=Appointments')} />)}
-            {medicationStatuses.map(({ item, status }) => <CarePreviewRow key={item.id} kind="medication" title={item.medication_name} subtitle={`${status.label}: ${status.detail}${item.dosage ? ` • ${item.dosage}` : ''}`} onPress={() => router.push('/care?tab=Medications')} />)}
+            {medicationStatuses.map(({ item, status }) => <CarePreviewRow key={item.id} kind="medication" imagePath={item.image_path} title={item.medication_name} subtitle={`${status.label}: ${status.detail}${item.dosage ? ` • ${item.dosage}` : ''}`} onPress={() => router.push('/care?tab=Medications')} />)}
             {notes.map((item) => <CarePreviewRow key={item.id} kind="note" title={item.title || 'Caregiver note'} subtitle={item.content} onPress={() => router.push('/care?tab=Notes')} />)}
             {doctor ? <Pressable accessibilityRole="button" accessibilityLabel={`Call ${doctor.full_name}`} onPress={callDoctor} style={[styles.doctorCard, { backgroundColor: isDark ? theme.cardElevated : palette.aquaSurface }]}>
               {doctor.photo_url ? <Image source={{ uri: doctor.photo_url }} resizeMode="cover" style={styles.doctorPhoto} /> : <View style={styles.doctorFallback}><Ionicons name="medical-outline" size={90} color={palette.primaryDark} /></View>}
@@ -324,9 +326,9 @@ export default function DashboardScreen() {
   );
 }
 
-function CarePreviewRow({ kind, title, subtitle, onPress }: { kind: 'appointment' | 'medication' | 'note'; title: string; subtitle: string; onPress: () => void }) {
+function CarePreviewRow({ kind, title, subtitle, onPress, imagePath }: { kind: 'appointment' | 'medication' | 'note'; imagePath?:string|null; title: string; subtitle: string; onPress: () => void }) {
   const theme = getTheme(useColorScheme() === 'dark');
-  return <Pressable accessibilityRole="button" onPress={onPress} style={[styles.careRow, { backgroundColor: theme.cardElevated }]}><View style={styles.careIcon}><CareArtwork kind={kind} size={42} /></View><View style={styles.careCopy}><Text numberOfLines={1} style={[styles.careTitle, { color: theme.text }]}>{title}</Text><Text numberOfLines={2} style={[styles.careText, { color: theme.subtitle }]}>{subtitle}</Text></View><Ionicons name="chevron-forward" size={17} color={theme.subtitle} /></Pressable>;
+  return <Pressable accessibilityRole="button" onPress={onPress} style={[styles.careRow, { backgroundColor: theme.cardElevated }]}><View style={styles.careIcon}>{kind==='medication'?<CareImage path={imagePath} size={42}/>:<CareArtwork kind={kind} size={42} />}</View><View style={styles.careCopy}><Text numberOfLines={1} style={[styles.careTitle, { color: theme.text }]}>{title}</Text><Text numberOfLines={2} style={[styles.careText, { color: theme.subtitle }]}>{subtitle}</Text></View><Ionicons name="chevron-forward" size={17} color={theme.subtitle} /></Pressable>;
 }
 
 function WeekStrip({ appointmentDates }: { appointmentDates: string[] }) {

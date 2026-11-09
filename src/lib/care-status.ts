@@ -1,9 +1,11 @@
+import {formatCareTime,parseCareTime,nextMedicationAt,medicationDayDoses,careZoneParts} from './care-time';
 type MedicationLike = {
   id: string;
   medication_name: string;
   dosage: string | null;
   frequency: string;
   times_of_day: string[] | null;
+  start_date?:string|null;end_date?:string|null;timezone?:string;
 };
 
 export type MedicationLogLike = {
@@ -36,22 +38,11 @@ export function endOfLocalDay(date = new Date()) {
 }
 
 export function formatMedicationClock(value: string | null | undefined) {
-  if (!value) return null;
-  const [hourRaw, minuteRaw] = value.split(':');
-  const hour = Number(hourRaw);
-  const minute = Number(minuteRaw ?? 0);
-  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return value;
-  const date = new Date();
-  date.setHours(hour, minute, 0, 0);
-  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  return parseCareTime(value) ? formatCareTime(value) : null;
 }
-
-function parseTime(value: string) {
-  const [hourRaw, minuteRaw] = value.split(':');
-  const hour = Number(hourRaw);
-  const minute = Number(minuteRaw ?? 0);
-  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
-  return { time: value, minutes: hour * 60 + minute };
+function parseTime(value:string) {
+  const clock=parseCareTime(value);
+  return clock ? {time:clock.canonical,minutes:clock.hour*60+clock.minute}:null;
 }
 
 export function wasMedicationTakenToday(scheduleId: string, logs: MedicationLogLike[], now = new Date()) {
@@ -78,14 +69,12 @@ export function medicationDoseStatus(item: MedicationLike, logs: MedicationLogLi
     };
   }
 
-  if ((item.times_of_day?.length??0)<=1 && wasMedicationTakenToday(item.id, logs, now)) {
-    return {
-      tone: 'taken',
-      label: 'Taken today',
-      detail: 'Recorded in care log',
-      summary: `${medName} was marked taken today.`,
-      nextMinutes: null,
-    };
+  const day=careZoneParts(now,item.timezone).day;
+  if(!medicationDayDoses(item,day).length&&(item.times_of_day?.length??0)>0){
+    const next=nextMedicationAt(item,now);
+    const nextClock=next?careZoneParts(next,item.timezone):null;
+    const nextLabel=nextClock?`${nextClock.day} · ${formatCareTime(nextClock.hour+':'+String(nextClock.minute).padStart(2,'0'))}`:'';
+    return {tone:next?'upcoming':'unscheduled',label:next?'Next scheduled day':'Schedule ended',detail:next?nextLabel:'No upcoming dose',summary:next?`${medName}: next scheduled dose ${nextLabel}.`:`${medName} has no upcoming scheduled dose.`,nextMinutes:next?Math.round((next.getTime()-now.getTime())/60000):null};
   }
 
   const parsed = (item.times_of_day ?? [])
@@ -103,9 +92,10 @@ export function medicationDoseStatus(item: MedicationLike, logs: MedicationLogLi
     };
   }
 
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  const zoned=careZoneParts(now,item.timezone);
+  const nowMinutes = zoned.hour * 60 + zoned.minute;
   const pending=parsed.filter(time=>{
-    const at=new Date(now);at.setHours(Math.floor(time.minutes/60),time.minutes%60,0,0);
+    const at=medicationDayDoses({...item,times_of_day:[time.time]},day)[0];if(!at)return false;
     return !logs.some(log=>log.schedule_id===item.id && log.status==='taken' && log.scheduled_time &&
       Math.floor(Date.parse(log.scheduled_time)/60000)===Math.floor(at.getTime()/60000));
   });

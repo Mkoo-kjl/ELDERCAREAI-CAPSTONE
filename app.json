@@ -2,7 +2,7 @@
   "expo": {
     "name": "ElderCareAI",
     "slug": "eldercare-ai",
-    "version": "1.3.4",
+    "version": "1.4.1",
     "orientation": "portrait",
     "scheme": "eldercareai",
     "icon": "./assets/images/eldercare-logo.png",

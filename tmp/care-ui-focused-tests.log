@@ -1,0 +1,12 @@
+PASS __tests__/notification-sounds.test.tsx (5.26 s)
+PASS __tests__/watch-sos-observer.test.tsx
+PASS __tests__/care-usability.test.ts
+PASS __tests__/monitoring-chart.test.tsx (9.264 s)
+PASS __tests__/care-images-analytics.test.tsx
+PASS __tests__/care-ui-updates.test.tsx
+
+Test Suites: 6 passed, 6 total
+Tests:       42 passed, 42 total
+Snapshots:   0 total
+Time:        24.604 s
+Ran all test suites matching /__tests__\\care-ui-updates.test.tsx|__tests__\\monitoring-chart.test.tsx|__tests__\\watch-sos-observer.test.tsx|__tests__\\notification-sounds.test.tsx|__tests__\\care-images-analytics.test.tsx|__tests__\\care-usability.test.ts/i.

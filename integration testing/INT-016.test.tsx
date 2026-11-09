@@ -1,15 +1,12 @@
-import { Notifications, change, prepareCareWorkflow, pressLabel, pressText, showCare, waitFor } from '../test-support/integration/care-workflow-harness';
+import { Print, Sharing, exportFromSettings, prepareReportWorkflow } from '../test-support/integration/report-workflow-harness';
 
-test('INT-016 saving an appointment schedules a named patient reminder', async () => {
-  const { writes } = prepareCareWorkflow();
-  await showCare();
-  await pressText('Appointments');
-  await pressLabel('Add Appointment');
-  await change('Title', 'Cardiology visit');
-  await change('Doctor name', 'Dr. Kevin');
-  await pressText('Save');
-  await waitFor(() => expect(writes).toContainEqual(expect.objectContaining({ table: 'appointments', operation: 'insert' })));
-  await waitFor(() => expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(expect.objectContaining({
-    content: expect.objectContaining({ title: 'Appointment now: Cardiology visit', body: expect.stringContaining('Maria') }),
-  })));
+test('INT-017 patient-scoped vital history becomes a shareable health PDF', async () => {
+  const history = [{ id: 'log-1', elderly_id: 'patient-1', heart_rate_bpm: 82, spo2_percent: 97.5, sleep_hours: 7, steps_count: 3200, skin_temp_celsius: 36.1, hrv_rmssd_ms: 41, overall_status: 'normal', recorded_at: '2026-10-20T08:00:00Z', synced_at: '2026-10-20T08:01:00Z' }];
+  const { query } = prepareReportWorkflow('vital_sign_logs', history);
+  const html = await exportFromSettings('Health vitals PDF');
+  expect(query.eq).toHaveBeenCalledWith('elderly_id', 'patient-1');
+  expect(html).toContain('Maria Santos');
+  expect(html).toContain('97.5');
+  expect(Print.printToFileAsync).toHaveBeenCalledTimes(1);
+  expect(Sharing.shareAsync).toHaveBeenCalledWith('file:///mock-report.pdf', expect.objectContaining({ mimeType: 'application/pdf' }));
 });

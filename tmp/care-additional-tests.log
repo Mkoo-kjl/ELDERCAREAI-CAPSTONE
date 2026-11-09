@@ -1,0 +1,8 @@
+PASS __tests__/notification-sounds.test.tsx
+PASS __tests__/care-images-analytics.test.tsx (14.022 s)
+
+Test Suites: 2 passed, 2 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        19.689 s
+Ran all test suites matching /__tests__\\care-images-analytics.test.tsx|__tests__\\notification-sounds.test.tsx/i.

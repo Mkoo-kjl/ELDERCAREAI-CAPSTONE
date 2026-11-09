@@ -22,7 +22,7 @@ jest.mock('expo-router', () => {
 jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
 jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({ session: mockSession }) }));
 jest.mock('@/src/providers/HealthDataProvider', () => ({ useHealthData: () => ({ elderly: mockElderly }) }));
-jest.mock('@/src/components/PickerModal', () => ({ PickerModal: () => null }));
+jest.mock('@/src/components/PickerModal', () => ({ PickerModal: ({visible,onChange,onClose}:any) => {const React=require('react');const {Pressable,Text}=require('react-native');return visible?React.createElement(Pressable,{onPress:()=>{const date=new Date();date.setHours(20,0,0,0);onChange(date);onClose();}},React.createElement(Text,null,'Choose 8:00 PM')):null;} }));
 jest.mock('@/src/hooks/useCareRefresh',()=>({useCareRefresh:jest.fn()}));
 jest.mock('@/src/lib/watch-push',()=>({isCarePushRegistered:jest.fn(async()=>false)}));
 jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn(),rpc:jest.fn() } }));

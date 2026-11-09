@@ -1,10 +1,13 @@
-import { medication, Notifications, prepareCareWorkflow, showCare, waitFor } from '../test-support/integration/care-workflow-harness';
+import { Notifications, change, prepareCareWorkflow, pressLabel, pressText, showCare, waitFor } from '../test-support/integration/care-workflow-harness';
 
-test('INT-012 loading a saved medication schedules its native reminder', async () => {
-  const { store } = prepareCareWorkflow({ medication_schedules: [medication] });
+test('INT-013 saving an as-needed medication stores it without a timed reminder', async () => {
+  const { writes } = prepareCareWorkflow();
   await showCare();
-  await waitFor(() => expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(expect.objectContaining({
-    content: expect.objectContaining({ body: 'Maria: Time for Losartan (50 mg).' }),
-  })));
-  expect(store.has('eldercare-notification:medication:med-1')).toBe(true);
+  await pressLabel('Add Medication');
+  await change('Medication name', 'Paracetamol');
+  await pressText('As needed');
+  await pressText('Save');
+  await waitFor(() => expect(writes).toContainEqual(expect.objectContaining({ table: 'medication_schedules', operation: 'insert' })));
+  expect(writes.find((row) => row.table === 'medication_schedules')?.payload.times_of_day).toEqual([]);
+  expect(Notifications.scheduleNotificationAsync).not.toHaveBeenCalled();
 });

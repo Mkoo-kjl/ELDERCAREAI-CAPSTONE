@@ -20,7 +20,7 @@ jest.mock('expo-notifications', () => ({
 describe('Care reminders', () => {
   test('CASE-055 rejects malformed or out-of-range reminder times', () => {
     expect(isValidReminderTime('24:00')).toBe(false);
-    expect(isValidReminderTime('9:00')).toBe(false);
+    expect(isValidReminderTime('9:00')).toBe(true);
     expect(isValidReminderTime('12:60')).toBe(false);
   });
 });

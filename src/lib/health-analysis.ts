@@ -1,3 +1,4 @@
+import {metricRecords} from './monitoring-records';
 import type { VitalLog } from '@/src/providers/HealthDataProvider';
 import {vitalReviewWarnings,VITAL_REVIEW_RULES} from '@/src/lib/vital-review';
 
@@ -15,13 +16,7 @@ export type AnalysisResult = {
 type NumericVitalKey = 'heart_rate_bpm' | 'spo2_percent' | 'sleep_hours' | 'steps_count' | 'skin_temp_celsius' | 'hrv_rmssd_ms';
 
 function series(history: VitalLog[], key: NumericVitalKey) {
-  const ordered = [...history].sort((a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime());
-  const values: number[] = [];
-  for (const row of ordered) {
-    const value = row[key];
-    if (typeof value === 'number' && Number.isFinite(value) && values.at(-1) !== value) values.push(value);
-  }
-  return values;
+  return metricRecords(history,key).map(point=>point.value);
 }
 
 function mean(values: number[]) { return values.reduce((sum, value) => sum + value, 0) / values.length; }
@@ -115,11 +110,11 @@ export function buildHealthPredictions(history: VitalLog[]): AnalysisResult[] {
     const direction = prediction.slope > definition.meaningfulSlope ? 'rising' : prediction.slope < -definition.meaningfulSlope ? 'falling' : 'stable';
     return [{
       id: definition.id, metric: definition.metric, title: definition.label,
-      body: `The short-term trend is ${direction}. A simple linear projection estimates the next comparable reading near ${format(prediction.forecast, definition.digits)} ${definition.unit}, based on ${prediction.samples} distinct readings.`,
+      body: `The short-term trend is ${direction}. A simple linear projection estimates the next comparable reading near ${format(prediction.forecast, definition.digits)} ${definition.unit}, based on ${prediction.samples} recorded readings.`,
       severity: 'info' as const, confidence: prediction.confidence,
     }];
   });
-  return results.length ? results : [{ id: 'prediction-waiting', title: 'Building personal trends', body: 'At least four distinct readings per metric are required before a statistical trend can be calculated.', severity: 'info', metric: 'data', confidence: 'Low' }];
+  return results.length ? results : [{ id: 'prediction-waiting', title: 'Building personal trends', body: 'At least four recorded readings per metric are required before a statistical trend can be calculated.', severity: 'info', metric: 'data', confidence: 'Low' }];
 }
 
 export function buildHealthAnomalies(history: VitalLog[]): AnalysisResult[] {
@@ -129,8 +124,8 @@ export function buildHealthAnomalies(history: VitalLog[]): AnalysisResult[] {
   if (!latest) return [{ id: 'anomaly-waiting', title: 'No readings to analyze', body: 'Start monitoring on Galaxy Watch before checking for anomalies.', severity: 'info', metric: 'data' }];
   const anomalies: AnalysisResult[] = [];
   const review=vitalReviewWarnings(latest);
-  if (latest.spo2_percent !== null && review.some(warning=>warning.metric==='spo2_percent')) anomalies.push({ id: 'low-spo2', title: 'Low SpO₂ threshold crossed', body: `The latest SpO₂ is ${latest.spo2_percent.toFixed(1)}%, below the app’s ${VITAL_REVIEW_RULES.oxygenLow}% review threshold. Confirm the wearable reading and consider appropriate medical guidance.`, severity: 'critical', metric: 'oxygen' });
-  if (latest.heart_rate_bpm !== null && review.some(warning=>warning.metric==='heart_rate_bpm')) anomalies.push({ id: 'heart-threshold', title: 'Heart-rate threshold crossed', body: `The latest heart rate is ${latest.heart_rate_bpm.toFixed(0)} bpm, outside the app’s ${VITAL_REVIEW_RULES.heartRateLow}–${VITAL_REVIEW_RULES.heartRateHigh} bpm review range. Context such as activity and symptoms matters.`, severity: 'critical', metric: 'heart' });
+  if (latest.spo2_percent !== null && review.some(warning=>warning.metric==='spo2_percent')) anomalies.push({ id: 'low-spo2', title: 'Low SpO₂ threshold crossed', body: `The latest SpO₂ is ${latest.spo2_percent.toFixed(1)}%, below the app’s ${VITAL_REVIEW_RULES.oxygenLow}% review threshold. Confirm the wearable reading and consider appropriate medical guidance.`, severity: latest.spo2_percent<=92?'critical':'warning', metric: 'oxygen' });
+  if (latest.heart_rate_bpm !== null && review.some(warning=>warning.metric==='heart_rate_bpm')) anomalies.push({ id: 'heart-threshold', title: 'Heart-rate threshold crossed', body: `The latest heart rate is ${latest.heart_rate_bpm.toFixed(0)} bpm, outside the app’s ${VITAL_REVIEW_RULES.heartRateLow}–${VITAL_REVIEW_RULES.heartRateHigh} bpm review range. Context such as activity and symptoms matters.`, severity: 'warning', metric: 'heart' });
   if (latest.sleep_hours !== null && latest.sleep_hours < 5) anomalies.push({ id: 'short-sleep', title: 'Very short recorded sleep', body: `The latest synchronized sleep duration is ${latest.sleep_hours.toFixed(1)} hours.`, severity: 'warning', metric: 'sleep' });
 
 

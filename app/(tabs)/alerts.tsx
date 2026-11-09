@@ -1,9 +1,12 @@
+import {AutomaticVitalAlerts} from '@/src/components/AutomaticVitalAlerts';
+import {RelatedMedications} from '@/src/components/RelatedMedications';
+import {EmergencyContacts} from '@/src/components/EmergencyContacts';
 import { Ionicons } from '@expo/vector-icons';
 import { useAudioPlayer } from 'expo-audio';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Linking, Pressable, ScrollView, StyleSheet, useColorScheme, Vibration, View } from 'react-native';
+import { Alert, Animated, Pressable, ScrollView, StyleSheet, useColorScheme, Vibration, View } from 'react-native';
 
 import { AppText as Text } from '@/src/components/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,13 +19,11 @@ import { getTheme, palette } from '@/src/theme/colors';
 import { fontFamily, typeScale } from '@/src/theme/typography';
 import {useCareRefresh} from '@/src/hooks/useCareRefresh';
 import {registerCarePush} from '@/src/lib/watch-push';
-import {openHealthSoundSettings} from '@/src/lib/notifications';
-import {VITAL_REVIEW_RULES} from '@/src/lib/vital-review';
 import {alertResponseStatus} from '@/src/lib/care-workflow';
 import {FeatureButton,FeatureMessage,FeatureStatus} from '@/src/components/CareFeature';
 
 type ViewTab = 'Alerts' | 'Notifications' | 'Emergency';
-type HealthAlert = { id: string; severity: string; title: string; message: string; is_read: boolean; is_resolved: boolean; triggered_at: string; acknowledged_at:string|null;emergency_event_id?:string|null };
+type HealthAlert = { id: string; alert_type?:string; severity: string; title: string; message: string; is_read: boolean; is_resolved: boolean; triggered_at: string; acknowledged_at:string|null;emergency_event_id?:string|null };
 type Notification = { id: string; title: string; body: string; is_read: boolean; sent_at: string; delivery_status: string;alert_id?:string;data?:{watch_sos_id?:string;emergency_event_id?:string} };
 type Emergency = { id: string; event_type: string; severity: string; description: string | null; is_resolved: boolean; triggered_at: string };
 
@@ -32,6 +33,7 @@ export default function AlertsScreen() {
   const theme = getTheme(useColorScheme() === 'dark');
   const { session } = useAuth();
   const { elderly, vital } = useHealthData();
+  const [contactRequest,setContactRequest]=useState(0);
   const [tab, setTab] = useState<ViewTab>('Alerts');
   const [alerts, setAlerts] = useState<HealthAlert[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -93,14 +95,14 @@ export default function AlertsScreen() {
       });
       if (notificationError) throw notificationError;
       await load();
-      if (elderly.emergency_contact_phone) await Linking.openURL(`tel:${elderly.emergency_contact_phone.replace(/[^+\d]/g, '')}`);
-      else Alert.alert('Emergency logged', 'No emergency contact phone is saved. Add one in the older adult profile.');
+      setTab('Emergency');
+      setContactRequest(value=>value+1);
     } catch (error) {
       Alert.alert('SOS could not complete', error instanceof Error ? error.message : 'Please call emergency services directly.');
     } finally { setLoadingSos(false); }
   };
 
-  const confirmSos = () => Alert.alert('Activate SOS?', 'This logs an emergency event and calls the saved emergency contact. It is not a replacement for local emergency services.', [
+  const confirmSos = () => Alert.alert('Activate SOS?', 'This logs an emergency event. You can then choose the caregiver, family member or doctor to call. It is not a replacement for local emergency services.', [
     { text: 'Cancel', style: 'cancel' }, { text: 'Activate SOS', style: 'destructive', onPress: () => void triggerSos() },
   ]);
 
@@ -141,14 +143,8 @@ export default function AlertsScreen() {
   return <View style={[styles.screen, { backgroundColor: theme.background, paddingTop: insets.top }]}> 
     <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 90 }}>
       <View style={styles.header}><Text style={[styles.title, { color: theme.text }]}>Alerts</Text><Text style={[styles.subtitle, { color: theme.subtitle }]}>Updates and emergency history</Text></View>
-      <View style={[styles.card,{backgroundColor:theme.cardElevated,marginHorizontal:18}]}>
-        <Text style={[styles.cardTitle,{color:theme.text}]}>Automatic vital alerts</Text>
-        <Text style={[styles.cardBody,{color:theme.subtitle}]}>Heart rate: below {VITAL_REVIEW_RULES.heartRateLow} or above {VITAL_REVIEW_RULES.heartRateHigh} BPM. SpO₂: below {VITAL_REVIEW_RULES.oxygenLow}%. Sleep: a recorded session below {VITAL_REVIEW_RULES.sleepHoursLow} hours. Wrist skin temperature: a change of at least {VITAL_REVIEW_RULES.skinTemperatureChangeC}°C and {VITAL_REVIEW_RULES.skinTemperatureStandardDeviations} standard deviations after at least {VITAL_REVIEW_RULES.skinTemperatureMinimumReferences} recent same-watch readings. Skin temperature is not core temperature. These are app review rules, not medical limits.</Text>
-        <Text style={[styles.cardBody,{color:theme.subtitle}]}>New qualifying readings create a saved alert and notification. HRV/stress and steps have no automatic threshold because this app has no validated or personalized rule for them. Sleep and skin readings alert after they sync.</Text>
-        <Pressable accessibilityRole="button" style={styles.secondary} onPress={()=>void openHealthSoundSettings().catch(()=>Alert.alert('Sound settings','Open Android Settings → Apps → ElderCareAI → Notifications → Health reading warnings.'))}><Text style={styles.secondaryText}>Health alert sound settings</Text></Pressable>
-        <Text style={[styles.cardBody,{color:theme.subtitle}]}>Keep notification volume on for background alerts and media volume on for alerts while the app is open.</Text>
-      </View>
-      <View style={styles.sosArea}><Animated.View style={{ transform: [{ scale }] }}><Pressable disabled={loadingSos} onPress={confirmSos}><LinearGradient colors={[palette.error, '#DC2626']} style={styles.sos}><Ionicons name="call" size={39} color="#FFFFFF" /><Text style={styles.sosText}>SOS</Text></LinearGradient></Pressable></Animated.View><Text style={[styles.sosHelp, { color: theme.subtitle }]}>Tap to confirm, log, and call {elderly?.emergency_contact ?? 'the emergency contact'}</Text><Pressable accessibilityRole="button" style={styles.secondary} onPress={()=>{if(session)void registerCarePush(session.user.id).then(()=>Alert.alert('Background notifications enabled','This phone is registered for watch SOS, vital alerts, medication reminders and appointment reminders when ElderCareAI is closed. Delivery needs internet and allowed notifications.')).catch(error=>Alert.alert('Background notifications setup',error.message));}}><Text style={styles.secondaryText}>Enable background notifications</Text></Pressable><Text style={[styles.sosHelp,{color:theme.subtitle}]}>Enable once on each caregiver phone. Background delivery needs the Firebase-enabled APK, notification permission and internet access.</Text></View>
+      <AutomaticVitalAlerts/>
+      <View style={{paddingHorizontal:18,paddingTop:12}}><EmergencyContacts openRequest={contactRequest}/></View><View style={styles.sosArea}><Animated.View style={{ transform: [{ scale }] }}><Pressable disabled={loadingSos} onPress={confirmSos}><LinearGradient colors={[palette.error, '#DC2626']} style={styles.sos}><Ionicons name="call" size={39} color="#FFFFFF" /><Text style={styles.sosText}>SOS</Text></LinearGradient></Pressable></Animated.View><Text style={[styles.sosHelp, { color: theme.subtitle }]}>Tap to confirm SOS, then choose a priority contact</Text><Pressable accessibilityRole="button" style={styles.secondary} onPress={()=>{if(session)void registerCarePush(session.user.id).then(()=>Alert.alert('Background notifications enabled','This phone is registered for watch SOS, vital alerts, medication reminders and appointment reminders when ElderCareAI is closed. Delivery needs internet and allowed notifications.')).catch(error=>Alert.alert('Background notifications setup',error.message));}}><Text style={styles.secondaryText}>Enable background notifications</Text></Pressable><Text style={[styles.sosHelp,{color:theme.subtitle}]}>Enable once on each caregiver phone. Background delivery needs the Firebase-enabled APK, notification permission and internet access.</Text></View>
       <View style={styles.tabs}>{(['Alerts', 'Notifications', 'Emergency'] as ViewTab[]).map((item) => <Pressable key={item} onPress={() => setTab(item)} style={[styles.tab, { backgroundColor: tab === item ? palette.aquaSurface : theme.cardElevated, borderColor: tab === item ? palette.aquaSurface : theme.border }]}><Text style={[styles.tabText, { color: tab === item ? palette.text : theme.subtitle }]}>{item}</Text>{item === 'Notifications' && notifications.some((n) => !n.is_read) ? <View style={styles.unreadDot} /> : null}</Pressable>)}</View>
       <View style={styles.content}>{loading?<FeatureMessage loading message="Loading alerts…"/>:null}{loadError?<><FeatureMessage error message={loadError}/><FeatureButton secondary label="Retry alerts" onPress={()=>void load()}/></>:null}
         {tab === 'Alerts' ? <><View style={styles.actionRow}><Text style={[styles.count, { color: theme.subtitle }]}>{alerts.length} alerts</Text>{alerts.length ? <Pressable onPress={() => void markAllRead()}><Text style={styles.clear}>Mark all read</Text></Pressable> : null}</View>
@@ -163,7 +159,7 @@ export default function AlertsScreen() {
 
 function severityColor(severity: string) { return severity === 'critical' ? palette.error : severity === 'high' || severity === 'warning' ? palette.warning : severity === 'medium' ? palette.primaryDark : palette.accentDark; }
 function Badge({ label, color }: { label: string; color: string }) { return <View style={[styles.badge, { backgroundColor: `${color}18` }]}><Text style={[styles.badgeText, { color }]}>{label}</Text></View>; }
-function AlertCard({ item, onRead, onReview }: { item: HealthAlert; onRead: () => void; onReview: () => void }) { const theme = getTheme(useColorScheme() === 'dark'); const color = severityColor(item.severity); return <View style={[styles.card, { backgroundColor: theme.cardElevated }]}><View style={styles.cardHeader}><Text style={[styles.cardTitle, { color: theme.text }]}>{item.title}</Text><Badge label={item.severity.toUpperCase()} color={color} /></View><Text style={[styles.cardBody, { color: theme.subtitle }]}>{item.message}</Text><Text style={[styles.time, { color: theme.subtitle }]}>{formatDateTime(item.triggered_at)}</Text><View style={{marginTop:8}}><FeatureStatus label={alertResponseStatus(item)} color={item.is_resolved?palette.accentDark:item.acknowledged_at?palette.primaryDark:palette.warning}/></View><View style={styles.buttons}>{!item.is_read ? <Pressable onPress={onRead} style={styles.secondary}><Text style={styles.secondaryText}>Mark Read</Text></Pressable> : null}<Pressable accessibilityRole="button" accessibilityLabel={`Review response: ${item.title}`} onPress={onReview} style={styles.secondary}><Text style={styles.secondaryText}>{item.is_resolved?'View response':'Review and respond'}</Text></Pressable></View></View>; }
+function AlertCard({ item, onRead, onReview }: { item: HealthAlert; onRead: () => void; onReview: () => void }) { const theme = getTheme(useColorScheme() === 'dark'); const color = severityColor(item.severity); return <View style={[styles.card, { backgroundColor: theme.cardElevated }]}><View style={styles.cardHeader}><Text style={[styles.cardTitle, { color: theme.text }]}>{item.title}</Text><Badge label={item.severity.toUpperCase()} color={color} /></View><Text style={[styles.cardBody, { color: theme.subtitle }]}>{item.message}</Text><Text style={[styles.time, { color: theme.subtitle }]}>{formatDateTime(item.triggered_at)}</Text><View style={{marginTop:8}}><FeatureStatus label={alertResponseStatus(item)} color={item.is_resolved?palette.accentDark:item.acknowledged_at?palette.primaryDark:palette.warning}/></View><RelatedMedications rule={item.alert_type}/><View style={styles.buttons}>{!item.is_read ? <Pressable onPress={onRead} style={styles.secondary}><Text style={styles.secondaryText}>Mark Read</Text></Pressable> : null}<Pressable accessibilityRole="button" accessibilityLabel={`Review response: ${item.title}`} onPress={onReview} style={styles.secondary}><Text style={styles.secondaryText}>{item.is_resolved?'View response':'Review and respond'}</Text></Pressable></View></View>; }
 function Empty({ text }: { text: string }) { const theme = getTheme(useColorScheme() === 'dark'); return <View style={styles.empty}><Ionicons name="checkmark-circle-outline" size={36} color={palette.accent} /><Text style={[styles.emptyText, { color: theme.subtitle }]}>{text}</Text></View>; }
 
 const styles = StyleSheet.create({
