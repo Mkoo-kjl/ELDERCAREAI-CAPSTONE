@@ -60,12 +60,13 @@ beforeEach(() => {
 });
 
 describe('Caregiver profile setup', () => {
-  test('CASE-017 valid caregiver saves and advances to patient setup', async () => {
+  test('CASE-017 missing required details show field errors without saving', async () => {
     await render(<CaregiverSetupScreen />);
-    await fillValidForm();
     await fireEvent.press(screen.getByText('Next'));
-    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/setup/elderly'));
-    expect(mockUpsert).toHaveBeenCalledTimes(2);
-    expect(mockRefreshOnboarding).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Enter the caregiver’s full name.')).toBeTruthy();
+    expect(screen.getByText('Enter a valid phone number.')).toBeTruthy();
+    expect(screen.getByText('Age must be between 18 and 120.')).toBeTruthy();
+    expect(screen.getByText('Select a sex or gender.')).toBeTruthy();
+    expect(mockUpsert).not.toHaveBeenCalled();
   });
 });

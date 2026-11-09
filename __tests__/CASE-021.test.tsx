@@ -60,16 +60,14 @@ async function fillValidPatient() {
 }
 
 describe('Older-adult profile setup', () => {
-  test('CASE-021 birth date is selected from the calendar and determines age', async () => {
+  test('CASE-021 implausible weight and height block save', async () => {
     await render(<ElderlySetupScreen />);
     await fillValidPatient();
-    await fireEvent.press(screen.getByLabelText('Choose date of birth'));
-    const chosen = new Date(new Date().getFullYear() - 75, new Date().getMonth(), 1);
-    const label = chosen.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    await fireEvent.press(screen.getByLabelText(label));
-    await fireEvent.press(screen.getByLabelText('Done choosing date and time'));
+    await fireEvent.changeText(screen.getByLabelText('Weight (kg)'), '0');
+    await fireEvent.changeText(screen.getByLabelText('Height (cm)'), '300');
     await fireEvent.press(screen.getByText('Save profile'));
-    const dateOfBirth = `${chosen.getFullYear()}-${String(chosen.getMonth() + 1).padStart(2, '0')}-01`;
-    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ date_of_birth: dateOfBirth, age: 75 }));
+    expect(screen.getByText('Enter a weight between 1 and 500 kg.')).toBeTruthy();
+    expect(screen.getByText('Enter a height between 30 and 250 cm.')).toBeTruthy();
+    expect(mockInsert).not.toHaveBeenCalled();
   });
 });

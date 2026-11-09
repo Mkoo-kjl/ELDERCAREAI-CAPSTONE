@@ -15,7 +15,7 @@ const completed: OnboardingProgress = {
 };
 
 describe('Onboarding route', () => {
-  test('CASE-007 incomplete patient details return to elderly setup', () => {
-    expect(getPostAuthRoute({ ...completed, elderly_completed_at: null })).toBe('/setup/elderly');
+  test('CASE-007 new caregiver starts with introduction', () => {
+    expect(getPostAuthRoute(null)).toBe('/setup/intro');
   });
 });

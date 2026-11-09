@@ -1,14 +1,43 @@
-import { waitFor } from '@testing-library/react-native';
-import { from, medicationPdf, patient, prepareReportCase, pressReport } from '../test-support/profile-report-case-harness';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
-test('CASE-069 saved medication schedule is scoped and passed to the PDF exporter', async () => {
-  const medications = [{ medication_name: 'Aspirin', dosage: '81 mg', frequency: 'daily', is_active: true }];
-  const query = prepareReportCase({ data: medications });
-  await pressReport('Medication schedule PDF');
-  await waitFor(() => expect(medicationPdf).toHaveBeenCalledWith({ patient, caregiverName: 'Caregiver', medications }));
-  expect(from).toHaveBeenCalledWith('medication_schedules');
-  expect(query.eq).toHaveBeenCalledWith('caregiver_id', 'caregiver-1');
-  expect(query.eq).toHaveBeenCalledWith('elderly_id', 'patient-1');
-  expect(query.order).toHaveBeenNthCalledWith(1, 'is_active', { ascending: false });
-  expect(query.order).toHaveBeenNthCalledWith(2, 'medication_name');
+import ProfileScreen from '@/app/(tabs)/profile';
+import { supabase } from '@/src/lib/supabase';
+
+const mockUpsert = jest.fn();
+
+jest.mock('expo-router', () => ({ useFocusEffect: jest.fn(), useRouter: () => ({ push: jest.fn() }) }));
+jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
+jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({ session: { user: { id: 'caregiver-1', email: 'alex@example.com' } }, onboarding: { wearable_status: 'connected', paired_device_count: 1 }, refreshOnboarding: jest.fn(), signOut: jest.fn() }) }));
+jest.mock('@/src/providers/HealthDataProvider', () => ({ useHealthData: () => ({ elderly: { elderly_id: 'patient-1', full_name: 'Maria', photo_url: null }, refresh: jest.fn() }) }));
+jest.mock('@/src/providers/ThemePreferenceProvider', () => ({ useThemePreference: () => ({ isDark: false, toggleDarkMode: jest.fn() }) }));
+jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn(), functions: { invoke: jest.fn() } } }));
+jest.mock('@/src/lib/notifications', () => ({ hasNotificationPermission: jest.fn().mockResolvedValue(false), ensureNotificationPermission: jest.fn().mockResolvedValue(false) }));
+jest.mock('@/src/lib/pdf-reports', () => ({ exportHealthReportPdf: jest.fn(), exportMedicationReportPdf: jest.fn() }));
+jest.mock('@/src/components/ProfilePhotoPicker', () => ({ ProfilePhotoPicker: () => null }));
+jest.mock('@/src/components/GradientButton', () => {
+  const React = require('react');
+  const { Pressable, Text } = require('react-native');
+  return { GradientButton: ({ label, onPress }: { label: string; onPress: () => void }) => React.createElement(Pressable, { onPress }, React.createElement(Text, null, label)) };
+});
+
+beforeEach(() => {
+  (supabase.from as jest.Mock).mockImplementation(() => ({ upsert: mockUpsert }));
+  mockUpsert.mockReturnValue({ select: () => ({ single: async () => ({ data: { id: 'doctor-1', full_name: 'Dr. Kevin', phone: '+639171234567', photo_url: null }, error: null }) }) });
+  jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+});
+afterEach(() => jest.restoreAllMocks());
+
+async function openDoctor() {
+  await fireEvent.press(screen.getByText('Add'));
+}
+
+describe('Saved doctor contact', () => {
+  test('CASE-069 missing doctor name blocks save', async () => {
+    await render(<ProfileScreen />);
+    await openDoctor();
+    await fireEvent.press(screen.getByText('Save doctor'));
+    expect(Alert.alert).toHaveBeenCalledWith('Doctor name needed', 'Enter the doctor’s full name.');
+    expect(mockUpsert).not.toHaveBeenCalled();
+  });
 });

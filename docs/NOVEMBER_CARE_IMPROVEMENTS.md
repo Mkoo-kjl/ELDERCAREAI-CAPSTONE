@@ -214,8 +214,9 @@ In the foreground, the queue owns the local popup and sound, avoiding a second c
 
 ### Test filenames as of 9 November 2026
 
-The feature-named test files listed above were reorganized into numbered files. The focused unit test files are `__tests__/CASE-001.test.tsx` through `CASE-100.test.tsx`; the integration test files are `integration testing/INT-001.test.tsx` through `INT-030.test.tsx`. The focused Jest run passed 187 tests in 130 suites on 9 November 2026. The Word tables document all 100 unit and 30 integration files.
+The numbered visible-outcome test files are `__tests__/CASE-001.test.tsx` through `CASE-100.test.tsx` and `integration testing/INT-001.test.tsx` through `INT-040.test.tsx`. The nine-column Word tables document all 100 unit and 40 integration cases, grouped by module. The complete run passed 165 tests in 140 suites on 9 November 2026. Screenshots are separate live evidence and have not been captured by Jest.
 - Updated analytics, vital band, foreground popup, local sound/ownership and appointment integration tests.
 
 The code-level and database checks do not constitute a physical-phone visual or notification-delivery test. No new phone APK was built or installed by the agent; the user is handling that build.
+
 

@@ -1,42 +1,27 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { buildHealthAnomalies, buildHealthInsights, buildHealthPredictions } from '@/src/lib/health-analysis';
+import type { VitalLog } from '@/src/providers/HealthDataProvider';
 
-import ChatbotScreen from '@/app/(tabs)/chatbot';
-import { supabase } from '@/src/lib/supabase';
-
-const mockPush = jest.fn();
-const mockSessionInsert = jest.fn();
-const mockSessionUpdate = jest.fn();
-const mockMessageInsert = jest.fn();
-const mockInvoke = jest.fn();
-
-jest.mock('expo-router', () => ({ useRouter: () => ({ push: mockPush }) }));
-jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
-jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({ session: { user: { id: 'caregiver-1' } } }) }));
-jest.mock('@/src/providers/HealthDataProvider', () => ({ useHealthData: () => ({ elderly: { elderly_id: 'patient-1', full_name: 'Maria' }, vital: null }) }));
-jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn(), functions: { invoke: jest.fn() } } }));
-
-beforeEach(() => {
-  (supabase.from as jest.Mock).mockImplementation((table: string) => table === 'ai_chatbot_sessions'
-    ? { insert: mockSessionInsert, update: mockSessionUpdate }
-    : { insert: mockMessageInsert });
-  (supabase.functions.invoke as jest.Mock).mockImplementation(mockInvoke);
-  mockSessionInsert.mockReturnValue({ select: () => ({ single: async () => ({ data: { id: 'session-1' }, error: null }) }) });
-  mockSessionUpdate.mockReturnValue({ eq: async () => ({ error: null }) });
-  mockMessageInsert.mockResolvedValue({ error: null });
-  mockInvoke.mockResolvedValue({ data: { reply: 'Maria slept 7 hours in the latest patient reading.', emotion: 'happy' }, error: null });
-  jest.spyOn(console, 'warn').mockImplementation(() => undefined);
-});
-
-afterEach(() => jest.restoreAllMocks());
-
-async function sendQuestion(question: string) {
-  await fireEvent.changeText(screen.getByPlaceholderText('Ask about health or care…'), question);
-  await fireEvent.press(screen.getByLabelText('Send message'));
+function reading(index: number, fields: Partial<VitalLog> = {}): VitalLog {
+  return {
+    id: `reading-${index}`,
+    elderly_id: 'patient-1',
+    heart_rate_bpm: null,
+    spo2_percent: null,
+    hrv_rmssd_ms: null,
+    skin_temp_celsius: null,
+    steps_count: null,
+    sleep_hours: null,
+    overall_status: null,
+    ai_risk_score: null,
+    source: 'google-health',
+    recorded_at: new Date(2026, 9, index + 1).toISOString(),
+    synced_at: null,
+    ...fields,
+  };
 }
 
-describe('Elle caregiver assistant', () => {
-  test('CASE-036 shows the non-medical assistant disclaimer', async () => {
-    await render(<ChatbotScreen />);
-    expect(screen.getByText(/not a medical-grade AI/)).toBeTruthy();
+describe('Health analysis', () => {
+  test('CASE-036 empty history shows a waiting insight', () => {
+    expect(buildHealthInsights([])[0].id).toBe('waiting');
   });
 });

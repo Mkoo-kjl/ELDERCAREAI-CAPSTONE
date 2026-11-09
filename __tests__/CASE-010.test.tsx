@@ -15,7 +15,7 @@ const completed: OnboardingProgress = {
 };
 
 describe('Onboarding route', () => {
-  test('CASE-010 completed onboarding opens home', () => {
-    expect(getPostAuthRoute(completed)).toBe('/home');
+  test('CASE-010 incomplete wearable step returns to fitness setup', () => {
+    expect(getPostAuthRoute({ ...completed, wearable_completed_at: null })).toBe('/setup/fitness');
   });
 });

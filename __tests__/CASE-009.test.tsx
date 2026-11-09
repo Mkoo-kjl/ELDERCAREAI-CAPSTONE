@@ -15,7 +15,7 @@ const completed: OnboardingProgress = {
 };
 
 describe('Onboarding route', () => {
-  test('CASE-009 missing location consent prevents home access', () => {
-    expect(getPostAuthRoute({ ...completed, location_consent_at: null })).toBe('/setup/location');
+  test('CASE-009 incomplete patient details return to elderly setup', () => {
+    expect(getPostAuthRoute({ ...completed, elderly_completed_at: null })).toBe('/setup/elderly');
   });
 });

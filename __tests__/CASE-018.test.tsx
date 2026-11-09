@@ -60,14 +60,12 @@ beforeEach(() => {
 });
 
 describe('Caregiver profile setup', () => {
-  test('CASE-018 database failure shows an error and does not advance', async () => {
-    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
-    mockUpsert.mockResolvedValueOnce({ error: { message: 'Save unavailable' } });
+  test('CASE-018 invalid phone blocks caregiver profile save', async () => {
     await render(<CaregiverSetupScreen />);
     await fillValidForm();
+    await fireEvent.changeText(screen.getByLabelText('Phone'), '12');
     await fireEvent.press(screen.getByText('Next'));
-    await waitFor(() => expect(alert).toHaveBeenCalledWith('Unable to save', 'Caregiver profile save failed: Save unavailable'));
-    expect(mockReplace).not.toHaveBeenCalled();
-    alert.mockRestore();
+    expect(screen.getByText('Enter a valid phone number.')).toBeTruthy();
+    expect(mockUpsert).not.toHaveBeenCalled();
   });
 });

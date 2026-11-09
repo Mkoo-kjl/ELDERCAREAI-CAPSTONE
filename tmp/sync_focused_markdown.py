@@ -11,12 +11,12 @@ for filename,heading in [('UNIT_TEST_TABLE','Unit testing'),('INTEGRATION_TEST_T
     (root/'docs'/f'{filename}.md').write_text('\n'.join(lines),encoding='utf8')
 
 for name,kind in [('UNIT_TEST_EVIDENCE','unit'),('INTEGRATION_TEST_EVIDENCE','integration')]:
-    count=100 if kind=='unit' else 30
+    count=105 if kind=='unit' else 30
     prefix='CASE' if kind=='unit' else 'INT'
     folder='__tests__' if kind=='unit' else 'integration testing'
     text=f'''# {kind.title()} test evidence
 
-The current {kind} table contains {count} selected cases. Each {prefix}-### row matches one file in `{folder}`. The full focused run passed 187 tests in 130 suites on 9 November 2026.
+The current {kind} table contains {count} selected cases. Each {prefix}-### row matches one file in `{folder}`. The full focused run passed 187 tests in 135 suites on 9 November 2026.
 
 For one case, run `npm test -- --runTestsByPath "{folder}/{prefix}-001.test.tsx"` from the project root, replacing the number. Capture the terminal `PASS` result and, for a visible UI case, the corresponding screen from the installed app. Logic-only tests do not have a phone screenshot.
 

@@ -1,15 +1,8 @@
-import { Notifications, change, prepareCareWorkflow, pressLabel, pressText, showCare, waitFor } from '../test-support/integration/care-workflow-harness';
+import { medication, prepareCareWorkflow, showCare } from '../test-support/integration/care-workflow-harness';
 
-test('INT-016 saving an appointment schedules a named patient reminder', async () => {
-  const { writes } = prepareCareWorkflow();
-  await showCare();
-  await pressText('Appointments');
-  await pressLabel('Add Appointment');
-  await change('Title', 'Cardiology visit');
-  await change('Doctor name', 'Dr. Kevin');
-  await pressText('Save');
-  await waitFor(() => expect(writes).toContainEqual(expect.objectContaining({ table: 'appointments', operation: 'insert' })));
-  await waitFor(() => expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(expect.objectContaining({
-    content: expect.objectContaining({ title: 'Appointment now: Cardiology visit', body: expect.stringContaining('Maria') }),
-  })));
+test('INT-015 saved medication schedule reaches the Care plan status view', async () => {
+  prepareCareWorkflow({ medication_schedules: [{ ...medication, frequency: 'As needed', times_of_day: [] }] });
+  const screen = await showCare();
+  expect(await screen.findByText('Losartan')).toBeTruthy();
+  expect(screen.getByText('As needed')).toBeTruthy();
 });

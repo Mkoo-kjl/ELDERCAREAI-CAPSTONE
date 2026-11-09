@@ -1,14 +1,21 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { StyleSheet } from 'react-native';
+import { getPostAuthRoute } from '@/src/lib/onboarding-route';
+import type { OnboardingProgress } from '@/src/providers/AuthProvider';
 
-import { ChoiceChips } from '@/src/components/ChoiceChips';
-import { FormField } from '@/src/components/FormField';
-import { MetricCard } from '@/src/components/MetricCard';
+const completed: OnboardingProgress = {
+  user_id: 'caregiver-1',
+  intro_completed_at: '2026-10-07T00:00:00Z',
+  caregiver_completed_at: '2026-10-07T00:00:00Z',
+  elderly_completed_at: '2026-10-07T00:00:00Z',
+  wearable_status: 'connected',
+  paired_device_count: 1,
+  wearable_completed_at: '2026-10-07T00:00:00Z',
+  location_permission: 'granted',
+  location_consent_at: '2026-10-07T00:00:00Z',
+  completed_at: '2026-10-07T00:00:00Z',
+};
 
-describe('Care UI components', () => {
-  test('CASE-012 authenticated email field cannot be edited', async () => {
-    const change = jest.fn();
-    await render(<FormField label="Authenticated email" value="caregiver@example.com" editable={false} onChangeText={change} />);
-    expect(screen.getByLabelText('Authenticated email').props.editable).toBe(false);
+describe('Onboarding route', () => {
+  test('CASE-012 completed onboarding opens home', () => {
+    expect(getPostAuthRoute(completed)).toBe('/home');
   });
 });

@@ -60,14 +60,12 @@ async function fillValidPatient() {
 }
 
 describe('Older-adult profile setup', () => {
-  test('CASE-024 failed patient save reports an error without advancing', async () => {
-    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
-    mockInsert.mockResolvedValueOnce({ error: { message: 'Database unavailable' } });
+  test('CASE-024 valid patient saves and advances to wearable setup', async () => {
     await render(<ElderlySetupScreen />);
     await fillValidPatient();
     await fireEvent.press(screen.getByText('Save profile'));
-    await waitFor(() => expect(alert).toHaveBeenCalledWith('Unable to save', 'Older adult profile save failed: Database unavailable'));
-    expect(mockReplace).not.toHaveBeenCalled();
-    alert.mockRestore();
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/setup/fitness'));
+    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ full_name: 'Maria Santos', age: 78, blood_type: 'O+' }));
+    expect(mockUpsert).toHaveBeenCalledTimes(1);
   });
 });

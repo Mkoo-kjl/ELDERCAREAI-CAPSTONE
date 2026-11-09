@@ -1,6 +1,6 @@
 import { reading, showHealth } from '../test-support/integration/health-screen-harness';
 
-test('INT-007 four distinct readings produce a Health trend projection', async () => {
-  const screen = await showHealth([reading(4), reading(3), reading(2), reading(1)], 'Predictions');
-  expect(screen.getByText('Heart-rate trend projection')).toBeTruthy();
+test('INT-007 insufficient synchronized history keeps Health predictions pending', async () => {
+  const screen = await showHealth([reading(2), reading(1)], 'Predictions');
+  expect(screen.getByText('Building personal trends')).toBeTruthy();
 });

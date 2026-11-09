@@ -1,12 +1,13 @@
-import { Sharing, exportFromSettings, prepareReportWorkflow } from '../test-support/integration/report-workflow-harness';
+import { Notifications, change, prepareCareWorkflow, pressLabel, pressText, showCare, waitFor } from '../test-support/integration/care-workflow-harness';
 
-test('INT-018 patient medication schedule becomes a shareable medication PDF', async () => {
-  const medications = [{ medication_name: 'Losartan', dosage: '50 mg', form: 'tablet', frequency: 'Daily', times_of_day: ['08:00'], start_date: '2026-10-01', end_date: null, instructions: 'After breakfast', prescribed_by: 'Dr. Kevin', is_active: true }];
-  const { query } = prepareReportWorkflow('medication_schedules', medications);
-  const html = await exportFromSettings('Medication schedule PDF');
-  expect(query.eq).toHaveBeenCalledWith('caregiver_id', 'caregiver-1');
-  expect(query.eq).toHaveBeenCalledWith('elderly_id', 'patient-1');
-  expect(html).toContain('Losartan');
-  expect(html).toContain('After breakfast');
-  expect(Sharing.shareAsync).toHaveBeenCalledTimes(1);
+test('INT-017 saving an as-needed medication stores it without a timed reminder', async () => {
+  const { writes } = prepareCareWorkflow();
+  await showCare();
+  await pressLabel('Add Medication');
+  await change('Medication name', 'Paracetamol');
+  await pressText('As needed');
+  await pressText('Save');
+  await waitFor(() => expect(writes).toContainEqual(expect.objectContaining({ table: 'medication_schedules', operation: 'insert' })));
+  expect(writes.find((row) => row.table === 'medication_schedules')?.payload.times_of_day).toEqual([]);
+  expect(Notifications.scheduleNotificationAsync).not.toHaveBeenCalled();
 });

@@ -60,12 +60,12 @@ async function fillValidPatient() {
 }
 
 describe('Older-adult profile setup', () => {
-  test('CASE-023 valid patient saves and advances to wearable setup', async () => {
+  test('CASE-023 invalid emergency phone blocks save', async () => {
     await render(<ElderlySetupScreen />);
     await fillValidPatient();
+    await fireEvent.changeText(screen.getByLabelText('Emergency contact phone'), '123');
     await fireEvent.press(screen.getByText('Save profile'));
-    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/setup/fitness'));
-    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ full_name: 'Maria Santos', age: 78, blood_type: 'O+' }));
-    expect(mockUpsert).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Enter a valid emergency phone number.')).toBeTruthy();
+    expect(mockInsert).not.toHaveBeenCalled();
   });
 });

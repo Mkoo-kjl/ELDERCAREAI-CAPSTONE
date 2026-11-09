@@ -1,6 +1,6 @@
 import { reading, showHealth } from '../test-support/integration/health-screen-harness';
 
-test('INT-006 insufficient synchronized history keeps Health predictions pending', async () => {
-  const screen = await showHealth([reading(2), reading(1)], 'Predictions');
-  expect(screen.getByText('Building personal trends')).toBeTruthy();
+test('INT-006 low oxygen reaches the Health insight card', async () => {
+  const screen = await showHealth([reading(1, { spo2_percent: 92 })], 'AI Insights');
+  expect(screen.getByText('Critical · Recheck now')).toBeTruthy();
 });

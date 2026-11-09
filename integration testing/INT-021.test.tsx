@@ -1,10 +1,14 @@
-import { prepareChatWorkflow, sendChatQuestion, waitFor } from '../test-support/integration/chat-workflow-harness';
-import { fireEvent } from '@testing-library/react-native';
+import {prepareCareWorkflow,pressText,showCare} from '../test-support/integration/care-workflow-harness';
 
-test('INT-024 Elle medication advice links into the Care medication tab', async () => {
-  const { push } = prepareChatWorkflow({ data: { reply: 'Check Maria’s medication schedule before the next dose.', emotion: 'happy' }, error: null });
-  const screen = await sendChatQuestion('What medication is due?');
-  await waitFor(() => expect(screen.getByText('Open Meds')).toBeTruthy());
-  await fireEvent.press(screen.getByText('Open Meds'));
-  expect(push).toHaveBeenCalledWith('/care?tab=Medications');
+test('schedule orders appointments by date and time and distinguishes completed activities',async()=>{
+  const nextDay=Date.now()+86400000;
+  prepareCareWorkflow({appointments:[
+    {id:'later',elderly_id:'patient-1',caregiver_id:'caregiver-1',title:'Later visit',appointment_at:new Date(nextDay+3600000).toISOString(),status:'upcoming'},
+    {id:'done',elderly_id:'patient-1',caregiver_id:'caregiver-1',title:'Completed visit',appointment_at:new Date(nextDay-86400000).toISOString(),status:'completed'},
+    {id:'early',elderly_id:'patient-1',caregiver_id:'caregiver-1',title:'Earlier visit',appointment_at:new Date(nextDay).toISOString(),status:null},
+  ]});
+  const screen=await showCare();await pressText('Schedule');
+  const titles=screen.getAllByText(/^(Earlier visit|Later visit|Completed visit)$/).map(node=>node.props.children);
+  expect(titles).toEqual(['Earlier visit','Later visit','Completed visit']);
+  expect(screen.getByText('Completed')).toBeTruthy();
 });

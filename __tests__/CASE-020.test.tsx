@@ -60,14 +60,12 @@ async function fillValidPatient() {
 }
 
 describe('Older-adult profile setup', () => {
-  test('CASE-020 implausible weight and height block save', async () => {
+  test('CASE-020 missing required patient details are explained', async () => {
     await render(<ElderlySetupScreen />);
-    await fillValidPatient();
-    await fireEvent.changeText(screen.getByLabelText('Weight (kg)'), '0');
-    await fireEvent.changeText(screen.getByLabelText('Height (cm)'), '300');
     await fireEvent.press(screen.getByText('Save profile'));
-    expect(screen.getByText('Enter a weight between 1 and 500 kg.')).toBeTruthy();
-    expect(screen.getByText('Enter a height between 30 and 250 cm.')).toBeTruthy();
+    expect(screen.getByText('Enter the older adult’s full name.')).toBeTruthy();
+    expect(screen.getAllByText('Enter a valid date of birth or age.').length).toBeGreaterThan(0);
+    expect(screen.getByText('Select a blood type.')).toBeTruthy();
     expect(mockInsert).not.toHaveBeenCalled();
   });
 });

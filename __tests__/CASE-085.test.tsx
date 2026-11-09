@@ -1,17 +1,41 @@
-import {fireEvent,render,screen,waitFor} from '@testing-library/react-native';
-
-import {Linking} from 'react-native';
-
-import {EmergencyContacts,orderedEmergencyContacts} from '@/src/components/EmergencyContacts';
-
-const mockRefresh=jest.fn(),mockUpdate=jest.fn();
-
-const patient={elderly_id:'patient',full_name:'Test patient',emergency_contacts:[{role:'doctor',name:'Dr C',relationship:'Physician',phone:'09170000003'},{role:'family',name:'Family B',relationship:'Brother',phone:'09170000002'},{role:'caregiver',name:'Caregiver A',relationship:'Caregiver',phone:'09170000001'}]};
-
-jest.mock('@/src/providers/AuthProvider',()=>({useAuth:()=>({session:{user:{id:'owner'}}})}));
-
-jest.mock('@/src/providers/HealthDataProvider',()=>({useHealthData:()=>({elderly:patient,refresh:mockRefresh})}));
-
-jest.mock('@/src/lib/supabase',()=>({supabase:{from:()=>{const query:any={select:()=>query,eq:()=>query,maybeSingle:async()=>({data:null,error:null}),update:(payload:any)=>{mockUpdate(payload);return query;}};return query;}}}));
-
-test('contact roles have a fixed caregiver → family → doctor order regardless of storage order',()=>expect(orderedEmergencyContacts(patient.emergency_contacts).map(x=>x.name)).toEqual(['Caregiver A','Family B','Dr C']));
+import {act,renderHook,waitFor} from '@testing-library/react-native';
+import {useWatchTrack} from '@/src/hooks/useWatchTrack';
+import {AppState} from 'react-native';
+import {supabase} from '@/src/lib/supabase';
+let mockReceive:((event:any)=>void)|undefined;
+const stamp=new Date().toISOString();
+const gps={id:'gps',elderly_id:'patient',device_id:'watch',latitude:10,longitude:123,accuracy_m:8,location_source:'watch_gps',measured_at:stamp};
+const mockEq=jest.fn();
+let mockRows:any[]=[];
+jest.mock('@/src/lib/supabase',()=>({supabase:{from:jest.fn(),channel:()=>{const channel={on:(_event:any,_filter:any,receive:any)=>{mockReceive=receive;return channel;},subscribe:()=>channel};return channel;},removeChannel:jest.fn()}}));
+beforeEach(()=>{
+  mockEq.mockClear();
+  mockRows=[gps,{...gps,id:'phone',location_source:'fused'}];
+  (supabase.from as jest.Mock).mockImplementation(()=>{
+    const query={select:()=>query,eq:(...args:any[])=>{mockEq(...args);return query;},gte:()=>query,order:()=>query,
+      limit:async()=>({data:mockRows,error:null})};return query;
+  });
+});
+test('polling recovers movement when the realtime channel sends no events',async()=>{
+  jest.useFakeTimers();const previousState=AppState.currentState;Object.defineProperty(AppState,'currentState',{value:'active',configurable:true});
+  try{
+    mockRows=[gps];
+    const view=await renderHook(()=>useWatchTrack('patient','watch'));
+    await act(async()=>{});expect(view.result.current.points.map(p=>p.id)).toEqual(['gps']);
+    mockRows=[{...gps,id:'polled-movement',latitude:10.001,measured_at:new Date(Date.now()+2_000).toISOString()}];
+    await act(async()=>{jest.advanceTimersByTime(3_000);});
+    expect(view.result.current.points.at(-1)?.id).toBe('polled-movement');
+    await view.unmount();
+  }finally{Object.defineProperty(AppState,'currentState',{value:previousState,configurable:true});jest.useRealTimers();}
+});
+test('route query and realtime merge retain hybrid sources for only this patient and device',async()=>{
+  const view=await renderHook(()=>useWatchTrack('patient','watch'));
+  await waitFor(()=>expect(view.result.current.points).toHaveLength(2));
+  expect(mockEq).not.toHaveBeenCalledWith('location_source','watch_gps');
+  await act(async()=>{
+    mockReceive?.({new:{...gps,id:'new-phone',location_source:'fused'}});
+    mockReceive?.({new:{...gps,id:'foreign',elderly_id:'other'}});
+    mockReceive?.({new:{...gps,id:'next-watch',latitude:10.001}});
+  });
+  expect(view.result.current.points.map(p=>p.id)).toEqual(['gps','phone','new-phone','next-watch']);
+});

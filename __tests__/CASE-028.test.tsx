@@ -1,27 +1,22 @@
-import { buildHealthAnomalies, buildHealthInsights, buildHealthPredictions } from '@/src/lib/health-analysis';
-import type { VitalLog } from '@/src/providers/HealthDataProvider';
+import {appointmentPhase,careZonedInstant,formatCareTime,medicationDayDoses,nextMedicationAt,parseCareTime} from '@/src/lib/care-time';
 
-function reading(index: number, fields: Partial<VitalLog> = {}): VitalLog {
-  return {
-    id: `reading-${index}`,
-    elderly_id: 'patient-1',
-    heart_rate_bpm: null,
-    spo2_percent: null,
-    hrv_rmssd_ms: null,
-    skin_temp_celsius: null,
-    steps_count: null,
-    sleep_hours: null,
-    overall_status: null,
-    ai_risk_score: null,
-    source: 'google-health',
-    recorded_at: new Date(2026, 9, index + 1).toISOString(),
-    synced_at: null,
-    ...fields,
-  };
-}
+import {vitalStatus} from '@/src/lib/vital-status';
 
-describe('Health analysis', () => {
-  test('CASE-028 empty history shows a waiting insight', () => {
-    expect(buildHealthInsights([])[0].id).toBe('waiting');
-  });
+import {metricRecords} from '@/src/lib/monitoring-records';
+
+import {NoticeQueue} from '@/src/lib/notice-queue';
+
+import {prescriptionDrafts} from '@/src/lib/prescription';
+
+import type {VitalLog} from '@/src/providers/HealthDataProvider';
+
+const medication={id:'med',frequency:'Daily',times_of_day:['08:00','20:00'],start_date:'2026-11-08',end_date:'2026-11-10',timezone:'Asia/Manila'};
+
+test('live BPM display bands change at 80 while alert boundary stays above 110',()=>{
+  expect(vitalStatus('heart_rate_bpm',{heart_rate_bpm:50}).label).toContain('Good');
+  expect(vitalStatus('heart_rate_bpm',{heart_rate_bpm:79}).label).toContain('Good');
+  for(const bpm of [80,90,110]){expect(vitalStatus('heart_rate_bpm',{heart_rate_bpm:bpm}).tone).toBe('attention');expect(vitalStatus('heart_rate_bpm',{heart_rate_bpm:bpm}).label).toContain('High');}
+  expect(vitalStatus('heart_rate_bpm',{heart_rate_bpm:111}).label).toContain('High');
+  expect(vitalStatus('heart_rate_bpm',{heart_rate_bpm:49}).tone).toBe('attention');
+  expect(vitalStatus('heart_rate_bpm',{heart_rate_bpm:null}).label).toBe('No reading');
 });

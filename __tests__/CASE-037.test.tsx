@@ -1,43 +1,27 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import {fireEvent,render,screen} from '@testing-library/react-native';
 
-import ChatbotScreen from '@/app/(tabs)/chatbot';
-import { supabase } from '@/src/lib/supabase';
+import {StyleSheet} from 'react-native';
 
-const mockPush = jest.fn();
-const mockSessionInsert = jest.fn();
-const mockSessionUpdate = jest.fn();
-const mockMessageInsert = jest.fn();
-const mockInvoke = jest.fn();
+import {MonitoringChart} from '@/src/components/MonitoringChart';
 
-jest.mock('expo-router', () => ({ useRouter: () => ({ push: mockPush }) }));
-jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
-jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({ session: { user: { id: 'caregiver-1' } } }) }));
-jest.mock('@/src/providers/HealthDataProvider', () => ({ useHealthData: () => ({ elderly: { elderly_id: 'patient-1', full_name: 'Maria' }, vital: null }) }));
-jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn(), functions: { invoke: jest.fn() } } }));
+import {chartCoordinates,chartReadings} from '@/src/lib/monitoring-chart';
 
-beforeEach(() => {
-  (supabase.from as jest.Mock).mockImplementation((table: string) => table === 'ai_chatbot_sessions'
-    ? { insert: mockSessionInsert, update: mockSessionUpdate }
-    : { insert: mockMessageInsert });
-  (supabase.functions.invoke as jest.Mock).mockImplementation(mockInvoke);
-  mockSessionInsert.mockReturnValue({ select: () => ({ single: async () => ({ data: { id: 'session-1' }, error: null }) }) });
-  mockSessionUpdate.mockReturnValue({ eq: async () => ({ error: null }) });
-  mockMessageInsert.mockResolvedValue({ error: null });
-  mockInvoke.mockResolvedValue({ data: { reply: 'Maria slept 7 hours in the latest patient reading.', emotion: 'happy' }, error: null });
-  jest.spyOn(console, 'warn').mockImplementation(() => undefined);
-});
+import {metricRecords} from '@/src/lib/monitoring-records';
 
-afterEach(() => jest.restoreAllMocks());
+import {localCareNotice} from '@/src/lib/local-care-notice';
 
-async function sendQuestion(question: string) {
-  await fireEvent.changeText(screen.getByPlaceholderText('Ask about health or care…'), question);
-  await fireEvent.press(screen.getByLabelText('Send message'));
-}
+import type {VitalLog} from '@/src/providers/HealthDataProvider';
 
-describe('Elle caregiver assistant', () => {
-  test('CASE-037 blank messages cannot call the assistant', async () => {
-    await render(<ChatbotScreen />);
-    expect(screen.getByLabelText('Send message').props.accessibilityState?.disabled).toBe(true);
-    expect(mockInvoke).not.toHaveBeenCalled();
-  });
+const readings=Array.from({length:200},(_,index)=>({id:String(index),value:index===91?999:index===92?-10:70+index%30,at:new Date(Date.UTC(2026,10,8,0,index)).toISOString()}));
+
+test('analytics toggles line/thin bars and exposes each selected measurement timestamp',async()=>{
+  await render(<MonitoringChart records={readings.slice(0,80)} unit="BPM"/>);
+  expect(screen.getAllByTestId('monitoring-line-segment')).toHaveLength(79);
+  expect(screen.getByLabelText('Line chart').props.accessibilityState.selected).toBe(true);
+  await fireEvent.press(screen.getByLabelText('Bar chart'));
+  expect(screen.getAllByTestId('monitoring-thin-bar')).toHaveLength(80);
+  expect(screen.getAllByTestId('monitoring-thin-bar').every(bar=>StyleSheet.flatten(bar.props.style).width<=6)).toBe(true);
+  expect(screen.getByLabelText(/bar chart of 80/)).toBeTruthy();
+  await fireEvent.press(screen.getByLabelText('Previous chart reading'));
+  expect(screen.getByLabelText(/Selected 88 BPM/)).toBeTruthy();
 });

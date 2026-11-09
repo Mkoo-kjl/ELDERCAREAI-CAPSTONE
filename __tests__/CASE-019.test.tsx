@@ -1,21 +1,19 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
-import ElderlySetupScreen from '@/app/setup/elderly';
+import CaregiverSetupScreen from '@/app/setup/caregiver';
 import { supabase } from '@/src/lib/supabase';
 
 const mockReplace = jest.fn();
-const mockInsert = jest.fn();
 const mockUpsert = jest.fn();
+const mockMaybeSingle = jest.fn();
 const mockQuery = {
   select: jest.fn().mockReturnThis(),
   eq: jest.fn().mockReturnThis(),
-  order: jest.fn().mockReturnThis(),
-  limit: jest.fn().mockReturnThis(),
-  maybeSingle: jest.fn(),
-  insert: mockInsert,
+  maybeSingle: mockMaybeSingle,
   upsert: mockUpsert,
 };
+const mockRefreshOnboarding = jest.fn();
 
 jest.mock('expo-router', () => {
   const React = require('react');
@@ -26,8 +24,12 @@ jest.mock('expo-router', () => {
     useLocalSearchParams: () => ({}),
   };
 });
-jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({ session: { user: { id: 'caregiver-1' } }, refreshOnboarding: jest.fn().mockResolvedValue(null) }) }));
-jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
+jest.mock('@/src/providers/AuthProvider', () => ({
+  useAuth: () => ({
+    session: { user: { id: 'caregiver-1', email: 'alex@example.com', user_metadata: {} } },
+    refreshOnboarding: mockRefreshOnboarding,
+  }),
+}));
 jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn() } }));
 jest.mock('@/src/components/SetupScaffold', () => {
   const React = require('react');
@@ -41,31 +43,29 @@ jest.mock('@/src/components/GradientButton', () => {
   return { GradientButton: ({ label, onPress }: { label: string; onPress: () => void }) => React.createElement(Pressable, { onPress }, React.createElement(Text, null, label)) };
 });
 
-beforeEach(() => {
-  (supabase.from as jest.Mock).mockReturnValue(mockQuery);
-  mockQuery.maybeSingle.mockResolvedValue({ data: null, error: null });
-  mockInsert.mockResolvedValue({ error: null });
-  mockUpsert.mockResolvedValue({ error: null });
-});
+const mockFrom = supabase.from as jest.Mock;
 
-async function fillValidPatient() {
-  await fireEvent.changeText(screen.getByLabelText('Full name'), 'Maria Santos');
-  await fireEvent.changeText(screen.getByLabelText('Age'), '78');
+async function fillValidForm() {
+  await fireEvent.changeText(screen.getByLabelText('Full name'), 'Alex Caregiver');
+  await fireEvent.changeText(screen.getByLabelText('Phone'), '+63 917 123 4567');
+  await fireEvent.changeText(screen.getByLabelText('Age'), '35');
   await fireEvent.press(screen.getByText('Female'));
-  await fireEvent.changeText(screen.getByLabelText('Weight (kg)'), '65');
-  await fireEvent.changeText(screen.getByLabelText('Height (cm)'), '160');
-  await fireEvent.press(screen.getByText('O+'));
-  await fireEvent.changeText(screen.getByLabelText('Emergency contact name'), 'Alex Santos');
-  await fireEvent.changeText(screen.getByLabelText('Emergency contact phone'), '+63 917 123 4567');
 }
 
-describe('Older-adult profile setup', () => {
-  test('CASE-019 missing required patient details are explained', async () => {
-    await render(<ElderlySetupScreen />);
-    await fireEvent.press(screen.getByText('Save profile'));
-    expect(screen.getByText('Enter the older adult’s full name.')).toBeTruthy();
-    expect(screen.getAllByText('Enter a valid date of birth or age.').length).toBeGreaterThan(0);
-    expect(screen.getByText('Select a blood type.')).toBeTruthy();
-    expect(mockInsert).not.toHaveBeenCalled();
+beforeEach(() => {
+  mockFrom.mockReturnValue(mockQuery);
+  mockMaybeSingle.mockResolvedValue({ data: null, error: null });
+  mockUpsert.mockResolvedValue({ error: null });
+  mockRefreshOnboarding.mockResolvedValue(null);
+});
+
+describe('Caregiver profile setup', () => {
+  test('CASE-019 valid caregiver saves and advances to patient setup', async () => {
+    await render(<CaregiverSetupScreen />);
+    await fillValidForm();
+    await fireEvent.press(screen.getByText('Next'));
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/setup/elderly'));
+    expect(mockUpsert).toHaveBeenCalledTimes(2);
+    expect(mockRefreshOnboarding).toHaveBeenCalledTimes(1);
   });
 });

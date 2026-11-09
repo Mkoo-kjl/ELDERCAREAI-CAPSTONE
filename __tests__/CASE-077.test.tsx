@@ -1,18 +1,14 @@
-import {appointmentPhase,careZonedInstant,formatCareTime,medicationDayDoses,nextMedicationAt,parseCareTime} from '@/src/lib/care-time';
+import { waitFor } from '@testing-library/react-native';
+import { from, medicationPdf, patient, prepareReportCase, pressReport } from '../test-support/profile-report-case-harness';
 
-import {vitalStatus} from '@/src/lib/vital-status';
-
-import {metricRecords} from '@/src/lib/monitoring-records';
-
-import {NoticeQueue} from '@/src/lib/notice-queue';
-
-import {prescriptionDrafts} from '@/src/lib/prescription';
-
-import type {VitalLog} from '@/src/providers/HealthDataProvider';
-
-const medication={id:'med',frequency:'Daily',times_of_day:['08:00','20:00'],start_date:'2026-11-08',end_date:'2026-11-10',timezone:'Asia/Manila'};
-
-test('Manila wall clocks are not interpreted as UTC; DST gaps are rejected',()=>{
-  expect(careZonedInstant('2026-11-08','08:00','Asia/Manila')?.toISOString()).toBe('2026-11-08T00:00:00.000Z');
-  expect(careZonedInstant('2026-03-08','02:30','America/New_York')).toBeNull();
+test('CASE-077 saved medication schedule is scoped and passed to the PDF exporter', async () => {
+  const medications = [{ medication_name: 'Aspirin', dosage: '81 mg', frequency: 'daily', is_active: true }];
+  const query = prepareReportCase({ data: medications });
+  await pressReport('Medication schedule PDF');
+  await waitFor(() => expect(medicationPdf).toHaveBeenCalledWith({ patient, caregiverName: 'Caregiver', medications }));
+  expect(from).toHaveBeenCalledWith('medication_schedules');
+  expect(query.eq).toHaveBeenCalledWith('caregiver_id', 'caregiver-1');
+  expect(query.eq).toHaveBeenCalledWith('elderly_id', 'patient-1');
+  expect(query.order).toHaveBeenNthCalledWith(1, 'is_active', { ascending: false });
+  expect(query.order).toHaveBeenNthCalledWith(2, 'medication_name');
 });

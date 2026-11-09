@@ -39,11 +39,13 @@ beforeEach(() => {
 });
 
 describe('Google caregiver sign-in', () => {
-  test('CASE-002 starts Google sign-in and redirects only on success', async () => {
-    signInWithGoogle.mockResolvedValue(true);
+  test('CASE-002 failed sign-in stays on the login screen with the error', async () => {
+    signInWithGoogle.mockResolvedValue(false);
+    mockUseAuth.mockReturnValue({ ...mockUseAuth(), authError: 'Google sign-in failed.' });
     await render(<LoginScreen />);
     fireEvent.press(screen.getByRole('button', { name: 'Sign in with Google' }));
-    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'));
-    expect(clearAuthError).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(signInWithGoogle).toHaveBeenCalledTimes(1));
+    expect(screen.getByText('Google sign-in failed.')).toBeTruthy();
+    expect(mockReplace).not.toHaveBeenCalled();
   });
 });

@@ -60,12 +60,16 @@ async function fillValidPatient() {
 }
 
 describe('Older-adult profile setup', () => {
-  test('CASE-022 invalid emergency phone blocks save', async () => {
+  test('CASE-022 birth date is selected from the calendar and determines age', async () => {
     await render(<ElderlySetupScreen />);
     await fillValidPatient();
-    await fireEvent.changeText(screen.getByLabelText('Emergency contact phone'), '123');
+    await fireEvent.press(screen.getByLabelText('Choose date of birth'));
+    const chosen = new Date(new Date().getFullYear() - 75, new Date().getMonth(), 1);
+    const label = chosen.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    await fireEvent.press(screen.getByLabelText(label));
+    await fireEvent.press(screen.getByLabelText('Done choosing date and time'));
     await fireEvent.press(screen.getByText('Save profile'));
-    expect(screen.getByText('Enter a valid emergency phone number.')).toBeTruthy();
-    expect(mockInsert).not.toHaveBeenCalled();
+    const dateOfBirth = `${chosen.getFullYear()}-${String(chosen.getMonth() + 1).padStart(2, '0')}-01`;
+    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ date_of_birth: dateOfBirth, age: 75 }));
   });
 });

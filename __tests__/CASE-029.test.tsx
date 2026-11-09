@@ -1,27 +1,24 @@
-import { buildHealthAnomalies, buildHealthInsights, buildHealthPredictions } from '@/src/lib/health-analysis';
-import type { VitalLog } from '@/src/providers/HealthDataProvider';
+import {appointmentPhase,careZonedInstant,formatCareTime,medicationDayDoses,nextMedicationAt,parseCareTime} from '@/src/lib/care-time';
 
-function reading(index: number, fields: Partial<VitalLog> = {}): VitalLog {
-  return {
-    id: `reading-${index}`,
-    elderly_id: 'patient-1',
-    heart_rate_bpm: null,
-    spo2_percent: null,
-    hrv_rmssd_ms: null,
-    skin_temp_celsius: null,
-    steps_count: null,
-    sleep_hours: null,
-    overall_status: null,
-    ai_risk_score: null,
-    source: 'google-health',
-    recorded_at: new Date(2026, 9, index + 1).toISOString(),
-    synced_at: null,
-    ...fields,
-  };
-}
+import {vitalStatus} from '@/src/lib/vital-status';
 
-describe('Health analysis', () => {
-  test('CASE-029 low oxygen produces a critical insight', () => {
-    expect(buildHealthInsights([reading(1, { spo2_percent: 93 })]).find((item) => item.metric === 'oxygen')?.severity).toBe('critical');
-  });
+import {metricRecords} from '@/src/lib/monitoring-records';
+
+import {NoticeQueue} from '@/src/lib/notice-queue';
+
+import {prescriptionDrafts} from '@/src/lib/prescription';
+
+import type {VitalLog} from '@/src/providers/HealthDataProvider';
+
+const medication={id:'med',frequency:'Daily',times_of_day:['08:00','20:00'],start_date:'2026-11-08',end_date:'2026-11-10',timezone:'Asia/Manila'};
+
+test('oxygen, sleep, steps and experimental stress have appropriate distinct statuses',()=>{
+  expect(vitalStatus('spo2_percent',{spo2_percent:92}).tone).toBe('critical');
+  expect(vitalStatus('spo2_percent',{spo2_percent:94}).tone).toBe('attention');
+  expect(vitalStatus('sleep_hours',{sleep_hours:8}).label).toBe('Good duration');
+  expect(vitalStatus('sleep_hours',{sleep_hours:6}).label).toContain('Fair');
+  expect(vitalStatus('steps_count',{steps_count:0}).tone).toBe('neutral');
+  expect(vitalStatus('hrv_rmssd_ms',{hrv_rmssd_ms:40}).label).toBe('Learning baseline');
+  expect(vitalStatus('hrv_rmssd_ms',{hrv_rmssd_ms:20,stress_score:80}).label).toBe('Elevated estimate');
+  expect(vitalStatus('skin_temp_celsius',{skin_temp_celsius:35}).label).toBe('Learning baseline');
 });

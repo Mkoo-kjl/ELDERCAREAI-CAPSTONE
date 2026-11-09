@@ -1,15 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { StyleSheet } from 'react-native';
-
-import { ChoiceChips } from '@/src/components/ChoiceChips';
-import { FormField } from '@/src/components/FormField';
-import { MetricCard } from '@/src/components/MetricCard';
-
-describe('Care UI components', () => {
-  test('CASE-013 selecting a choice calls back with that option', async () => {
-    const change = jest.fn();
-    await render(<ChoiceChips label="Gender" options={['Male', 'Female', 'Other']} value="Male" onChange={change} />);
-    fireEvent.press(screen.getByText('Female'));
-    expect(change).toHaveBeenCalledWith('Female');
-  });
+import {readFileSync} from 'node:fs';
+import {join} from 'node:path';
+const ui=readFileSync(join(__dirname,'..','app/setup/intro.tsx'),'utf8');
+test('visible UI contract',()=>{
+expect(ui).toContain('Heart rate');
+expect(ui).toContain('Sleep');
 });

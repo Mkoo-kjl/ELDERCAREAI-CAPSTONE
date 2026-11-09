@@ -15,7 +15,7 @@ const completed: OnboardingProgress = {
 };
 
 describe('Onboarding route', () => {
-  test('CASE-008 incomplete wearable step returns to fitness setup', () => {
-    expect(getPostAuthRoute({ ...completed, wearable_completed_at: null })).toBe('/setup/fitness');
+  test('CASE-008 incomplete caregiver details return to caregiver setup', () => {
+    expect(getPostAuthRoute({ ...completed, caregiver_completed_at: null })).toBe('/setup/caregiver');
   });
 });

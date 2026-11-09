@@ -1,41 +1,17 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
+import {appointmentPhase,careZonedInstant,formatCareTime,medicationDayDoses,nextMedicationAt,parseCareTime} from '@/src/lib/care-time';
 
-import ProfileScreen from '@/app/(tabs)/profile';
-import { supabase } from '@/src/lib/supabase';
+import {vitalStatus} from '@/src/lib/vital-status';
 
-const mockUpsert = jest.fn();
+import {metricRecords} from '@/src/lib/monitoring-records';
 
-jest.mock('expo-router', () => ({ useFocusEffect: jest.fn(), useRouter: () => ({ push: jest.fn() }) }));
-jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
-jest.mock('@/src/providers/AuthProvider', () => ({ useAuth: () => ({ session: { user: { id: 'caregiver-1', email: 'alex@example.com' } }, onboarding: { wearable_status: 'connected', paired_device_count: 1 }, refreshOnboarding: jest.fn(), signOut: jest.fn() }) }));
-jest.mock('@/src/providers/HealthDataProvider', () => ({ useHealthData: () => ({ elderly: { elderly_id: 'patient-1', full_name: 'Maria', photo_url: null }, refresh: jest.fn() }) }));
-jest.mock('@/src/providers/ThemePreferenceProvider', () => ({ useThemePreference: () => ({ isDark: false, toggleDarkMode: jest.fn() }) }));
-jest.mock('@/src/lib/supabase', () => ({ supabase: { from: jest.fn(), functions: { invoke: jest.fn() } } }));
-jest.mock('@/src/lib/notifications', () => ({ hasNotificationPermission: jest.fn().mockResolvedValue(false), ensureNotificationPermission: jest.fn().mockResolvedValue(false) }));
-jest.mock('@/src/lib/pdf-reports', () => ({ exportHealthReportPdf: jest.fn(), exportMedicationReportPdf: jest.fn() }));
-jest.mock('@/src/components/ProfilePhotoPicker', () => ({ ProfilePhotoPicker: () => null }));
-jest.mock('@/src/components/GradientButton', () => {
-  const React = require('react');
-  const { Pressable, Text } = require('react-native');
-  return { GradientButton: ({ label, onPress }: { label: string; onPress: () => void }) => React.createElement(Pressable, { onPress }, React.createElement(Text, null, label)) };
-});
+import {NoticeQueue} from '@/src/lib/notice-queue';
 
-beforeEach(() => {
-  (supabase.from as jest.Mock).mockImplementation(() => ({ upsert: mockUpsert }));
-  mockUpsert.mockReturnValue({ select: () => ({ single: async () => ({ data: { id: 'doctor-1', full_name: 'Dr. Kevin', phone: '+639171234567', photo_url: null }, error: null }) }) });
-  jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
-});
-afterEach(() => jest.restoreAllMocks());
+import {prescriptionDrafts} from '@/src/lib/prescription';
 
-async function openDoctor() {
-  await fireEvent.press(screen.getByText('Add'));
-}
+import type {VitalLog} from '@/src/providers/HealthDataProvider';
 
-describe('Saved doctor contact', () => {
-  test('CASE-060 Settings shows an empty doctor contact state', async () => {
-    await render(<ProfileScreen />);
-    expect(screen.getByText('No doctor saved')).toBeTruthy();
-    expect(screen.getByText('Add')).toBeTruthy();
-  });
-});
+const medication={id:'med',frequency:'Daily',times_of_day:['08:00','20:00'],start_date:'2026-11-08',end_date:'2026-11-10',timezone:'Asia/Manila'};
+
+test.each([['00:00','12:00 AM'],['12:00','12:00 PM'],['17:05:00','5:05 PM'],['1:09','1:09 AM'],['23:59','11:59 PM']])('database clock %s displays as %s',(clock,expected)=>expect(formatCareTime(clock)).toBe(expected));
+
+test.each(['24:00','12:70','-1:00','noon','2026-11-08T10:00:00Z'])('invalid wall clock %s is rejected',clock=>expect(parseCareTime(clock)).toBeNull());

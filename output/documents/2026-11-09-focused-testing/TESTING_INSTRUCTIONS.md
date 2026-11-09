@@ -1,4 +1,4 @@
-# Run the focused tests
+# Run the screenshotable tests
 
 Open PowerShell in `C:\ELDERCAREAI-CAPSTONE`.
 
@@ -13,7 +13,7 @@ Install dependencies only when the project has not already been set up. Run all 
 npm test -- --silent
 ```
 
-The selected set has `CASE-001.test.tsx` through `CASE-100.test.tsx` in `__tests__`, and `INT-001.test.tsx` through `INT-030.test.tsx` in `integration testing`. Each table row in the Word files matches one numbered file.
+The selected set has `CASE-001.test.tsx` through `CASE-100.test.tsx` in `__tests__`, and `INT-001.test.tsx` through `INT-040.test.tsx` in `integration testing`. The files remain flat and in the same module and case order as the Word tables.
 
 To run one unit case, replace the number in the path:
 
@@ -47,4 +47,7 @@ Run the TypeScript check after code changes:
 npm run typecheck
 ```
 
-The Jest tests use controlled fixtures for native sensors, Supabase, notifications and other external services. For the project demo, also verify real watch vital updates, GPS movement, Samsung Health sleep sync, and phone alerts on your devices. The user guide lists the screens to capture.
+For evidence, run the case and capture its terminal `PASS`, then capture the matching visible result on the installed phone app, watch, or signed-in admin portal. The tables use the requested nine-column format. For states that depend on saved readings, alerts, or appointments, use a real record belonging to the selected patient. Do not enter invented medical readings merely to make a screenshot.
+
+The automated tests use controlled fixtures for sensors, Supabase, notifications, and other external services. New UI contract cases check current phone, watch, or admin source controls; they do not run those screens. A terminal pass is distinct from a live screenshot or proof of end-to-end delivery. In particular, appointment and medication notification delivery, GPS movement, Samsung Health sync, and watch sensor accuracy require live checks.
+

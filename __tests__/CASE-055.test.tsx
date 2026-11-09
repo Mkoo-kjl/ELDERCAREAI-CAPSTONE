@@ -1,26 +1,14 @@
-import * as Notifications from 'expo-notifications';
+import { medicationDoseStatus, medicationStatusPriority, wasMedicationTakenToday } from '@/src/lib/care-status';
 
-import { isValidReminderTime, scheduleAppointmentNotification, scheduleMedicationNotifications, secondDailyTime } from '@/src/lib/notifications';
+const now = new Date(2026, 9, 7, 12, 0, 0);
+const medicine = { id: 'med-1', medication_name: 'Losartan', dosage: '50 mg', frequency: 'Daily', times_of_day: ['17:00'] };
 
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  __esModule: true,
-  default: { getItem: jest.fn().mockResolvedValue(null), setItem: jest.fn().mockResolvedValue(undefined), removeItem: jest.fn().mockResolvedValue(undefined) },
-}));
-jest.mock('expo-notifications', () => ({
-  AndroidImportance: { HIGH: 4 },
-  SchedulableTriggerInputTypes: { DATE: 'date', DAILY: 'daily', WEEKLY: 'weekly' },
-  setNotificationHandler: jest.fn(),
-  setNotificationChannelAsync: jest.fn().mockResolvedValue(undefined),
-  getPermissionsAsync: jest.fn(),
-  requestPermissionsAsync: jest.fn(),
-  scheduleNotificationAsync: jest.fn().mockResolvedValue('notification-1'),
-  cancelScheduledNotificationAsync: jest.fn().mockResolvedValue(undefined),
-}));
-
-describe('Care reminders', () => {
-  test('CASE-055 rejects malformed or out-of-range reminder times', () => {
-    expect(isValidReminderTime('24:00')).toBe(false);
-    expect(isValidReminderTime('9:00')).toBe(true);
-    expect(isValidReminderTime('12:60')).toBe(false);
+describe('Medication dose status', () => {
+  test('CASE-055 taken log for today marks the dose taken', () => {
+    const due=new Date(now);due.setHours(17,0,0,0);
+    const taken=new Date(now);taken.setHours(17,1,0,0);
+    const logs = [{ schedule_id: medicine.id, status: 'taken', scheduled_time: due.toISOString(), taken_at: taken.toISOString() }];
+    expect(wasMedicationTakenToday(medicine.id, logs, taken)).toBe(true);
+    expect(medicationDoseStatus(medicine, logs, taken).tone).toBe('taken');
   });
 });

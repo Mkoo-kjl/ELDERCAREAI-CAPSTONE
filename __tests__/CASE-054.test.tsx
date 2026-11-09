@@ -1,25 +1,10 @@
-import * as Notifications from 'expo-notifications';
+import { medicationDoseStatus, medicationStatusPriority, wasMedicationTakenToday } from '@/src/lib/care-status';
 
-import { isValidReminderTime, scheduleAppointmentNotification, scheduleMedicationNotifications, secondDailyTime } from '@/src/lib/notifications';
+const now = new Date(2026, 9, 7, 12, 0, 0);
+const medicine = { id: 'med-1', medication_name: 'Losartan', dosage: '50 mg', frequency: 'Daily', times_of_day: ['17:00'] };
 
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  __esModule: true,
-  default: { getItem: jest.fn().mockResolvedValue(null), setItem: jest.fn().mockResolvedValue(undefined), removeItem: jest.fn().mockResolvedValue(undefined) },
-}));
-jest.mock('expo-notifications', () => ({
-  AndroidImportance: { HIGH: 4 },
-  SchedulableTriggerInputTypes: { DATE: 'date', DAILY: 'daily', WEEKLY: 'weekly' },
-  setNotificationHandler: jest.fn(),
-  setNotificationChannelAsync: jest.fn().mockResolvedValue(undefined),
-  getPermissionsAsync: jest.fn(),
-  requestPermissionsAsync: jest.fn(),
-  scheduleNotificationAsync: jest.fn().mockResolvedValue('notification-1'),
-  cancelScheduledNotificationAsync: jest.fn().mockResolvedValue(undefined),
-}));
-
-describe('Care reminders', () => {
-  test('CASE-054 accepts valid 24-hour reminder times', () => {
-    expect(isValidReminderTime('00:00')).toBe(true);
-    expect(isValidReminderTime('23:59')).toBe(true);
+describe('Medication dose status', () => {
+  test('CASE-054 as-needed medicine has no scheduled dose', () => {
+    expect(medicationDoseStatus({ ...medicine, frequency: 'As needed' }, [], now).tone).toBe('as_needed');
   });
 });
