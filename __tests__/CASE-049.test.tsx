@@ -1,4 +1,5 @@
 jest.mock('@/src/hooks/useCareRefresh',()=>({useCareRefresh:()=>{}}));
+jest.mock('@/src/lib/watch-push',()=>({isCarePushRegistered:jest.fn().mockResolvedValue(false)}));
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
