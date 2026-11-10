@@ -4,6 +4,12 @@ Open `index.html` directly in a browser. The landing page is static and separate
 
 For a Git-based Vercel deployment, set the project root directory to `website` and use the `Other` framework preset. The admin portal at `/edcadmin/` requires the committed `edcadmin/config.js` public configuration file; see [admin setup](edcadmin/README.md). After deployment, check that `/edcadmin/config.js` returns JavaScript, not a 404.
 
+## Android app installation
+
+The public landing page has an Install or try the app section at `/#install`, linked from the hero and both navigation menus. The installation promotion appears only on the public landing page. The supplied download is https://drive.google.com/file/d/1znHl4gWYmZKK5F0QYAa3rkPlsxYoMsI8/view?usp=sharing. Keep its Google Drive access available to intended testers; this repository does not host the APK binary. Replace the APK link in `index.html` when publishing a new download.
+
+The recommendation is Best with Galaxy Watch6. The Android phone APK and Wear OS companion are separate installations. Trying the phone app uses the tester's own caregiver account and does not create sample medical records.
+
 ## Team photos
 
 The three team cards deliberately show photo placeholders. To add portraits later, place `kristoffer.jpg`, `melvence.jpg`, and `john-wayne.jpg` in `assets/team/`. Add the corresponding `<img src="assets/team/..." alt="...">` inside each `.team-photo` element in `index.html`; the existing CSS fills the photo area. The initials remain behind the photo as a fallback.

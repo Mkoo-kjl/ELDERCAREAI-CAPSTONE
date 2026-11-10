@@ -222,5 +222,15 @@ section[id]{scroll-margin-top:90px}
 }
 @media(max-width:360px){.brand{font-size:1.08rem}.brand img{width:36px;height:36px}.hero h1{font-size:2.57rem}.hero-lead{font-size:1.05rem}.hero-copy{max-width:270px}}
 @media(max-width:499px){.hero-photo img{top:120px;height:calc(100% - 120px)}}
+.install-section{background:var(--mint)}
+.install-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.8fr);gap:64px;align-items:center}
+.install-layout h2{font-size:clamp(2rem,4vw,3.2rem)}
+.install-steps{padding-left:24px;margin:28px 0 18px;line-height:1.7}
+.install-steps li{padding-left:6px;margin-bottom:12px}
+.install-note{font-size:.83rem;color:var(--muted);line-height:1.6}
+.install-device{background:white;border-radius:20px;padding:28px;text-align:center}
+.install-device img{width:min(100%,260px);height:auto;object-fit:contain;margin:0 auto 20px}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:760px){.install-layout{grid-template-columns:1fr;gap:28px}.install-layout .button{white-space:normal;text-align:center}.install-device{padding:24px}}
 @media(max-height:640px) and (min-width:700px){.hero{height:calc(100svh - 125px);min-height:350px}.hero h1{font-size:4rem}.hero-lead{font-size:1.15rem}.hero-copy{font-size:.86rem;margin-bottom:16px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button,.nav-contact,.desktop-nav>a,.team-member,.motion-ready [data-reveal]{transition:none;transform:none}.motion-ready [data-reveal]{opacity:1}.site-header.is-navigating::after,.hero-content>*{animation:none}}

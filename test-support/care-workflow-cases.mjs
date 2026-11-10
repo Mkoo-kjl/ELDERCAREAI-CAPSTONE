@@ -111,6 +111,27 @@ export async function testCareWorkflow(db,{caregiver,other,patient}){
   }
   console.log('PASS 10/20 m zones: accurate inside/exit/return confirmation, uncertainty withheld, poor GPS rejected, exit push queued and obsolete push cancelled');
 
+  await asUser(caregiver);await db.query('select save_patient_safe_zone($1,$2,10,123,20,true)',[patient,'Hybrid home']);
+  await system();await db.query('delete from watch_location_points where device_id=$1',[device]);
+  const beforeHybrid=(await db.query('select count(*)::int n from safe_zone_events where elderly_id=$1',[patient])).rows[0].n;
+  // 30 m from center +/-5 m is clearly outside a 20 m zone. Interleaved
+  // phone-assisted inside points must not starve satellite confirmation.
+  const outsideLat=10+30/111195;
+  await fix(85,outsideLat,'watch_gps',5);await fix(80,10,'fused',3);
+  assert.equal((await state()).candidate_count,1);
+  await fix(75,outsideLat,'watch_gps',5);await fix(70,10,'network',3);
+  await fix(65,outsideLat,'watch_gps',5);
+  assert.equal((await state()).status,'outside');
+  const hybridAlert=(await state()).last_alert_id;
+  const hybridNotice=(await db.query('select id from caregiver_notifications where alert_id=$1',[hybridAlert])).rows[0];
+  assert.ok(hybridNotice);assert.ok((await db.query('select id from care_push_jobs where notification_id=$1',[hybridNotice.id])).rows.length);
+  await fix(60,outsideLat,'watch_gps',5);
+  assert.equal((await db.query('select count(*)::int n from safe_zone_events where elderly_id=$1',[patient])).rows[0].n,beforeHybrid+1);
+  await fix(50,10,'watch_gps',5);await fix(45,outsideLat,'fused',3);
+  await fix(40,10,'watch_gps',5);await fix(35,outsideLat,'network',3);await fix(30,10,'watch_gps',5);
+  assert.equal((await state()).status,'inside');
+  console.log('PASS interleaved hybrid points preserve GPS exit/return confirmation, small-zone exit queues a push and repeated outside fixes do not duplicate alerts');
+
   await db.exec('set role service_role');
   await assert.rejects(()=>db.query("select watch_vital_evidence($1,$2,'heart_rate_bpm',100,'gte',null,null)",[other,patient]),/access denied/);
   const samples=(await db.query("select watch_vital_evidence($1,$2,'heart_rate_bpm',100,'gte',null,null) result",[caregiver,patient])).rows[0].result;

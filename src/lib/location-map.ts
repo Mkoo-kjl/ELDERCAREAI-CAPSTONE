@@ -53,18 +53,21 @@ const interactive=${!compact};
 const map=L.map('map',{zoomControl:interactive,dragging:interactive,scrollWheelZoom:interactive,doubleClickZoom:interactive,touchZoom:interactive,boxZoom:interactive,keyboard:interactive}).setView([latest.latitude,latest.longitude],${compact ? 15 : 17});
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
 const marker=L.marker([latest.latitude,latest.longitude],{icon:L.divIcon({className:'',html:'<div class="pin"></div>',iconSize:[22,22],iconAnchor:[11,11]})}).addTo(map);
-const circle=L.circle([latest.latitude,latest.longitude],{radius:Math.max(latest.accuracy_m||1,1),color:'#397F88',weight:1,fillOpacity:.09}).addTo(map);
+const circle=L.circle([latest.latitude,latest.longitude],{interactive:false,radius:Math.max(latest.accuracy_m||1,1),color:'#397F88',weight:1,fillOpacity:.09}).addTo(map);
 const trail=L.layerGroup().addTo(map);
 const zoneLayer=L.layerGroup().addTo(map);let selecting=false;let zoneSignature='';
+marker.on('click',function(event){if(selecting&&event.latlng)window.report('coordinate',{latitude:event.latlng.lat,longitude:event.latlng.lng});});
 map.on('click',function(event){if(selecting&&event.latlng)window.report('coordinate',{latitude:event.latlng.lat,longitude:event.latlng.lng});});
 map.on('dragstart',function(){following=false;window.report('follow',false);});
 window.followLatest=function(){following=true;map.panTo([latest.latitude,latest.longitude]);window.report('follow',true);};
 window.updatePosition=function(payload){
+ if(!!payload.selecting&&!selecting){following=false;map.closePopup();window.report('follow',false);}
  selecting=!!payload.selecting;
+ if(selecting)marker.unbindPopup();
  const zone=payload.safeZone;const signature=JSON.stringify(zone||null);
  if(signature!==zoneSignature){zoneLayer.clearLayers();zoneSignature=signature;
       if(zone&&Number.isFinite(zone.latitude)&&Number.isFinite(zone.longitude)&&Number.isFinite(zone.radius_m)&&zone.radius_m>=10&&zone.radius_m<=5000){
-   const area=L.circle([zone.latitude,zone.longitude],{radius:zone.radius_m,color:zone.enabled===false?'#65736E':'#3C704A',weight:2,dashArray:'6 4',fillOpacity:.08}).addTo(zoneLayer);
+   const area=L.circle([zone.latitude,zone.longitude],{interactive:false,radius:zone.radius_m,color:zone.enabled===false?'#65736E':'#3C704A',weight:2,dashArray:'6 4',fillOpacity:.08}).addTo(zoneLayer);
    const label=document.createElement('div');label.textContent=zone.name+' · '+zone.radius_m+' m'+(zone.enabled===false?' · Paused':'');area.bindPopup(label);
   }
  }
@@ -73,12 +76,12 @@ window.updatePosition=function(payload){
  const smooth=map.distance(old,target)<150&&point.location_source===latest.location_source;
  latest=point;cancelAnimationFrame(animation);
  circle.setRadius(Math.max(point.accuracy_m||1,1));
- const label=document.createElement('div');label.textContent=(point.location_source==='watch_gps'?'Watch satellite GPS':point.location_source==='fused'?'Fused location (may use paired phone)':'Network location')+' · '+new Date(point.measured_at).toLocaleString()+' · ±'+Math.round(point.accuracy_m||0)+'m';marker.bindPopup(label);
+ const label=document.createElement('div');label.textContent=(point.location_source==='watch_gps'?'Watch satellite GPS':point.location_source==='fused'?'Fused location (may use paired phone)':'Network location')+' · '+new Date(point.measured_at).toLocaleString()+' · ±'+Math.round(point.accuracy_m||0)+'m';if(!selecting)marker.bindPopup(label);
  const element=marker.getElement();if(element){const pin=element.querySelector('.pin');if(pin)pin.classList.toggle('stale',!payload.live);}
  if(smooth){let start=null;let delta=((point.longitude-old.lng+540)%360)-180;
   const frame=function(time){if(start===null)start=time;const fraction=Math.min(1,(time-start)/650);const eased=fraction*(2-fraction);const position=[old.lat+(point.latitude-old.lat)*eased,old.lng+delta*eased];marker.setLatLng(position);circle.setLatLng(position);if(fraction<1)animation=requestAnimationFrame(frame);};animation=requestAnimationFrame(frame);
  }else{marker.setLatLng(target);circle.setLatLng(target);}
- trail.clearLayers();(payload.segments||[]).forEach(function(segment){L.polyline(segment,{color:'#397F88',weight:3,opacity:.7}).addTo(trail);});
+ trail.clearLayers();(payload.segments||[]).forEach(function(segment){L.polyline(segment,{interactive:false,color:'#397F88',weight:3,opacity:.7}).addTo(trail);});
  if(following)map.panTo(target,{animate:true,duration:.65});
 };
 map.whenReady(function(){window.report('ready',true);});setTimeout(function(){map.invalidateSize();},100);

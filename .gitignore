@@ -7,6 +7,7 @@ coverage/
 .env
 .env.local
 google-services.json
+credentials.json
 *firebase-adminsdk*.json
 *service-account*.json
 *.jks

@@ -1,4 +1,5 @@
 import {testDailySteps} from './daily-steps-cases.mjs';
+import {testAllLocationSafeZones} from './safe-zone-all-sources.mjs';
 import {testCareUsability} from './care-usability-cases.mjs';
 // Isolated PostgreSQL check, never connects to the user's Supabase database.
 // npm install --prefix tmp/watch-db-check --no-package-lock --ignore-scripts @electric-sql/pglite
@@ -93,6 +94,7 @@ try {
   await db.exec(await readFile(new URL('../supabase/migrations/20261107020000_safe_zone_small_radius.sql', import.meta.url), 'utf8'));
   const tableCount=(await db.query("select count(*) n from information_schema.tables where table_schema='public'")).rows[0].n;
   await db.exec(await readFile(new URL('../supabase/migrations/20261108000000_care_usability_and_reminders.sql', import.meta.url), 'utf8'));
+  await db.exec(await readFile(new URL('../supabase/migrations/20261110000000_safe_zone_hybrid_confirmation.sql', import.meta.url), 'utf8'));
   assert.equal((await db.query("select count(*) n from information_schema.tables where table_schema='public'")).rows[0].n,tableCount,'Care update must not add public tables');
   console.log('PASS all watch migrations execute on PostgreSQL');
   await db.query("insert into galaxy_watch_pairings values ($1,$2,$3,now()+interval '10 minutes',now())", ['code', caregiver, patient]);
@@ -347,6 +349,8 @@ try {
   console.log('PASS pairing attempt limit persists across failed requests');
   await db.exec('reset role');
   await testCareWorkflow(db,{caregiver,other,patient,otherPatient});
+  await db.exec(await readFile(new URL('../supabase/migrations/20261110010000_safe_zone_all_location_sources.sql', import.meta.url), 'utf8'));
+  await testAllLocationSafeZones(db,{caregiver,patient});
   await testCareUsability(db,{caregiver,other,patient,otherPatient});
   await testDailySteps(db,{caregiver,other});
 } catch(error) { console.error('FAIL',error.stack??error.message,error.where??'',error.position??'',error.internalPosition??'',error.internalQuery??''); process.exitCode=1; } finally { await db.close(); }
