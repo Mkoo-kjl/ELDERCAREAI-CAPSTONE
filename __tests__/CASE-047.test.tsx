@@ -18,6 +18,7 @@ jest.mock('@/src/lib/notifications', () => ({
   scheduleMedicationNotifications: jest.fn(),
   secondDailyTime: jest.fn(),
 }));
+jest.mock('@/src/lib/watch-push', () => ({ isCarePushRegistered: jest.fn().mockResolvedValue(false) }));
 jest.mock('@/src/components/PickerModal', () => ({ PickerModal: () => null }));
 
 beforeEach(() => { jest.spyOn(Alert, 'alert').mockImplementation(() => undefined); });

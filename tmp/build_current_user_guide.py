@@ -62,7 +62,7 @@ install=[
 'In the phone app open Alerts, tap Enable background notifications and allow Android notifications. Confirm alert channels have sound enabled and notification volume is audible.',
 'For watch medication reminders, allow alarms and reminders through the watch reminder-timing settings when requested. Keep device time and timezone automatic.',
 'For developer sensor builds, follow the supplied Samsung Health Sensor SDK test-mode setup if sensor access is denied. Pair the app and tap Start monitoring to verify real values.'])]
-screens=install+screens
+# The operating guide begins at sign in; installation is a final appendix.
 
 OUT=ROOT/'output/documents/2026-11-10-user-guide';OUT.mkdir(parents=True,exist_ok=True)
 d=Document();s=d.sections[0];s.page_width=Inches(8.5);s.page_height=Inches(11);s.left_margin=s.right_margin=Inches(.8);s.top_margin=s.bottom_margin=Inches(.6)
@@ -72,15 +72,10 @@ for name,size in [('Normal',10.5),('Title',17),('Subtitle',11),('Heading 1',14)]
  for child in list(st._element.get_or_add_pPr()):
   if child.tag.endswith('pBdr'):st._element.get_or_add_pPr().remove(child)
 d.add_paragraph('ElderCareAI User Guide',style='Title')
-d.add_paragraph('Installation caregiver phone app Galaxy Watch6 and administrator portal',style='Subtitle')
-d.add_paragraph('Use this guide to install ElderCareAI, connect the patient watch, monitor recorded health information and manage everyday care. Each section identifies the screen to capture for the project report and gives operating instructions. Replace the figure spaces with screenshots from the installed system.')
-d.add_paragraph('Install the Android app',style='Heading 1')
-p=d.add_paragraph('Visit ');link=OxmlElement('w:hyperlink');link.set(qn('r:id'),p.part.relate_to('https://eldercareai-capstone.vercel.app/',RT.HYPERLINK,is_external=True));r=OxmlElement('w:r');pr=OxmlElement('w:rPr');color=OxmlElement('w:color');color.set(qn('w:val'),'0563C1');pr.append(color);r.append(pr);t=OxmlElement('w:t');t.text='https://eldercareai-capstone.vercel.app/';r.append(t);link.append(r);p._p.append(link);p.add_run(' and choose Install or try the app. Best with Galaxy Watch6 and the separate watch companion.')
-d.add_paragraph('Before taking screenshots',style='Heading 1')
-for text in ['Use one intended caregiver and patient account throughout the demonstration.','Hide personal names, phone numbers, prescriptions and exact home coordinates.','Use real demonstration records and show their original timestamps.','Wearable readings and Elle suggestions support care review and do not provide medical diagnoses.']:
- d.add_paragraph(text,style='List Bullet')
+d.add_paragraph('Follow the screens from sign in through caregiver monitoring and administrator functions. Each figure space names the screenshot to insert. Use the intended patient account and conceal private details. The Installation Guide appears at the end.')
 for number,(title,route,shot,bullets) in enumerate(screens,1):
- d.add_page_break();d.add_paragraph(f'{number}  {title}',style='Heading 1');d.add_paragraph(f'Screen: {route}');d.add_paragraph(f'What to screenshot: {shot}')
+ if number>1:d.add_page_break()
+ d.add_paragraph(f'{number}  {title}',style='Heading 1');d.add_paragraph(f'Screen: {route}');d.add_paragraph(f'What to screenshot: {shot}')
  table=d.add_table(rows=1,cols=1);table.alignment=WD_TABLE_ALIGNMENT.CENTER;table.autofit=False
  width=5.4 if title.startswith('Administrator') else 3.15;table.columns[0].width=Inches(width)
  table.rows[0].height=Inches(3.05 if len(bullets)>5 else 3.45);table.rows[0].height_rule=WD_ROW_HEIGHT_RULE.EXACTLY
@@ -96,8 +91,34 @@ for number,(title,route,shot,bullets) in enumerate(screens,1):
  for r in p.runs:r.bold=True
  for index,text in enumerate(bullets,1):
   p=d.add_paragraph(f'{index}. {text}');p.paragraph_format.left_indent=Inches(.2);p.paragraph_format.first_line_indent=Inches(-.2);p.paragraph_format.keep_together=True
+d.add_page_break()
+p=d.add_paragraph();p.add_run('Installation Guide. ').bold=True
+p.add_run('The ElderCareAI Installation Guide provides a step-by-step process for setting up the caregiver mobile application and Galaxy Watch6 companion. It explains how to download and install the Android APK, pair the patient watch, allow monitoring permissions and configure notifications. These steps help caregivers and administrators move from installation to everyday health monitoring and care management.')
+p.paragraph_format.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
+steps=[
+('Download the App','Go to https://eldercareai-capstone.vercel.app/ and select Install or try the app. Tap Download Android APK to open the supplied Google Drive file, then choose Download. If access is restricted, ask the project team to enable access to that file.'),
+('Verify Requirements','Use an Android phone running Android 10 or later for the current phone build, with available storage for the APK and app data. Keep a stable internet connection for Google sign-in, record synchronization, watch pairing and push notifications. This APK is for Android; the administrator portal runs in a web browser.'),
+('Install the Mobile Application','Open the downloaded APK through Downloads or Files. If Android requests permission, temporarily allow that browser or file manager to install unknown apps. Return to the installer, tap Install and open ElderCareAI. Turn off the temporary installation permission when finished.'),
+('Update an Existing Installation','When ElderCareAI is already installed, open the replacement APK and choose Update. Updates must use the same package and signing key. If Android reports a signature conflict, obtain a compatible signed APK from the project team before removing the existing installation.'),
+('Prepare the Galaxy Watch6','Use Galaxy Wearable to pair the patient’s Galaxy Watch6 with the Android phone. ElderCareAI works best with Galaxy Watch6. Install Samsung Health on this same phone to import recorded sleep and supported overnight oxygen from the patient’s watch.'),
+('Install the Watch Companion','Obtain the separate ElderCareAI Wear OS APK from the project team. The phone APK is not the watch installer. For developer installation, enable watch Wi-Fi and Wireless debugging. On a computer with Android platform-tools, run adb pair WATCH_IP:PAIRING_PORT and enter the watch’s displayed pairing code.'),
+('Complete Watch Installation','Run adb connect WATCH_IP:CONNECTION_PORT, followed by adb -s WATCH_IP:CONNECTION_PORT install -r WATCH_APK_PATH. Substitute the current connection address and Wear OS APK path. The connection port is on the main Wireless debugging screen and can differ from the pairing port. Open ElderCareAI on the watch; wireless debugging may then be disabled.'),
+('Sign In and Create Profiles','Open ElderCareAI on the phone, choose Sign in with Google and select the caregiver account. Complete caregiver and older-adult profiles. Check the selected patient before connecting the watch so readings and care records are associated with the intended person.'),
+('Connect the Watch to ElderCareAI','In phone setup or Profile, select Connect or change watch and generate an eight-digit code. Enter it in ElderCareAI on the watch and tap Pair watch. Wait for the connected status. This code links the app to the patient and is separate from Bluetooth and debugging pairing.'),
+('Allow Permissions and Configure Preferences','Allow the watch’s requested sensor, physical activity, precise location and notification permissions. Enable Location and keep device date and timezone correct. In the phone Alerts tab, choose Enable background notifications, grant Android permission and enable audible notification channels. Allow watch alarms and reminders when prompted for medication timing.'),
+('Connect Health History','In Profile, connect Health History and grant the requested Samsung Health access. Confirm that the same patient watch is paired to this phone. Sync after a recorded session is available. Developer builds may require the provided Samsung Health Data SDK and Sensor SDK access setup; contact the project team if authorization fails.'),
+('Start Monitoring and Verify Operation','Tap Start monitoring on the watch. Confirm fresh readings, original timestamps and upload status on the phone. Enable watch internet through Wi-Fi or supported LTE when the paired phone stays behind. Check location source and accuracy, save the safe zone, and verify a deliberate notification test. Fused location may represent the paired phone; an estimated crossing is not proof of the wearer’s actual position.')]
+for number,(label,text) in enumerate(steps,1):
+ if number==8:
+  d.add_page_break();d.add_paragraph('Installation Guide continued',style='Heading 1')
+ p=d.add_paragraph();p.paragraph_format.left_indent=Inches(.25);p.paragraph_format.first_line_indent=Inches(-.25);p.paragraph_format.space_after=Pt(10);p.paragraph_format.keep_together=True
+ p.add_run(f'{number}.  ');p.add_run(label+': ').bold=True
+ if number==1:
+  before,urlafter=text.split('https://eldercareai-capstone.vercel.app/',1);p.add_run(before)
+  link=OxmlElement('w:hyperlink');link.set(qn('r:id'),p.part.relate_to('https://eldercareai-capstone.vercel.app/',RT.HYPERLINK,is_external=True));r=OxmlElement('w:r');pr=OxmlElement('w:rPr');color=OxmlElement('w:color');color.set(qn('w:val'),'0563C1');pr.append(color);r.append(pr);t=OxmlElement('w:t');t.text='https://eldercareai-capstone.vercel.app/';r.append(t);link.append(r);p._p.append(link);p.add_run(urlafter)
+ else:p.add_run(text)
 footer=s.footer.paragraphs[0];footer.alignment=WD_ALIGN_PARAGRAPH.RIGHT
 field=OxmlElement('w:fldSimple');field.set(qn('w:instr'),'PAGE');footer._p.append(field)
-path=OUT/'ElderCareAI_User_Guide_Updated.docx';d.save(path)
+path=OUT/'ElderCareAI_User_Guide_Final.docx';d.save(path)
 alltext=' '.join(p.text for p in d.paragraphs);assert 'Live walk' not in alltext and 'live walk' not in alltext
 print(path,len(screens),'sections')
