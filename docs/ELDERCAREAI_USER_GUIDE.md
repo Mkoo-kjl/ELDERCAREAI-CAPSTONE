@@ -1,6 +1,6 @@
 # ElderCareAI User Guide
 
-The current screen by screen guide is [ElderCareAI User Guide](ELDERCAREAI_USER_GUIDE_FINAL.docx). It contains 20 figure placeholders with the screen to capture and numbered operating instructions below each figure.
+The current screen by screen guide is [ElderCareAI User Guide](ELDERCAREAI_USER_GUIDE_SLEEP_SETUP.docx). It contains 20 figure placeholders with the screen to capture and numbered operating instructions below each figure.
 
 Capture, in order: sign in; caregiver and patient setup; watch connection; watch monitoring; dashboard; vitals; vital detail and stable Elle insight; analytics; health history sync; live location and safe zone; medications; prescription review; appointments; care schedule; alerts and notifications; SOS and emergency contacts; Elle; settings and exports; administrator overview and accounts; administrator monitoring and reports.
 
@@ -8,4 +8,4 @@ Install the Android phone app through [the ElderCareAI website](https://eldercar
 
 Use real demonstration data and conceal names, phone numbers, medical notes and exact home coordinates before adding images to a report. The gray figure boxes in the Word guide are placeholders to replace with screenshots from the installed app or web portal.
 
-The guide starts at Sign in. The Installation Guide appears at the end with an introductory paragraph and 12 numbered steps covering download, Android requirements, phone and watch installation, pairing, permissions and verification.
+The guide starts at Sign in. The Installation Guide appears at the end with an introductory paragraph and 13 numbered steps covering download, Android requirements, phone and watch installation, pairing, permissions and verification.

@@ -1,0 +1,148 @@
+PAGE 1
+216 
+ 
+monitoring (M = 4.49), AI -generated suggestions (M = 4.56), and appliance -level consumption 
+reports (M = 4.45) are highly beneficial for managing household energy use. They also recognized 
+the value of historical data access (M = 4.63) and real-time alerts (M = 4.56) in helping them track 
+patterns, adjust habits, and make informed energy decisions. In contrast, participants strongly 
+disagreed with negative statements such as “viewing past electricity usage is not helpful” (M = 
+1.56) and “real-time alerts will overwhelm users” (M = 1.43), showing confidence in WisEnergy’s 
+practicality and user-friendly design. 
+These findings align with Chen, Gan, and Zhang (2021), who found that Home Energy 
+Management Systems (HEMS) offering real-time data and alerts significantly improve household 
+awareness and energy-saving behavior. Lyu, Hong, and Taylor-Lange (2022) similarly noted that 
+access to detailed energy-use data enables users to identify seasonal consumption trends and plan 
+more efficiently. In addition, Ferrari et al. (2023) confirmed that visualizing energy trends through 
+historical data enhances users’ ability to anticipate and manage electricity demand.  
+Taken together, these studies reinforce the survey results and demonstrate that 
+WisEnergy’s top features, including real-time monitoring, AI-powered insights, data visualization, 
+and timely alerts, align with proven strategies for improving household energ y efficiency. This 
+consistency with existing research suggests that WisEnergy can effectively enhance energy 
+awareness, promote informed decision-making, and encourage sustainable consumption behavior 
+among users. 
+Findings of the Study 
+The study revealed that WisEnergy, an IoT- and AI-powered household energy monitoring 
+application, effectively addresses significant gaps in current household energy management 
+practices in Mandaue City and Lapu -Lapu City. Using a descriptive research desi gn, the research 
+team gathered insights from 418 respondents. Key findings include the need for improved 
+awareness of appliance-level consumption, better budgeting and forecasting of electricity bills, and 
+more accessible tools for tracking and analyzing u sage patterns. Respondents expressed strong 
+agreement that features such as real-time monitoring, appliance-level reports, mobile accessibility, 
+AI-generated recommendations, and timely alerts would enhance their ability to manage and reduce 
+energy costs. Negative perceptions of current energy monitoring practices, coupled with high 
+support for WisEnergy’s proposed features, highlight its potential to empower households to make 
+informed energy decisions, optimize consumption, and reduce electricity expenses while promoting 
+sustainable energy use. 
+ 
+ 
+PAGE 2
+217 
+ 
+CONCLUSION 
+The study concludes that WisEnergy is a feasible and effective system that responds to the 
+energy monitoring and management challenges faced by households in Mandaue City and Lapu -
+Lapu City. Findings revealed that most respondents experience difficulties i n tracking appliance-
+level consumption, managing electricity budgets, and interpreting monthly billing data. These 
+results indicate a clear lack of accessible, reliable, and user-friendly tools for understanding energy 
+usage in local households. The proposed WisEnergy system addresses these issues by providing a 
+mobile platform that integrates IoT-based data collection with AI-powered analysis to deliver real-
+time monitoring, personalized recommendations, and timely alerts. 
+Survey responses showed a strong positive reception to WisEnergy’s design and features. 
+Respondents rated the system highly in terms of ease of use, accuracy, and overall usefulness, 
+suggesting that its implementation could significantly improve awareness, convenience, and energy 
+efficiency. The platform’s simple interfa ce and visual presentation of data make it inclusive and 
+practical, particularly for non -technical users and older adults. With real -time information and 
+budget tracking, users can better understand their energy behavior and take immediate action to 
+control costs. 
+The results further demonstrate that WisEnergy has the potential to strengthen household 
+participation in sustainable energy practices. By enabling users to make informed decisions and 
+monitor appliance usage effectively, the system promotes both financial savings and environmental 
+responsibility. It also aligns with the growing demand for digital solutions that encourage 
+sustainability and smart living in Philippine communities. Continued enhancement of the system, 
+including improved offline access, support for multiple users, and integration with sma rt home 
+devices, will further expand its usability and long-term impact. 
+The study concludes that WisEnergy is a household -focused energy management system 
+that integrates AI and IoT technologies to make monitoring simpler, raise awareness, and support 
+informed decision-making in electricity consumption. Designed for residents of Mandaue City and 
+Lapu-Lapu City, the system improves daily energy management through real -time appliance 
+tracking, budget alerts, and personalized recommendations that encourage efficient and responsible 
+energy use. With deliberate attention to accuracy , usability, and accessibility, WisEnergy 
+demonstrates strong potential to help households better understand and control their energy 
+consumption, leading to greater cost savings and promoting sustainable living within the 
+community. 
+ 
+ 
+PAGE 3
+218 
+ 
+RECOMMENDATIONS 
+These recommendations aim to guide future researchers and developers in enhancing or 
+expanding WisEnergy, drawing from the insights gathered during the study. They provide a 
+foundation for continued innovation in household energy monitoring and management: 
+• Enable integration with smart home ecosystems  – Allow WisEnergy to connect with 
+existing smart home assistants and IoT devices for automated control of appliances based 
+on real-time energy data. 
+• Offer incentive and reward systems: Partner with local utilities or government programs 
+to give discounts, vouchers, or recognition to users who consistently meet energy -saving 
+goals. 
+• Multi-user household accounts: Allow different family members to access the app with 
+role-based permissions, encouraging shared responsibility for energy use. 
+• Allow multiple property management: Provide an option for users to manage multiple 
+households or properties (e.g., a primary home and a rented unit) under a single account to 
+broaden WisEnergy’s applicability for homeowners, landlords, and property managers. 
+• Expand educational resources:  Include in-app guides, energy -saving tips, and tutorial 
+videos to help users understand appliance consumption and the long -term benefits of 
+efficient energy management. 
+• Implement dark mode and accessibility options:  Offer a dark mode for visual comfort 
+and integrate accessibility features such as larger fonts, simple icons, and guided tooltips 
+for elderly users or those with limited technical experience. 
+• Support offline functionality:  Allow limited offline features , such as viewing cached 
+reports or recent energy summaries, so that users in areas with unstable internet connection, 
+especially in provincial settings, can still access essential information. 
+• Add gamification and motivational features:  Introduce leaderboards, progress badges, 
+or streaks to make energy-saving goals engaging. Gamified feedback can motivate users to 
+maintain low consumption habits. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+PAGE 4
+219 
+ 
+TRANSLATIONAL RESEARCH
+The primary objective of WisEnergy  is to enhance household energy efficiency and 
+encourage responsible electricity consumption through the use of a mobile application integrated 
+with Internet of Things (IoT) and Artificial Intelligence (AI) technologies. The system enables 
+users to monitor appliance-level energy usage in real time, receive alerts on high consumption, and 
+access data -driven recommendations for reducing electricity costs. By providing accurate, 
+transparent, and user -friendly information, WisEnergy supports households in makin g informed 
+energy decisions and adopting sustainable consumption practices. 
+The initial implementation phase will focus on selected households within Mandaue City 
+and Lapu-Lapu City. This pilot deployment will evaluate the system’s functionality, reliability, and 
+user acceptability while gathering feedback to refine its technical and interface components. 
+Insights obtained from this phase will guide subsequent improvements to ensure that the system 
+remains responsive to the energy management needs of local communities and adaptable to 
+different residential contexts. 
+WisEnergy’s key features include real -time monitoring of electricity usage, budget 
+management and bill estimation based on VECO and MECO rates, and AI -generated 
+recommendations for optimizing consumption. The system also issues alerts when usage 
+approaches preset budget limits or when irregular consumption patterns are detected. Periodic 
+testing, performance evaluation, and software updates will be conducted to maintain accuracy, 
+efficiency, and system stability over time. 
+As WisEnergy expands, the researchers will continue to refine its design and improve its 
+analytical capabilities to ensure it remains responsive to evolving user needs while advancing local 
+and environmental sustainability goals. This continuous development process will guide the system 
+toward becoming a model for community -based energy management solutions that contribute to 
+both household savings and broader environmental well-being. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

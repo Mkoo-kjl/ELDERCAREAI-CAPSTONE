@@ -22,6 +22,19 @@ export function validDateKey(value: string) {
   const date = new Date(`${value}T12:00:00`);
   return Number.isFinite(date.getTime()) && localDateKey(date) === value;
 }
+/** Calendar dates stay local; never parse a date-only database value as UTC. */
+export function careDate(value: string | null | undefined): Date | null {
+  if (!value || !validDateKey(value.trim())) return null;
+  const [year, month, day] = value.trim().split('-').map(Number);
+  const date = new Date(0);
+  date.setFullYear(year, month - 1, day);
+  date.setHours(12, 0, 0, 0);
+  return date;
+}
+export function formatCareDate(value: string | null | undefined) {
+  const date = careDate(value);
+  return date ? date.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}) : 'Choose date';
+}
 export function careZoneParts(date:Date,timezone=Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Manila'){
   const parts=new Intl.DateTimeFormat('en-CA',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(date);
   const get=(name:string)=>parts.find(part=>part.type===name)?.value??'00';

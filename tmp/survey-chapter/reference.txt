@@ -1,0 +1,201 @@
+PAGE 1
+ 
+ 
+CHAPTER IV 
+PRESENTATION, ANALYSIS AND INTERPRETATION OF DATA 
+In this chapter, the researchers present an in-depth analysis of the study’s results, providing 
+a clear summary of the collected data and its significance. The data are organized in tables for 
+clarity, accompanied by a concise discussion that highlights their relevance and implications. 
+Profile of the respondents 
+The demographic profile of respondents includes key details relevant to household energy 
+consumption in Mandaue City and Lapu -Lapu City. The profile captures the respondents’ city of 
+residence, type of residence, responsibility for paying the household ele ctricity bill, peak billing 
+season, highest recorded electricity bill during peak season, number of appliances in use during 
+peak consumption, and average monthly electricity bill. It also records the types of appliances 
+frequently used at home and whether the respondents currently use any energy monitoring tool or 
+system. These details provide essential context for analyzing household energy usage patterns and 
+evaluating the potential impact of WisEnergy. 
+Place of Residence 
+ 
+Figure 92: Respondents’ City of Residence 
+The survey data in Figure 92 shows the distribution of respondents according to their city 
+of residence. Out of the total participants, 198 respondents (47.3%) are from Lapu-Lapu City, while 
+220 respondents (52.7%) are from Mandaue City. This indicates a relatively balanced 
+representation between the two areas, ensuring that the gathered data reflects the perspectives and 
+
+PAGE 2
+204 
+ 
+experiences of residents from both cities. In a study by Olfato -Parojinog et al. (2024), it was 
+emphasized that people in different Philippine cities may have different experiences and views, 
+making it important to include multiple localities when conducti ng research. Such distribution is 
+important for the study, as it allows for a more comprehensive understanding of the local context 
+in which the proposed WisEnergy application will be implemented. 
+Type of Residence 
+ 
+Figure 93: Respondents’ Type of Housing 
+Figure 93 shows the distribution of respondents based on their type of residence. The 
+majority, 235 respondents, live in houses, followed by 112 residing in subdivisions. Boarding 
+houses account for 48 respondents, while apartments or condominiums represent the smallest group 
+with 23 respondents. This breakdown highlights how living arrangements may influence household 
+energy consumption and the applicability of the WisEnergy system. 
+According to Ali et al. (2021), housing characteristics such as dwelling size and structure 
+significantly affect electricity consumption, with larger homes typically using more energy due to 
+a greater number of appliances. Similarly, Gupta et al. (2024) emphasized that household type and 
+socio-economic conditions shape comfort needs and appliance usage patterns, especially in urban 
+areas. These findings indicate that different residence types lead to distinct energy behaviors, where 
+detached houses often have higher consumption compared to shared or rental units. Understanding 
+these variations allows the WisEnergy system to be more adaptive and responsive to the unique 
+energy management needs of each household type. 
+
+PAGE 3
+205 
+ 
+Bill Responsibility 
+ 
+Figure 94: Household Electricity Bill Responsibility 
+Figure 94 shows that 284 respondents are directly responsible for paying their household’s 
+electricity bills, while 134 are not. This indicates that most participants are actively involved in 
+managing energy expenses, giving them firsthand awareness of consumption patterns and billing 
+fluctuations. Their direct role allows them to provide valuable insights into current energy habits 
+and the potential benefits of using WisEnergy. 
+Research shows that households directly engaged with their bills are more willing to adopt 
+energy management systems (Chen et al., 2021) and seek more information about their energy use 
+(Trotta, 2021). Likewise, consumers who experience significant bill in creases are more likely to 
+invest in energy -saving measures (Lang et al., 2024). Thus, respondents who handle their own 
+electricity payments are more likely to recognize changes in consumption and appreciate the 
+usefulness of monitoring tools like WisEnergy. 
+Peak Billing Season 
+ 
+Figure 95: Period When Respondents’ Electricity Bills Typically Peak 
+
+PAGE 4
+206 
+ 
+Figure 95 presents the distribution of respondents based on the time of year when their 
+electricity bills usually reach their highest amounts. The largest group, comprising 132 respondents, 
+reported that their electricity bills remain consistent throughout the year , indicating stable 
+consumption patterns. This is followed by 110 respondents who identified the holiday season 
+(October–December) as their peak billing period, which may be attributed to increased appliance 
+use for celebrations, gatherings, and festive li ghting. Another 100 respondents reported that the 
+summer season (April –June) is when their bills peak, likely due to higher usage of cooling 
+appliances such as air conditioners and electric fans.  
+A smaller number of respondents indicated the rainy season (July–September) as their peak 
+period (42), and the fewest respondents, 34, experienced peak bills at the start of the year (January–
+March). These variations suggest that both seasonal climate changes and lifestyle patterns influence 
+household electricity consumption. Studies have shown that residential cooling behavior varies 
+significantly across seasons (Lyu et al., 2022) and that even small temperature increases can raise 
+household electricity de mand (Roberts et al., 2022). Similarly, Ferrari et al. (2023) found that 
+residential electricity loads typically peak during hotter months, supporting the observed summer 
+increase in consumption among respondents. 
+Highest Peak Bill Amount 
+ 
+Figure 96: Range of Respondents’ Highest Electricity Bills During Peak Season 
+Figure 96 illustrates the range of respondents’ highest electricity bills during their 
+identified peak season. The majority, 250 respondents, reported paying above ₱4,000, indicating 
+substantial energy consumption during this period. This is followed by 69 respondents each in the 
+
+PAGE 5
+207 
+ 
+₱2,001–₱3,000 and ₱3,001–₱4,000 ranges, suggesting a considerable portion of households still 
+experience moderately high bills. Twenty -one respondents reported a peak bill between ₱1,000 –
+₱2,000, while only nine indicated their highest bill was below ₱1,000.  
+The data highlights that most households in Mandaue City and Lapu -Lapu City face 
+significant energy costs during their peak consumption periods. This aligns with findings that 
+households with variable consumption profiles tend to experience higher peak electricity expenses 
+(Hwang et al., 2025) and that weather fluctuations, particularly warmer temperatures, significantly 
+increase residential energy demand (Kang et al., 2022). These results support the importance of 
+monitoring and optimizing energy usage thr ough systems like WisEnergy to help households 
+manage peak-season costs effectively. 
+Appliance Count During Peak 
+ 
+Figure 97: Number of Appliances in Use During Respondents’ Peak Billing Period 
+Figure 97 shows the number of electric -powered appliances or devices typically in use in 
+respondents’ households during their peak billing period. The largest group, comprising 160 
+respondents, reported operating between 6–10 appliances, while 124 respondents indicated having 
+more than 16 appliances in operation, suggesting very high household energy demands. Another 
+106 respondents reported using between 1 –5 appliances, and 28 respondents stated that they 
+typically used 11 –15 appliances during peak periods. This di stribution reveals that many 
+households operate a substantial number of appliances simultaneously when consumption is at its 
+highest, which likely drives up electricity costs. McKenna, Richardson, and Thomson (2021) found 
+that the number of household appli ances and occupancy patterns significantly influence peak 
+
+PAGE 6
+208 
+ 
+electricity loads. Furthermore, Almeida et al. (2024) emphasized that behavioral aspects and 
+dwelling characteristics affect how appliances are utilized, particularly for cooling and comfort. 
+These studies validate the survey findings and underscore the im portance of systems like 
+WisEnergy in tracking appliance-level usage and promoting efficient energy management during 
+peak demand periods. 
+Average Monthly Bill 
+ 
+Figure 98: Common Monthly Electricity Bill Ranges of Respondents 
+Figure 98 presents the distribution of respondents’ average monthly electricity bills, 
+showing that the majority, 248 respondents, pay above ₱3,000 per month, followed by 79 
+respondents within the ₱2,001 –₱3,000 range and 72 respondents paying ₱1,001 –₱2,000. Only a 
+small portion reported lower bills, with 15 respondents paying ₱501 –₱1,000 and 4 respondents 
+paying below ₱500. These results indicate that most households in Mandaue City and Lapu -Lapu 
+City face substantial electricity expenses, likely influenced by appli ance usage patterns, seasonal 
+demands, and energy efficiency practices. 
+Similar findings have been documented in international and local studies. Ali et al. (2021) 
+identified that household electricity consumption increases with income, number of rooms, and 
+appliance ownership, showing that higher living standards directly correlate with increased energy 
+use. Never et al. (2022) further observed that middle -class households in the Philippines exhibit 
+growing electricity demand influenced by behavior, environmental awareness, and appliance 
+usage. Additionally, Olatunde, Okwandu,  and Akande (2024) highlighted that adopting energy -
+efficient appliances significantly reduces household electricity consumption and overall expenses 
+by minimizing energy wastage while maintaining performance. 
+
+PAGE 7
+209 
+ 
+Frequently Used Appliances 
+ 
+Figure 99: Appliances Most Frequently Used by Respondents 
+Figure 99 shows that electric fans (361) and refrigerators (359) are the most frequently 
+used appliances, followed by washing machines (335) and televisions (316). Air conditioners (296) 
+also have high usage despite their significant energy consumption. Desktop com puters (238), 
+microwave/oven units (196), and water heaters (145) are used less frequently but still contribute to 
+household electricity demand. 
+These findings are consistent with studies showing that cooling and refrigeration 
+appliances account for the largest share of household energy use. Ali et al. (2021) reported that 
+kitchen and cooling equipment are dominant electricity consumers in urban ho useholds, strongly 
+influenced by lifestyle and appliance ownership. Gupta et al. (2024) similarly found that household 
+comfort needs—particularly thermal comfort—drive the frequent use of fans, refrigerators, and air 
+conditioners across low- and middle-income housing. Moreover, Lyu et al. (2022) demonstrated 
+that seasonal variation in residential cooling behavior substantially raises electricity demand, 
+especially during warmer months. 
+Together, these studies support the survey’s observation that frequently used appliances 
+such as fans, refrigerators, washing machines, and air conditioners are major contributors to 
+household electricity consumption. They also highlight the importance of WisEnergy’s appliance-
+level monitoring feature to help users track high -consumption devices, adjust behavior, and 
+promote energy-efficient practices. 
+
+PAGE 8
+210 
+ 
+Use of Existing Energy Monitoring Tools 
+ 
+Figure 100: Respondents Currently Using an Energy Monitoring Tool or System 
+Figure 100 shows that only 13 respondents currently use an energy monitoring tool or 
+system at home, while the vast majority (405 respondents) reported not using one. This low 
+adoption rate reveals a significant opportunity for WisEnergy to address the gap by offeri ng an 
+accessible, user-friendly, and affordable platform for real-time energy tracking and management in 
+households. The results indicate that most households still rely on traditional methods, such as 
+manually checking monthly bills, which provide limited  insight into daily or appliance -level 
+consumption. 
+This finding is consistent with global research showing that the use of Home Energy 
+Management Systems (HEMS) remains low, especially in developing countries. Chen, Gan, and 
+Zhang (2021) found that many users are discouraged by the perceived complexity, hi gh upfront 
+cost, and lack of awareness about potential benefits. Similarly, Trotta (2021) reported that 
+households often underestimate their electricity usage and have little demand for energy feedback 
+technologies due to limited understanding of how these  tools work. Lang, Nakolan, Rapson, and 
+Taylor (2024) further observed that many households tend to respond only after receiving unusually 
+high energy bills, rather than actively monitoring their consumption throughout the month. 
+These patterns reflect a broader behavioral challenge in energy management: users often 
+recognize the importance of saving electricity but lack practical tools that make tracking and 
+analysis simple and rewarding. By integrating real -time monitoring, AI-driven recommendations, 
+and intuitive mobile features, WisEnergy can bridge this awareness gap, motivating users to adopt 
+more efficient habits and proactively manage their energy use. 

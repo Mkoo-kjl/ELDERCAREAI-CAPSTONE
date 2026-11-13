@@ -1,0 +1,517 @@
+[
+  {
+    "paragraph": 7,
+    "old": "The overview identifies the Caregiver, Elderly Person, and Administrator use cases. The existing detailed figures and formatted tables are retained, and the View System Overview table is added to complete the diagram's use case list.",
+    "new": "The overview identifies the Caregiver, Elderly Person, and Administrator roles, including watch monitoring, care plans, health review, emergency support, and system administration."
+  },
+  {
+    "paragraph": 20,
+    "old": "The caregiver opens ElderCareAI and selects Continue with Google.",
+    "new": "The caregiver opens ElderCareAI and selects Sign in with Google."
+  },
+  {
+    "paragraph": 29,
+    "old": "1. Open the app and select Continue with Google.",
+    "new": "1. Open the app and select Sign in with Google."
+  },
+  {
+    "paragraph": 66,
+    "old": "4. Select the Log in button.",
+    "new": "4. Select the Sign in button."
+  },
+  {
+    "paragraph": 78,
+    "old": "A newly authenticated caregiver completes the introduction, caregiver profile, older-adult profile, Google Health step, and optional phone-location consent.",
+    "new": "A newly authenticated caregiver completes the introduction, caregiver and patient profiles, Galaxy Watch pairing, and watch-location sharing setup."
+  },
+  {
+    "paragraph": 86,
+    "old": "A newly authenticated caregiver completes the introduction, caregiver profile, older-adult profile, Google Health step, and optional phone-location consent.",
+    "new": "A newly authenticated caregiver completes the introduction, caregiver and patient profiles, Galaxy Watch pairing, and watch-location sharing setup."
+  },
+  {
+    "paragraph": 92,
+    "old": "Each completed step is timestamped and the caregiver enters Home; wearable and location steps may be skipped.",
+    "new": "Completed setup steps are saved and the caregiver enters Home; watch pairing may be completed later."
+  },
+  {
+    "paragraph": 114,
+    "old": "7. Wear Tracker or skip the wearable step.",
+    "new": "7. Connect Galaxy Watch6 using the phone-generated code, or skip pairing."
+  },
+  {
+    "paragraph": 117,
+    "old": "9. Allow foreground phone location or continue without it.",
+    "new": "9. Review watch location sharing and select Finish setup."
+  },
+  {
+    "paragraph": 129,
+    "old": "8. Store the connection state and paired-device count when available.",
+    "new": "8. Save the watch pairing state and paired-device count when available."
+  },
+  {
+    "paragraph": 132,
+    "old": "10. Save the choice, complete onboarding, and open Home.",
+    "new": "10. Complete setup and open Home; location permission is requested on the watch when monitoring starts."
+  },
+  {
+    "paragraph": 136,
+    "old": "The caregiver reviews the latest synchronized readings, measurement times, care-plan preview, doctor shortcut, tracker sync status, and last saved sync location.",
+    "new": "The caregiver reviews current readings, measurement times, care tasks, doctor shortcuts, watch upload status, and the latest received watch location."
+  },
+  {
+    "paragraph": 144,
+    "old": "The caregiver reviews the latest synchronized readings, measurement times, care-plan preview, doctor shortcut, tracker sync status, and last saved sync location.",
+    "new": "The caregiver reviews current readings, measurement times, care tasks, doctor shortcuts, watch upload status, and the latest received watch location."
+  },
+  {
+    "paragraph": 169,
+    "old": "2. Load profile, care-plan, doctor, latest vital, and sync metadata.",
+    "new": "2. Load profiles, care tasks, doctor contacts, current vitals, and watch status."
+  },
+  {
+    "paragraph": 171,
+    "old": "4. Reconcile Google Health and update the visible sync result.",
+    "new": "4. Refresh saved watch data and available Health History imports."
+  },
+  {
+    "paragraph": 172,
+    "old": "    4.1. If new Google Health readings are available, save them and refresh the visible values.",
+    "new": "    4.1. If newer records exist, display their values and original measurement times."
+  },
+  {
+    "paragraph": 173,
+    "old": "    4.2. Else, preserve the latest saved values and show an explicit no-new-data or disconnected state.",
+    "new": "    4.2. Else, retain saved values and identify missing, stale, or disconnected data."
+  },
+  {
+    "paragraph": 195,
+    "old": "Selected alerts or notifications are marked read, resolved, or cleared as permitted.",
+    "new": "Selected alerts are reviewed or resolved; notifications are marked read or cleared as permitted."
+  },
+  {
+    "paragraph": 204,
+    "old": "5. Review the alert or notification details.6. Mark the item as read, resolve the alert, or clear the notification when appropriate.",
+    "new": "5. Review alert details and available response actions.6. Mark a notification read, resolve an alert with a response note, or clear a notification."
+  },
+  {
+    "paragraph": 205,
+    "old": "2. Load health alerts and caregiver notifications. If no records exist, display an empty state.4. Display the selected item's severity, message, time, and status.",
+    "new": "2. Load alerts and notifications; display an empty state when none exist.4. Show severity, original time, status, and linked medications when available."
+  },
+  {
+    "paragraph": 213,
+    "old": "The caregiver reviews data-driven summaries that compare the newest synchronized readings with recent personal averages and explicit review thresholds.",
+    "new": "The caregiver reviews recorded vital values, readable status labels, recent changes, and general preventive care guidance for available metrics."
+  },
+  {
+    "paragraph": 221,
+    "old": "The caregiver reviews data-driven summaries that compare the newest synchronized readings with recent personal averages and explicit review thresholds.",
+    "new": "The caregiver reviews recorded vital values, readable status labels, recent changes, and general preventive care guidance for available metrics."
+  },
+  {
+    "paragraph": 223,
+    "old": "The caregiver opens Health and selects Insights.",
+    "new": "The caregiver opens Health and selects AI Insights."
+  },
+  {
+    "paragraph": 232,
+    "old": "1. Open Health and select Insights.",
+    "new": "1. Open Health and select AI Insights."
+  },
+  {
+    "paragraph": 234,
+    "old": "3. Review heart rate, SpO2, sleep, steps, skin temperature, or HRV summaries.",
+    "new": "3. Review heart rate, SpO2, sleep, daily steps, wrist temperature, or experimental HRV-based stress summaries."
+  },
+  {
+    "paragraph": 246,
+    "old": "4. Compare the newest values with recent personal averages when enough data exists.",
+    "new": "4. Derive status labels and recent changes from available recorded measurements."
+  },
+  {
+    "paragraph": 247,
+    "old": "    4.1. If enough history exists, compare the newest reading with the recent personal average.",
+    "new": "    4.1. If readings exist, show dated values and supported changes with general wellness guidance."
+  },
+  {
+    "paragraph": 248,
+    "old": "    4.2. Else, display that more synchronized readings are required.",
+    "new": "    4.2. Else, identify the missing metric without inventing measurements or advice."
+  },
+  {
+    "paragraph": 250,
+    "old": "6. Show its latest value, recent values, source explanation, and caution.",
+    "new": "6. Show live values, saved history, and a stable Elle insight with manual refresh."
+  },
+  {
+    "paragraph": 599,
+    "old": "The caregiver authorizes Google Health API v4, while the older adult's compatible tracker is paired through the Google Health account rather than directly to ElderCareAI.",
+    "new": "The patient wears Galaxy Watch6 running ElderCareAI, paired directly to the patient profile; monitoring uploads measurements to Supabase."
+  },
+  {
+    "paragraph": 607,
+    "old": "The elderly person wears a compatible tracker so it can collect supported health measurements for later synchronization.",
+    "new": "The elderly person wears the paired Galaxy Watch6 and starts ElderCareAI monitoring to collect supported vital and location measurements."
+  },
+  {
+    "paragraph": 609,
+    "old": "The elderly person puts on and uses the configured tracker.",
+    "new": "The elderly person wears the configured watch and starts monitoring."
+  },
+  {
+    "paragraph": 611,
+    "old": "The tracker is charged, configured, and paired with the connected health service.",
+    "new": "Galaxy Watch6 is charged, paired to the ElderCareAI patient profile, and has the required permissions."
+  },
+  {
+    "paragraph": 613,
+    "old": "Supported measurements are collected and become available to the connected health service when the device synchronizes.",
+    "new": "Available measurements update watch cards and are uploaded to Supabase; unsent vital events remain queued for retry."
+  },
+  {
+    "paragraph": 618,
+    "old": "1. Wear the tracker as instructed.",
+    "new": "1. Wear Galaxy Watch6 with suitable wrist contact."
+  },
+  {
+    "paragraph": 620,
+    "old": "3. Keep the tracker charged and use it during normal daily activity.",
+    "new": "3. Tap Start monitoring; keep location, sensor permissions, and internet available."
+  },
+  {
+    "paragraph": 622,
+    "old": "5. Allow the tracker or companion service to synchronize available readings.",
+    "new": "5. Request a blood-oxygen spot check when desired; foreground auto checks are optional."
+  },
+  {
+    "paragraph": 624,
+    "old": "2. Collect supported measurements.",
+    "new": "2. Request supported vital measurements and GPS, fused, or network locations."
+  },
+  {
+    "paragraph": 626,
+    "old": "4. Report the paired or disconnected state.",
+    "new": "4. Show sensor, location-source, accuracy, and upload status."
+  },
+  {
+    "paragraph": 629,
+    "old": "6. Make synchronized readings available to ElderCareAI through the connected health service.",
+    "new": "6. Save accepted vital events and share current values with the caregiver app; import recorded sleep separately through Samsung Health."
+  },
+  {
+    "paragraph": 631,
+    "old": "7. If the tracker is off, unpaired, or out of power, return no new measurements.",
+    "new": "7. If the watch is off or monitoring stops, no new live events are collected; queued vital uploads retry when possible."
+  },
+  {
+    "paragraph": 635,
+    "old": "ElderCareAI reconciles available Google Health readings after manual requests, app foreground events, or supported webhook notifications and updates the caregiver view through Realtime.",
+    "new": "Galaxy Watch6 uploads measurements directly to Supabase. Realtime and reconciliation refresh the caregiver view; Health History imports recorded sleep and supported oxygen."
+  },
+  {
+    "paragraph": 643,
+    "old": "The elderly person views a supported current or recent measurement on the tracker or its paired device interface.",
+    "new": "The elderly person views available readings on the ElderCareAI watch dashboard and checks their measurement age or sensor status."
+  },
+  {
+    "paragraph": 645,
+    "old": "The elderly person checks the tracker for a vital reading.",
+    "new": "The elderly person opens ElderCareAI on the watch to inspect a reading."
+  },
+  {
+    "paragraph": 647,
+    "old": "The tracker supports the selected vital and has a valid reading.",
+    "new": "The watch is paired and the selected metric has a usable current or saved reading."
+  },
+  {
+    "paragraph": 649,
+    "old": "The measurement is displayed for personal awareness without changing ElderCareAI records.",
+    "new": "The watch displays the available reading and status while accepted measurements are recorded through monitoring."
+  },
+  {
+    "paragraph": 654,
+    "old": "1. Wake the tracker display.",
+    "new": "1. Wake Galaxy Watch6 and open ElderCareAI."
+  },
+  {
+    "paragraph": 656,
+    "old": "2. Open the supported health or vital tile.",
+    "new": "2. View the dashboard or open a blood-oxygen spot check."
+  },
+  {
+    "paragraph": 664,
+    "old": "7. Continue wearing the tracker so later readings can synchronize.",
+    "new": "7. Continue monitoring and keep internet available for uploads."
+  },
+  {
+    "paragraph": 667,
+    "old": "3. Display the supported measurement.",
+    "new": "3. Display available heart rate, wrist temperature, monitored steps, oxygen, or HRV-based stress estimate."
+  },
+  {
+    "paragraph": 669,
+    "old": "4. If no valid reading exists, show the device-specific unavailable or retry state.",
+    "new": "4. If a valid reading is unavailable, show waiting, missing-data, or retry feedback."
+  },
+  {
+    "paragraph": 718,
+    "old": "The caregiver creates or edits medication and appointment schedules, the device schedules local reminders when permission is available, and the caregiver records a taken dose.",
+    "new": "The caregiver manages medications and appointments, optionally reviews a prescription draft, and receives reminders; phone or watch dose confirmations update saved records."
+  },
+  {
+    "paragraph": 726,
+    "old": "The caregiver creates or edits medication and appointment schedules, the device schedules local reminders when permission is available, and the caregiver records a taken dose.",
+    "new": "The caregiver manages medications and appointments, optionally reviews a prescription draft, and receives reminders; phone or watch dose confirmations update saved records."
+  },
+  {
+    "paragraph": 732,
+    "old": "The care item is saved, local notification identifiers are stored when scheduled, and taken doses are recorded in medication_logs.",
+    "new": "Care items, images, times, and confirmed doses are saved; eligible reminders use local scheduling and server push."
+  },
+  {
+    "paragraph": 737,
+    "old": "1. Open Care and add or edit a medication or future appointment.",
+    "new": "1. Open Care and add or edit a medication or appointment; review any prescription draft before confirming it."
+  },
+  {
+    "paragraph": 749,
+    "old": "5. Record a dose after the older adult takes the medication.",
+    "new": "5. Confirm the corresponding dose as Taken on the phone or watch after medication is taken."
+  },
+  {
+    "paragraph": 751,
+    "old": "7. Review reminder or permission feedback.",
+    "new": "7. Review reminder, permission, and confirmation status."
+  },
+  {
+    "paragraph": 753,
+    "old": "2. Validate required fields, reminder time, and future appointment date.",
+    "new": "2. Validate required fields, local schedule dates, and AM/PM reminder times."
+  },
+  {
+    "paragraph": 757,
+    "old": "4. Store the schedule and request local notifications when applicable.",
+    "new": "4. Save the schedule and prepare eligible local, server-push, or watch reminders."
+  },
+  {
+    "paragraph": 758,
+    "old": "    4.1. If notification permission is available, schedule the local reminder and store its identifier.",
+    "new": "    4.1. If delivery is enabled, schedule each due event separately, including events at the same time."
+  },
+  {
+    "paragraph": 759,
+    "old": "    4.2. Else, save the care item without a scheduled notification.",
+    "new": "    4.2. Else, retain the schedule and explain the missing permission or registration."
+  },
+  {
+    "paragraph": 761,
+    "old": "6. Insert a taken medication log and recalculate today's due/taken status.",
+    "new": "6. Save one confirmation per scheduled dose and update the phone and watch after synchronization."
+  },
+  {
+    "paragraph": 767,
+    "old": "With optional foreground permission, a successful app-initiated health sync may save the caregiver phone's location for later map viewing.",
+    "new": "The caregiver views watch-uploaded GPS, fused, or network estimates on a live map and configures the patient safe zone."
+  },
+  {
+    "paragraph": 775,
+    "old": "With optional foreground permission, a successful app-initiated health sync may save the caregiver phone's location for later map viewing.",
+    "new": "The caregiver views watch-uploaded GPS, fused, or network estimates on a live map and configures the patient safe zone."
+  },
+  {
+    "paragraph": 777,
+    "old": "The caregiver opens Last sync location or completes a successful eligible sync.",
+    "new": "The caregiver opens Live location tracking or receives a safe-zone notification."
+  },
+  {
+    "paragraph": 779,
+    "old": "Foreground phone-location consent is enabled and an eligible health sync succeeds; otherwise an empty state is valid.",
+    "new": "A patient watch is paired; fresh locations require monitoring, location access, and internet on the watch."
+  },
+  {
+    "paragraph": 781,
+    "old": "The newest authorized phone-location event is shown on an OpenStreetMap-backed map, or the app explains why no location is available.",
+    "new": "The map shows the latest location source, age, accuracy, and saved zone; qualifying estimated crossings create alerts."
+  },
+  {
+    "paragraph": 786,
+    "old": "1. Allow foreground phone location or leave it disabled.",
+    "new": "1. Enable location on the watch and tap Start monitoring."
+  },
+  {
+    "paragraph": 788,
+    "old": "3. Complete an eligible successful sync while the app is open.",
+    "new": "3. Choose the home center and zone radius, then save and enable the zone."
+  },
+  {
+    "paragraph": 795,
+    "old": "5. Open Last sync location.",
+    "new": "5. Open Live location tracking and review marker movement."
+  },
+  {
+    "paragraph": 797,
+    "old": "2. Store the caregiver's consent choice without requesting background tracking.",
+    "new": "2. Receive watch fixes with source, time, and accuracy."
+  },
+  {
+    "paragraph": 800,
+    "old": "4. Save one phone-location event when permission and sync conditions are met.",
+    "new": "4. Save the zone and check fresh locations."
+  },
+  {
+    "paragraph": 801,
+    "old": "    4.1. If foreground location permission and eligible-sync conditions are met, save one phone-location event.",
+    "new": "    4.1. If 3 usable outside fixes span 20 seconds, save an estimated-exit alert and queue push."
+  },
+  {
+    "paragraph": 802,
+    "old": "    4.2. Else, complete the sync without saving a location.",
+    "new": "    4.2. Else, show checking, waiting, or accuracy status."
+  },
+  {
+    "paragraph": 804,
+    "old": "6. Load the newest wearable_sync_locations row and render it with Leaflet, or show an empty state.",
+    "new": "6. Show current watch state and saved watch_location_points in Leaflet."
+  },
+  {
+    "paragraph": 805,
+    "old": "    6.1. If a saved location exists, render the newest event on the map.",
+    "new": "    6.1. If available, show source, age, accuracy, route, and zone; fused may use the paired phone."
+  },
+  {
+    "paragraph": 806,
+    "old": "    6.2. Else, display the no-location-available state.",
+    "new": "    6.2. Else, show that location is unavailable."
+  },
+  {
+    "paragraph": 810,
+    "old": "The caregiver confirms SOS, after which the app logs an emergency event, creates a critical health alert and in-app notification, and calls the saved emergency contact when a number exists.",
+    "new": "The caregiver or watch wearer confirms SOS to save emergency records and notify the caregiver; the phone offers priority contacts for an explicit dial action."
+  },
+  {
+    "paragraph": 816,
+    "old": "Caregiver",
+    "new": "Caregiver, Elderly Person"
+  },
+  {
+    "paragraph": 818,
+    "old": "The caregiver confirms SOS, after which the app logs an emergency event, creates a critical health alert and in-app notification, and calls the saved emergency contact when a number exists.",
+    "new": "The caregiver or watch wearer confirms SOS to save emergency records and notify the caregiver; the phone offers priority contacts for an explicit dial action."
+  },
+  {
+    "paragraph": 820,
+    "old": "The caregiver presses SOS on the Alerts screen and confirms activation.",
+    "new": "The caregiver confirms phone SOS or the watch wearer selects Send SOS."
+  },
+  {
+    "paragraph": 822,
+    "old": "A caregiver session and older-adult profile exist; a saved emergency phone is needed for automatic calling.",
+    "new": "A patient profile or paired watch exists; delivery requires internet and enabled phone notifications."
+  },
+  {
+    "paragraph": 824,
+    "old": "The emergency, alert, and notification are saved; the phone dialer opens when a valid emergency contact number is available.",
+    "new": "Emergency records are saved and an eligible push is queued; the caregiver chooses whether to dial a priority contact."
+  },
+  {
+    "paragraph": 829,
+    "old": "1. Press SOS and review the confirmation warning.",
+    "new": "1. Press phone SOS or open watch SOS and review the confirmation."
+  },
+  {
+    "paragraph": 836,
+    "old": "3. Confirm activation.",
+    "new": "3. Confirm activation or tap Send SOS on the watch."
+  },
+  {
+    "paragraph": 839,
+    "old": "5. Continue the emergency action.",
+    "new": "5. Choose a caregiver, family member, or doctor to contact."
+  },
+  {
+    "paragraph": 849,
+    "old": "2. Require explicit confirmation because SOS creates records and starts a call.",
+    "new": "2. Require explicit confirmation before creating SOS records."
+  },
+  {
+    "paragraph": 851,
+    "old": "    2.2. Else, cancel without creating records or starting a call.",
+    "new": "    2.2. Else, cancel without creating records or opening the dialer."
+  },
+  {
+    "paragraph": 853,
+    "old": "4. Vibrate/play the alert sound and save emergency_events with the latest available vital snapshot.",
+    "new": "4. Save the emergency and available vital context; provide send, pending, or error feedback."
+  },
+  {
+    "paragraph": 855,
+    "old": "6. Create a critical health alert and in-app notification, then open the phone dialer for the saved contact.",
+    "new": "6. Save a critical alert and notification; queue push and display priority contacts on the phone."
+  },
+  {
+    "paragraph": 856,
+    "old": "    6.1. If a valid emergency phone exists, open the phone dialer after saving the emergency records.",
+    "new": "    6.1. If the caregiver selects a saved number, open the supported dial action."
+  },
+  {
+    "paragraph": 857,
+    "old": "    6.2. Else, save the emergency records and show that no call could be started.",
+    "new": "    6.2. Else, retain emergency records without claiming that a call occurred."
+  },
+  {
+    "paragraph": 859,
+    "old": "8. Save responder and response time while keeping emergency history.",
+    "new": "8. Save the caregiver response or resolution while retaining emergency history."
+  },
+  {
+    "paragraph": 862,
+    "old": "Figure 36: Manage Care Plans",
+    "new": "Figure 36: Manage Care Notes"
+  },
+  {
+    "paragraph": 865,
+    "old": "MANAGE CARE PLANS",
+    "new": "MANAGE CARE NOTES"
+  },
+  {
+    "paragraph": 867,
+    "old": "Manage Care Plans",
+    "new": "Manage Care Notes"
+  },
+  {
+    "paragraph": 949,
+    "old": "The caregiver manages Google Health connection, notification permission, foreground phone-location consent, dark mode, and sign-out from Settings.",
+    "new": "The caregiver manages Galaxy Watch pairing, Health History access, emergency contacts, care notifications, theme, and account sign-out in Settings."
+  },
+  {
+    "paragraph": 957,
+    "old": "The caregiver manages Google Health connection, notification permission, foreground phone-location consent, dark mode, and sign-out from Settings.",
+    "new": "The caregiver manages Galaxy Watch pairing, Health History access, emergency contacts, care notifications, theme, and account sign-out in Settings."
+  },
+  {
+    "paragraph": 970,
+    "old": "3. Connect/disconnect Google Health or manage phone permissions.",
+    "new": "3. Manage Galaxy Watch pairing, Health History access, emergency contacts, or care-notification permissions."
+  },
+  {
+    "paragraph": 976,
+    "old": "2. Load integration, notification, location, and theme status.",
+    "new": "2. Load watch, Health History, notification, contact, and theme status."
+  },
+  {
+    "paragraph": 994,
+    "old": "The administrator opens Emergency records or follows an overview activity link.",
+    "new": "The administrator opens Alerts and notifications or follows an Overview activity link."
+  },
+  {
+    "paragraph": 1003,
+    "old": "1. Open Emergency records.",
+    "new": "1. Open Alerts and notifications and review emergency history."
+  },
+  {
+    "paragraph": 1112,
+    "old": "5. Select an account, monitor, emergency, report, or security page.",
+    "new": "5. Select Accounts, System monitor, Alerts and notifications, Reports, or Security."
+  }
+]

@@ -1,0 +1,4534 @@
+[
+  {
+    "p": 0,
+    "text": "Use Case Diagrams"
+  },
+  {
+    "p": 1,
+    "text": "This diagram shows how the Caregiver, Elderly Person, and Administrator interact within the ElderCareAI system. It identifies each actor's responsibilities and the system functions available to them."
+  },
+  {
+    "p": 2,
+    "text": ""
+  },
+  {
+    "p": 3,
+    "text": ""
+  },
+  {
+    "p": 4,
+    "text": ""
+  },
+  {
+    "p": 5,
+    "text": ""
+  },
+  {
+    "p": 6,
+    "text": "Figure 15: ElderCareAI Current Use Case Diagram"
+  },
+  {
+    "p": 7,
+    "text": "The overview identifies the Caregiver, Elderly Person, and Administrator use cases. The existing detailed figures and formatted tables are retained, and the View System Overview table is added to complete the diagram's use case list."
+  },
+  {
+    "p": 8,
+    "text": ""
+  },
+  {
+    "p": 9,
+    "text": "Figure 16: Authenticate Caregiver"
+  },
+  {
+    "p": 10,
+    "text": "The caregiver authenticates with Google through Supabase and is routed to the first unfinished setup step or the protected Home screen."
+  },
+  {
+    "p": 11,
+    "text": "Table 4"
+  },
+  {
+    "p": 12,
+    "text": "AUTHENTICATE CAREGIVER"
+  },
+  {
+    "p": 13,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 14,
+    "text": "Authenticate Caregiver"
+  },
+  {
+    "p": 15,
+    "text": "Actor"
+  },
+  {
+    "p": 16,
+    "text": "Caregiver"
+  },
+  {
+    "p": 17,
+    "text": "Brief Description"
+  },
+  {
+    "p": 18,
+    "text": "The caregiver authenticates with Google through Supabase and is routed to the first unfinished setup step or the protected Home screen."
+  },
+  {
+    "p": 19,
+    "text": "Trigger"
+  },
+  {
+    "p": 20,
+    "text": "The caregiver opens ElderCareAI and selects Continue with Google."
+  },
+  {
+    "p": 21,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 22,
+    "text": "The app has valid Supabase configuration and the device can open the system authentication browser."
+  },
+  {
+    "p": 23,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 24,
+    "text": "A persisted Supabase session exists, the caregiver profile is synchronized, and the app opens setup or Home."
+  },
+  {
+    "p": 25,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 26,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 27,
+    "text": "Application"
+  },
+  {
+    "p": 28,
+    "text": ""
+  },
+  {
+    "p": 29,
+    "text": "1. Open the app and select Continue with Google."
+  },
+  {
+    "p": 30,
+    "text": ""
+  },
+  {
+    "p": 31,
+    "text": "3. Select the Google account."
+  },
+  {
+    "p": 32,
+    "text": ""
+  },
+  {
+    "p": 33,
+    "text": "4. Approve the requested sign-in access."
+  },
+  {
+    "p": 34,
+    "text": ""
+  },
+  {
+    "p": 35,
+    "text": "2. Display the Google authentication page through the system browser."
+  },
+  {
+    "p": 36,
+    "text": ""
+  },
+  {
+    "p": 37,
+    "text": ""
+  },
+  {
+    "p": 38,
+    "text": ""
+  },
+  {
+    "p": 39,
+    "text": "5. Validate the OAuth callback and create the Supabase session."
+  },
+  {
+    "p": 40,
+    "text": "    5.1. If authentication succeeds, synchronize the caregiver profile and open the first incomplete onboarding step or Home."
+  },
+  {
+    "p": 41,
+    "text": "    5.2. Else, keep the caregiver signed out and display a retry message."
+  },
+  {
+    "p": 42,
+    "text": "Figure 17: Authenticate Admin"
+  },
+  {
+    "p": 43,
+    "text": "An administrator signs in to the separate web portal, where the server verifies the session, administrator role, and active status."
+  },
+  {
+    "p": 44,
+    "text": "Table 5"
+  },
+  {
+    "p": 45,
+    "text": "AUTHENTICATE ADMIN"
+  },
+  {
+    "p": 46,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 47,
+    "text": "Authenticate Admin"
+  },
+  {
+    "p": 48,
+    "text": "Actor"
+  },
+  {
+    "p": 49,
+    "text": "Administrator"
+  },
+  {
+    "p": 50,
+    "text": "Brief Description"
+  },
+  {
+    "p": 51,
+    "text": "An administrator signs in to the separate web portal, where the server verifies the session, administrator role, and active status."
+  },
+  {
+    "p": 52,
+    "text": "Trigger"
+  },
+  {
+    "p": 53,
+    "text": "The administrator opens the admin portal and submits credentials."
+  },
+  {
+    "p": 54,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 55,
+    "text": "A separate Supabase Auth account exists and has an active admin record in user_access."
+  },
+  {
+    "p": 56,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 57,
+    "text": "The Overview opens for an active administrator; rejected access remains on the sign-in screen with an error."
+  },
+  {
+    "p": 58,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 59,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 60,
+    "text": "Application"
+  },
+  {
+    "p": 61,
+    "text": ""
+  },
+  {
+    "p": 62,
+    "text": "1. Open the administrator portal."
+  },
+  {
+    "p": 63,
+    "text": ""
+  },
+  {
+    "p": 64,
+    "text": "3. Enter the administrator username or email and password."
+  },
+  {
+    "p": 65,
+    "text": ""
+  },
+  {
+    "p": 66,
+    "text": "4. Select the Log in button."
+  },
+  {
+    "p": 67,
+    "text": ""
+  },
+  {
+    "p": 68,
+    "text": "2. Display the administrator credential form without storing a session on disk."
+  },
+  {
+    "p": 69,
+    "text": ""
+  },
+  {
+    "p": 70,
+    "text": ""
+  },
+  {
+    "p": 71,
+    "text": ""
+  },
+  {
+    "p": 72,
+    "text": "5. Authenticate the credentials and validate the active administrator role."
+  },
+  {
+    "p": 73,
+    "text": "    5.1. If the account is valid and active, open Overview and keep the session in memory."
+  },
+  {
+    "p": 74,
+    "text": "    5.2. Else, clear the rejected session and display the applicable access error."
+  },
+  {
+    "p": 75,
+    "text": ""
+  },
+  {
+    "p": 76,
+    "text": ""
+  },
+  {
+    "p": 77,
+    "text": "Figure 18: Complete Onboarding"
+  },
+  {
+    "p": 78,
+    "text": "A newly authenticated caregiver completes the introduction, caregiver profile, older-adult profile, Google Health step, and optional phone-location consent."
+  },
+  {
+    "p": 79,
+    "text": "Table 6"
+  },
+  {
+    "p": 80,
+    "text": ""
+  },
+  {
+    "p": 81,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 82,
+    "text": "Complete Onboarding"
+  },
+  {
+    "p": 83,
+    "text": "Actor"
+  },
+  {
+    "p": 84,
+    "text": "Caregiver"
+  },
+  {
+    "p": 85,
+    "text": "Brief Description"
+  },
+  {
+    "p": 86,
+    "text": "A newly authenticated caregiver completes the introduction, caregiver profile, older-adult profile, Google Health step, and optional phone-location consent."
+  },
+  {
+    "p": 87,
+    "text": "Trigger"
+  },
+  {
+    "p": 88,
+    "text": "The app detects that onboarding_progress is incomplete."
+  },
+  {
+    "p": 89,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 90,
+    "text": "The caregiver has a valid Supabase session."
+  },
+  {
+    "p": 91,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 92,
+    "text": "Each completed step is timestamped and the caregiver enters Home; wearable and location steps may be skipped."
+  },
+  {
+    "p": 93,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 94,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 95,
+    "text": "Application"
+  },
+  {
+    "p": 96,
+    "text": ""
+  },
+  {
+    "p": 97,
+    "text": "1. Review or skip the introduction."
+  },
+  {
+    "p": 98,
+    "text": ""
+  },
+  {
+    "p": 99,
+    "text": "3. Enter caregiver information."
+  },
+  {
+    "p": 100,
+    "text": ""
+  },
+  {
+    "p": 101,
+    "text": ""
+  },
+  {
+    "p": 102,
+    "text": ""
+  },
+  {
+    "p": 103,
+    "text": ""
+  },
+  {
+    "p": 104,
+    "text": "5. Enter older-adult and emergency-contact details."
+  },
+  {
+    "p": 105,
+    "text": ""
+  },
+  {
+    "p": 106,
+    "text": ""
+  },
+  {
+    "p": 107,
+    "text": ""
+  },
+  {
+    "p": 108,
+    "text": ""
+  },
+  {
+    "p": 109,
+    "text": ""
+  },
+  {
+    "p": 110,
+    "text": ""
+  },
+  {
+    "p": 111,
+    "text": ""
+  },
+  {
+    "p": 112,
+    "text": ""
+  },
+  {
+    "p": 113,
+    "text": ""
+  },
+  {
+    "p": 114,
+    "text": "7. Wear Tracker or skip the wearable step."
+  },
+  {
+    "p": 115,
+    "text": ""
+  },
+  {
+    "p": 116,
+    "text": ""
+  },
+  {
+    "p": 117,
+    "text": "9. Allow foreground phone location or continue without it."
+  },
+  {
+    "p": 118,
+    "text": ""
+  },
+  {
+    "p": 119,
+    "text": "2. Save intro completion in onboarding_progress."
+  },
+  {
+    "p": 120,
+    "text": ""
+  },
+  {
+    "p": 121,
+    "text": "4. Validate and save the caregiver profile."
+  },
+  {
+    "p": 122,
+    "text": "    4.1. If the caregiver information is valid, save the profile and continue."
+  },
+  {
+    "p": 123,
+    "text": "    4.2. Else, identify the fields that must be corrected."
+  },
+  {
+    "p": 124,
+    "text": ""
+  },
+  {
+    "p": 125,
+    "text": "6. Validate and save the older-adult profile."
+  },
+  {
+    "p": 126,
+    "text": "    6.1. If the older-adult and emergency-contact details are valid, save them and continue."
+  },
+  {
+    "p": 127,
+    "text": "    6.2. Else, keep the form open and display validation feedback."
+  },
+  {
+    "p": 128,
+    "text": ""
+  },
+  {
+    "p": 129,
+    "text": "8. Store the connection state and paired-device count when available."
+  },
+  {
+    "p": 130,
+    "text": ""
+  },
+  {
+    "p": 131,
+    "text": ""
+  },
+  {
+    "p": 132,
+    "text": "10. Save the choice, complete onboarding, and open Home."
+  },
+  {
+    "p": 133,
+    "text": "COMPLETE ONBOARDING "
+  },
+  {
+    "p": 134,
+    "text": ""
+  },
+  {
+    "p": 135,
+    "text": "Figure 19: View Dashboard"
+  },
+  {
+    "p": 136,
+    "text": "The caregiver reviews the latest synchronized readings, measurement times, care-plan preview, doctor shortcut, tracker sync status, and last saved sync location."
+  },
+  {
+    "p": 137,
+    "text": "Table 7"
+  },
+  {
+    "p": 138,
+    "text": "VIEW DASHBOARD"
+  },
+  {
+    "p": 139,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 140,
+    "text": "View Dashboard"
+  },
+  {
+    "p": 141,
+    "text": "Actor"
+  },
+  {
+    "p": 142,
+    "text": "Caregiver"
+  },
+  {
+    "p": 143,
+    "text": "Brief Description"
+  },
+  {
+    "p": 144,
+    "text": "The caregiver reviews the latest synchronized readings, measurement times, care-plan preview, doctor shortcut, tracker sync status, and last saved sync location."
+  },
+  {
+    "p": 145,
+    "text": "Trigger"
+  },
+  {
+    "p": 146,
+    "text": "The caregiver opens Home or returns to the foreground."
+  },
+  {
+    "p": 147,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 148,
+    "text": "Authentication and onboarding are complete; empty states are allowed when no readings exist."
+  },
+  {
+    "p": 149,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 150,
+    "text": "The latest available care and health status is displayed, with optional navigation to details, Care, doctor calling, or the location map."
+  },
+  {
+    "p": 151,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 152,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 153,
+    "text": "Application"
+  },
+  {
+    "p": 154,
+    "text": ""
+  },
+  {
+    "p": 155,
+    "text": "1. Open Home or pull to refresh."
+  },
+  {
+    "p": 156,
+    "text": ""
+  },
+  {
+    "p": 157,
+    "text": ""
+  },
+  {
+    "p": 158,
+    "text": "3. Request Sync now when needed."
+  },
+  {
+    "p": 159,
+    "text": ""
+  },
+  {
+    "p": 160,
+    "text": ""
+  },
+  {
+    "p": 161,
+    "text": ""
+  },
+  {
+    "p": 162,
+    "text": ""
+  },
+  {
+    "p": 163,
+    "text": ""
+  },
+  {
+    "p": 164,
+    "text": "5. Review vital cards and measured times."
+  },
+  {
+    "p": 165,
+    "text": ""
+  },
+  {
+    "p": 166,
+    "text": ""
+  },
+  {
+    "p": 167,
+    "text": "7. Open a metric, Care preview, doctor shortcut, or location."
+  },
+  {
+    "p": 168,
+    "text": ""
+  },
+  {
+    "p": 169,
+    "text": "2. Load profile, care-plan, doctor, latest vital, and sync metadata."
+  },
+  {
+    "p": 170,
+    "text": ""
+  },
+  {
+    "p": 171,
+    "text": "4. Reconcile Google Health and update the visible sync result."
+  },
+  {
+    "p": 172,
+    "text": "    4.1. If new Google Health readings are available, save them and refresh the visible values."
+  },
+  {
+    "p": 173,
+    "text": "    4.2. Else, preserve the latest saved values and show an explicit no-new-data or disconnected state."
+  },
+  {
+    "p": 174,
+    "text": ""
+  },
+  {
+    "p": 175,
+    "text": "6. Show current values or explicit empty/disconnected states."
+  },
+  {
+    "p": 176,
+    "text": ""
+  },
+  {
+    "p": 177,
+    "text": ""
+  },
+  {
+    "p": 178,
+    "text": "8. Navigate to the selected detail without changing the underlying record."
+  },
+  {
+    "p": 179,
+    "text": ""
+  },
+  {
+    "p": 180,
+    "text": "Figure 20: Review Health Alerts"
+  },
+  {
+    "p": 181,
+    "text": "The caregiver reviews health alerts, saved notifications, and emergency history, then marks, resolves, or clears the applicable records."
+  },
+  {
+    "p": 182,
+    "text": "Table 8"
+  },
+  {
+    "p": 183,
+    "text": "REVIEW HEALTH ALERTS"
+  },
+  {
+    "p": 184,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 185,
+    "text": "Review Health Alerts"
+  },
+  {
+    "p": 186,
+    "text": "Actor"
+  },
+  {
+    "p": 187,
+    "text": "Caregiver"
+  },
+  {
+    "p": 188,
+    "text": "Brief Description"
+  },
+  {
+    "p": 189,
+    "text": "The caregiver reviews saved health alerts and related in-app notifications, then updates the applicable status."
+  },
+  {
+    "p": 190,
+    "text": "Trigger"
+  },
+  {
+    "p": 191,
+    "text": "The caregiver opens Alerts or follows a notification route."
+  },
+  {
+    "p": 192,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 193,
+    "text": "A caregiver session and elderly-person profile exist."
+  },
+  {
+    "p": 194,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 195,
+    "text": "Selected alerts or notifications are marked read, resolved, or cleared as permitted."
+  },
+  {
+    "p": 196,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 197,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 198,
+    "text": "Application"
+  },
+  {
+    "p": 199,
+    "text": ""
+  },
+  {
+    "p": 200,
+    "text": "1. Open Alerts."
+  },
+  {
+    "p": 201,
+    "text": ""
+  },
+  {
+    "p": 202,
+    "text": "3. Select a saved alert or notification."
+  },
+  {
+    "p": 203,
+    "text": ""
+  },
+  {
+    "p": 204,
+    "text": "5. Review the alert or notification details.6. Mark the item as read, resolve the alert, or clear the notification when appropriate."
+  },
+  {
+    "p": 205,
+    "text": "2. Load health alerts and caregiver notifications. If no records exist, display an empty state.4. Display the selected item's severity, message, time, and status."
+  },
+  {
+    "p": 206,
+    "text": ""
+  },
+  {
+    "p": 207,
+    "text": ""
+  },
+  {
+    "p": 208,
+    "text": "7. Save the selected status change. Clearing a notification does not delete the underlying health alert or emergency record."
+  },
+  {
+    "p": 209,
+    "text": ""
+  },
+  {
+    "p": 210,
+    "text": ""
+  },
+  {
+    "p": 211,
+    "text": ""
+  },
+  {
+    "p": 212,
+    "text": "Figure 21: Review Health Insights"
+  },
+  {
+    "p": 213,
+    "text": "The caregiver reviews data-driven summaries that compare the newest synchronized readings with recent personal averages and explicit review thresholds."
+  },
+  {
+    "p": 214,
+    "text": "Table 9"
+  },
+  {
+    "p": 215,
+    "text": "REVIEW HEALTH INSIGHTS"
+  },
+  {
+    "p": 216,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 217,
+    "text": "Review Health Insights"
+  },
+  {
+    "p": 218,
+    "text": "Actor"
+  },
+  {
+    "p": 219,
+    "text": "Caregiver"
+  },
+  {
+    "p": 220,
+    "text": "Brief Description"
+  },
+  {
+    "p": 221,
+    "text": "The caregiver reviews data-driven summaries that compare the newest synchronized readings with recent personal averages and explicit review thresholds."
+  },
+  {
+    "p": 222,
+    "text": "Trigger"
+  },
+  {
+    "p": 223,
+    "text": "The caregiver opens Health and selects Insights."
+  },
+  {
+    "p": 224,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 225,
+    "text": "The caregiver is signed in; synchronized history may be empty or partial."
+  },
+  {
+    "p": 226,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 227,
+    "text": "The app displays available metric summaries or a clear message that more readings are needed."
+  },
+  {
+    "p": 228,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 229,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 230,
+    "text": "Application"
+  },
+  {
+    "p": 231,
+    "text": ""
+  },
+  {
+    "p": 232,
+    "text": "1. Open Health and select Insights."
+  },
+  {
+    "p": 233,
+    "text": ""
+  },
+  {
+    "p": 234,
+    "text": "3. Review heart rate, SpO2, sleep, steps, skin temperature, or HRV summaries."
+  },
+  {
+    "p": 235,
+    "text": ""
+  },
+  {
+    "p": 236,
+    "text": ""
+  },
+  {
+    "p": 237,
+    "text": ""
+  },
+  {
+    "p": 238,
+    "text": ""
+  },
+  {
+    "p": 239,
+    "text": ""
+  },
+  {
+    "p": 240,
+    "text": ""
+  },
+  {
+    "p": 241,
+    "text": "5. Open a related metric."
+  },
+  {
+    "p": 242,
+    "text": ""
+  },
+  {
+    "p": 243,
+    "text": "2. Load the available synchronized vital history."
+  },
+  {
+    "p": 244,
+    "text": ""
+  },
+  {
+    "p": 245,
+    "text": ""
+  },
+  {
+    "p": 246,
+    "text": "4. Compare the newest values with recent personal averages when enough data exists."
+  },
+  {
+    "p": 247,
+    "text": "    4.1. If enough history exists, compare the newest reading with the recent personal average."
+  },
+  {
+    "p": 248,
+    "text": "    4.2. Else, display that more synchronized readings are required."
+  },
+  {
+    "p": 249,
+    "text": ""
+  },
+  {
+    "p": 250,
+    "text": "6. Show its latest value, recent values, source explanation, and caution."
+  },
+  {
+    "p": 251,
+    "text": ""
+  },
+  {
+    "p": 252,
+    "text": ""
+  },
+  {
+    "p": 253,
+    "text": "Figure 22: Analyze Health Trends"
+  },
+  {
+    "p": 254,
+    "text": "The caregiver reviews short-term statistical trend projections calculated from distinct synchronized readings, including the sample-based confidence label."
+  },
+  {
+    "p": 255,
+    "text": "Table 10"
+  },
+  {
+    "p": 256,
+    "text": "ANALYZE HEALTH TRENDS"
+  },
+  {
+    "p": 257,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 258,
+    "text": "Analyze Health Trends"
+  },
+  {
+    "p": 259,
+    "text": "Actor"
+  },
+  {
+    "p": 260,
+    "text": "Caregiver"
+  },
+  {
+    "p": 261,
+    "text": "Brief Description"
+  },
+  {
+    "p": 262,
+    "text": "The caregiver reviews short-term statistical trend projections calculated from distinct synchronized readings, including the sample-based confidence label."
+  },
+  {
+    "p": 263,
+    "text": "Trigger"
+  },
+  {
+    "p": 264,
+    "text": "The caregiver opens Health and selects Predictions."
+  },
+  {
+    "p": 265,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 266,
+    "text": "At least four distinct readings are needed for a metric projection; otherwise the waiting state is shown."
+  },
+  {
+    "p": 267,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 268,
+    "text": "A non-diagnostic trend or an explicit insufficient-data message is displayed."
+  },
+  {
+    "p": 269,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 270,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 271,
+    "text": "Application"
+  },
+  {
+    "p": 272,
+    "text": ""
+  },
+  {
+    "p": 273,
+    "text": "1. Open Health and select Predictions."
+  },
+  {
+    "p": 274,
+    "text": ""
+  },
+  {
+    "p": 275,
+    "text": "3. Review a supported trend."
+  },
+  {
+    "p": 276,
+    "text": ""
+  },
+  {
+    "p": 277,
+    "text": ""
+  },
+  {
+    "p": 278,
+    "text": ""
+  },
+  {
+    "p": 279,
+    "text": ""
+  },
+  {
+    "p": 280,
+    "text": ""
+  },
+  {
+    "p": 281,
+    "text": "5. Continue collecting readings when a projection is unavailable."
+  },
+  {
+    "p": 282,
+    "text": ""
+  },
+  {
+    "p": 283,
+    "text": "2. Build metric series from synchronized history."
+  },
+  {
+    "p": 284,
+    "text": ""
+  },
+  {
+    "p": 285,
+    "text": "4. Apply simple linear regression and label confidence from sample count and fit."
+  },
+  {
+    "p": 286,
+    "text": "    4.1. If at least four distinct readings exist, calculate the trend and confidence label."
+  },
+  {
+    "p": 287,
+    "text": "    4.2. Else, display the insufficient-data state."
+  },
+  {
+    "p": 288,
+    "text": ""
+  },
+  {
+    "p": 289,
+    "text": ""
+  },
+  {
+    "p": 290,
+    "text": "6. Explain that at least four distinct readings per metric are required."
+  },
+  {
+    "p": 291,
+    "text": ""
+  },
+  {
+    "p": 292,
+    "text": ""
+  },
+  {
+    "p": 293,
+    "text": "Figure 23: Consult Elle"
+  },
+  {
+    "p": 294,
+    "text": "The caregiver asks Elle a care-related question and receives non-diagnostic guidance informed by available saved care data."
+  },
+  {
+    "p": 295,
+    "text": "Table 11"
+  },
+  {
+    "p": 296,
+    "text": "CONSULT ELLE"
+  },
+  {
+    "p": 297,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 298,
+    "text": "Consult Elle"
+  },
+  {
+    "p": 299,
+    "text": "Actor"
+  },
+  {
+    "p": 300,
+    "text": "Caregiver"
+  },
+  {
+    "p": 301,
+    "text": "Brief Description"
+  },
+  {
+    "p": 302,
+    "text": "The caregiver asks Elle a care-related question and receives non-diagnostic guidance informed by available saved care data."
+  },
+  {
+    "p": 303,
+    "text": "Trigger"
+  },
+  {
+    "p": 304,
+    "text": "The caregiver opens Elle, selects a quick topic, or enters a question."
+  },
+  {
+    "p": 305,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 306,
+    "text": "The caregiver is signed in and the ai-care-assistant function is deployed with its Gemini key."
+  },
+  {
+    "p": 307,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 308,
+    "text": "The conversation is saved in the active chat session and the caregiver may follow a suggested in-app action or start a new chat."
+  },
+  {
+    "p": 309,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 310,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 311,
+    "text": "Application"
+  },
+  {
+    "p": 312,
+    "text": ""
+  },
+  {
+    "p": 313,
+    "text": "1. Open Elle and enter or select a question."
+  },
+  {
+    "p": 314,
+    "text": ""
+  },
+  {
+    "p": 315,
+    "text": "3. Send the question."
+  },
+  {
+    "p": 316,
+    "text": ""
+  },
+  {
+    "p": 317,
+    "text": ""
+  },
+  {
+    "p": 318,
+    "text": ""
+  },
+  {
+    "p": 319,
+    "text": ""
+  },
+  {
+    "p": 320,
+    "text": ""
+  },
+  {
+    "p": 321,
+    "text": "5. Review the response and optional action links."
+  },
+  {
+    "p": 322,
+    "text": ""
+  },
+  {
+    "p": 323,
+    "text": ""
+  },
+  {
+    "p": 324,
+    "text": "7. Start a new chat when desired."
+  },
+  {
+    "p": 325,
+    "text": ""
+  },
+  {
+    "p": 326,
+    "text": "2. Create or reuse an active chatbot session."
+  },
+  {
+    "p": 327,
+    "text": ""
+  },
+  {
+    "p": 328,
+    "text": "4. Call the care assistant with the permitted saved-care context."
+  },
+  {
+    "p": 329,
+    "text": "    4.1. If guidance is returned, display it and save both messages in the active session."
+  },
+  {
+    "p": 330,
+    "text": "    4.2. Else, show a safe retry message without presenting diagnostic advice."
+  },
+  {
+    "p": 331,
+    "text": ""
+  },
+  {
+    "p": 332,
+    "text": "6. Save both messages and keep the response within non-diagnostic safety limits."
+  },
+  {
+    "p": 333,
+    "text": ""
+  },
+  {
+    "p": 334,
+    "text": "8. Close the prior active session and clear the visible conversation."
+  },
+  {
+    "p": 335,
+    "text": ""
+  },
+  {
+    "p": 336,
+    "text": ""
+  },
+  {
+    "p": 337,
+    "text": "Figure 24: Manage Health Records"
+  },
+  {
+    "p": 338,
+    "text": "The caregiver maintains medical-history text and completed checkup records while reviewing the current active medication schedules."
+  },
+  {
+    "p": 339,
+    "text": "Table 12"
+  },
+  {
+    "p": 340,
+    "text": "MANAGE HEALTH RECORDS"
+  },
+  {
+    "p": 341,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 342,
+    "text": "Manage Health Records"
+  },
+  {
+    "p": 343,
+    "text": "Actor"
+  },
+  {
+    "p": 344,
+    "text": "Caregiver"
+  },
+  {
+    "p": 345,
+    "text": "Brief Description"
+  },
+  {
+    "p": 346,
+    "text": "The caregiver maintains medical-history text and completed checkup records while reviewing the current active medication schedules."
+  },
+  {
+    "p": 347,
+    "text": "Trigger"
+  },
+  {
+    "p": 348,
+    "text": "The caregiver opens Settings and selects Manage health records."
+  },
+  {
+    "p": 349,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 350,
+    "text": "A caregiver session and older-adult profile exist."
+  },
+  {
+    "p": 351,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 352,
+    "text": "Validated history and checkup entries are saved and the current records reload."
+  },
+  {
+    "p": 353,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 354,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 355,
+    "text": "Application"
+  },
+  {
+    "p": 356,
+    "text": ""
+  },
+  {
+    "p": 357,
+    "text": "1. Open Manage health records."
+  },
+  {
+    "p": 358,
+    "text": "3. Edit medical-history text."
+  },
+  {
+    "p": 359,
+    "text": "5. Add a completed checkup dated today or earlier."
+  },
+  {
+    "p": 360,
+    "text": "7. Review active medications."
+  },
+  {
+    "p": 361,
+    "text": "2. Load the older-adult profile, recent completed checkups, and active medications."
+  },
+  {
+    "p": 362,
+    "text": "4. Validate and save the updated older-adult medical history."
+  },
+  {
+    "p": 363,
+    "text": "    4.1. If the medical-history entry is valid, save it to the older-adult profile."
+  },
+  {
+    "p": 364,
+    "text": "    4.2. Else, retain the entered text and display correction guidance."
+  },
+  {
+    "p": 365,
+    "text": "6. Save the checkup as a completed appointment record."
+  },
+  {
+    "p": 366,
+    "text": "    6.1. If the checkup date is today or earlier, save it as a completed appointment."
+  },
+  {
+    "p": 367,
+    "text": "    6.2. Else, reject the future completion date and keep the form open."
+  },
+  {
+    "p": 368,
+    "text": "8. Display medication details managed from the Care tab."
+  },
+  {
+    "p": 369,
+    "text": ""
+  },
+  {
+    "p": 370,
+    "text": ""
+  },
+  {
+    "p": 371,
+    "text": "Figure 25: Manage User Profiles"
+  },
+  {
+    "p": 372,
+    "text": "The caregiver edits caregiver and older-adult information, uploads profile photos, and adds or updates the saved doctor contact."
+  },
+  {
+    "p": 373,
+    "text": "Table 13"
+  },
+  {
+    "p": 374,
+    "text": "MANAGE USER PROFILES"
+  },
+  {
+    "p": 375,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 376,
+    "text": "Manage User Profiles"
+  },
+  {
+    "p": 377,
+    "text": "Actor"
+  },
+  {
+    "p": 378,
+    "text": "Caregiver"
+  },
+  {
+    "p": 379,
+    "text": "Brief Description"
+  },
+  {
+    "p": 380,
+    "text": "The caregiver edits caregiver and older-adult information, uploads profile photos, and adds or updates the saved doctor contact."
+  },
+  {
+    "p": 381,
+    "text": "Trigger"
+  },
+  {
+    "p": 382,
+    "text": "The caregiver opens Settings and selects a profile or doctor action."
+  },
+  {
+    "p": 383,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 384,
+    "text": "Authentication and onboarding are complete."
+  },
+  {
+    "p": 385,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 386,
+    "text": "Validated profile, photo, or doctor changes are saved and reflected in the app."
+  },
+  {
+    "p": 387,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 388,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 389,
+    "text": "Application"
+  },
+  {
+    "p": 390,
+    "text": ""
+  },
+  {
+    "p": 391,
+    "text": "1. Open Settings."
+  },
+  {
+    "p": 392,
+    "text": ""
+  },
+  {
+    "p": 393,
+    "text": ""
+  },
+  {
+    "p": 394,
+    "text": "3. Edit caregiver or older-adult information."
+  },
+  {
+    "p": 395,
+    "text": ""
+  },
+  {
+    "p": 396,
+    "text": ""
+  },
+  {
+    "p": 397,
+    "text": ""
+  },
+  {
+    "p": 398,
+    "text": ""
+  },
+  {
+    "p": 399,
+    "text": "5. Select a caregiver or older-adult photo."
+  },
+  {
+    "p": 400,
+    "text": ""
+  },
+  {
+    "p": 401,
+    "text": ""
+  },
+  {
+    "p": 402,
+    "text": ""
+  },
+  {
+    "p": 403,
+    "text": ""
+  },
+  {
+    "p": 404,
+    "text": "7. Add or edit the doctor name, phone, and photo."
+  },
+  {
+    "p": 405,
+    "text": ""
+  },
+  {
+    "p": 406,
+    "text": "2. Load caregiver, older-adult, photo, and doctor details."
+  },
+  {
+    "p": 407,
+    "text": ""
+  },
+  {
+    "p": 408,
+    "text": "4. Validate and save the selected profile."
+  },
+  {
+    "p": 409,
+    "text": "    4.1. If the selected profile fields are valid, save and refresh the profile."
+  },
+  {
+    "p": 410,
+    "text": "    4.2. Else, display field-level validation feedback."
+  },
+  {
+    "p": 411,
+    "text": ""
+  },
+  {
+    "p": 412,
+    "text": "6. Upload the image and save its storage URL."
+  },
+  {
+    "p": 413,
+    "text": "    6.1. If the selected image is supported, upload it and save its storage URL."
+  },
+  {
+    "p": 414,
+    "text": "    6.2. Else, keep the existing photo and display an upload error."
+  },
+  {
+    "p": 415,
+    "text": ""
+  },
+  {
+    "p": 416,
+    "text": "8. Validate the phone, save the contact, and refresh the display."
+  },
+  {
+    "p": 417,
+    "text": ""
+  },
+  {
+    "p": 418,
+    "text": ""
+  },
+  {
+    "p": 419,
+    "text": "Figure 26: Manage Accounts"
+  },
+  {
+    "p": 420,
+    "text": "The administrator pages through caregiver accounts, views linked older adults, edits allowed profile fields, changes caregiver access status, or permanently deletes confirmed records."
+  },
+  {
+    "p": 421,
+    "text": "Table 14"
+  },
+  {
+    "p": 422,
+    "text": "MANAGE ACCOUNTS"
+  },
+  {
+    "p": 423,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 424,
+    "text": "Manage Accounts"
+  },
+  {
+    "p": 425,
+    "text": "Actor"
+  },
+  {
+    "p": 426,
+    "text": "Administrator"
+  },
+  {
+    "p": 427,
+    "text": "Brief Description"
+  },
+  {
+    "p": 428,
+    "text": "The administrator pages through caregiver accounts, views linked older adults, edits allowed profile fields, changes caregiver access status, or permanently deletes confirmed records."
+  },
+  {
+    "p": 429,
+    "text": "Trigger"
+  },
+  {
+    "p": 430,
+    "text": "The administrator opens Accounts."
+  },
+  {
+    "p": 431,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 432,
+    "text": "An active administrator session exists."
+  },
+  {
+    "p": 433,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 434,
+    "text": "Authorized edits, status changes, or confirmed deletions are applied and audited."
+  },
+  {
+    "p": 435,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 436,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 437,
+    "text": "Application"
+  },
+  {
+    "p": 438,
+    "text": ""
+  },
+  {
+    "p": 439,
+    "text": "1. Open Accounts and page through caregivers."
+  },
+  {
+    "p": 440,
+    "text": ""
+  },
+  {
+    "p": 441,
+    "text": ""
+  },
+  {
+    "p": 442,
+    "text": "3. Select a caregiver and optionally edit a caregiver or older-adult profile."
+  },
+  {
+    "p": 443,
+    "text": ""
+  },
+  {
+    "p": 444,
+    "text": ""
+  },
+  {
+    "p": 445,
+    "text": ""
+  },
+  {
+    "p": 446,
+    "text": ""
+  },
+  {
+    "p": 447,
+    "text": ""
+  },
+  {
+    "p": 448,
+    "text": ""
+  },
+  {
+    "p": 449,
+    "text": "5. Activate or suspend caregiver access."
+  },
+  {
+    "p": 450,
+    "text": ""
+  },
+  {
+    "p": 451,
+    "text": "7. Type the required name to confirm permanent deletion."
+  },
+  {
+    "p": 452,
+    "text": ""
+  },
+  {
+    "p": 453,
+    "text": "2. Return caregiver profiles, access status, and linked older-adult counts."
+  },
+  {
+    "p": 454,
+    "text": ""
+  },
+  {
+    "p": 455,
+    "text": ""
+  },
+  {
+    "p": 456,
+    "text": "4. Validate and save only the supported profile fields."
+  },
+  {
+    "p": 457,
+    "text": "    4.1. If the edited fields are supported and valid, save the profile changes."
+  },
+  {
+    "p": 458,
+    "text": "    4.2. Else, reject the unsupported or invalid changes."
+  },
+  {
+    "p": 459,
+    "text": ""
+  },
+  {
+    "p": 460,
+    "text": "6. Update user_access and record the administrative action."
+  },
+  {
+    "p": 461,
+    "text": ""
+  },
+  {
+    "p": 462,
+    "text": ""
+  },
+  {
+    "p": 463,
+    "text": "8. Delete the selected profile/account and linked records through the secured admin service."
+  },
+  {
+    "p": 464,
+    "text": "    8.1. If the typed confirmation matches, delete the selected account and linked records."
+  },
+  {
+    "p": 465,
+    "text": "    8.2. Else, cancel deletion and leave the records unchanged."
+  },
+  {
+    "p": 466,
+    "text": ""
+  },
+  {
+    "p": 467,
+    "text": ""
+  },
+  {
+    "p": 468,
+    "text": "Figure 27: Monitor System Data"
+  },
+  {
+    "p": 469,
+    "text": "The administrator reviews onboarding-reported device connection state and recent saved health sync records, including measured time, saved time, and source."
+  },
+  {
+    "p": 470,
+    "text": "Table 15"
+  },
+  {
+    "p": 471,
+    "text": "MONITOR SYSTEM DATA"
+  },
+  {
+    "p": 472,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 473,
+    "text": "Monitor System Data"
+  },
+  {
+    "p": 474,
+    "text": "Actor"
+  },
+  {
+    "p": 475,
+    "text": "Administrator"
+  },
+  {
+    "p": 476,
+    "text": "Brief Description"
+  },
+  {
+    "p": 477,
+    "text": "The administrator reviews onboarding-reported device connection state and recent saved health sync records, including measured time, saved time, and source."
+  },
+  {
+    "p": 478,
+    "text": "Trigger"
+  },
+  {
+    "p": 479,
+    "text": "The administrator opens System monitor or selects Refresh."
+  },
+  {
+    "p": 480,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 481,
+    "text": "An active administrator session exists."
+  },
+  {
+    "p": 482,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 483,
+    "text": "The latest available connection and sync records are displayed with an updated timestamp."
+  },
+  {
+    "p": 484,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 485,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 486,
+    "text": "Application"
+  },
+  {
+    "p": 487,
+    "text": ""
+  },
+  {
+    "p": 488,
+    "text": "1. Open System monitor."
+  },
+  {
+    "p": 489,
+    "text": ""
+  },
+  {
+    "p": 490,
+    "text": ""
+  },
+  {
+    "p": 491,
+    "text": ""
+  },
+  {
+    "p": 492,
+    "text": ""
+  },
+  {
+    "p": 493,
+    "text": ""
+  },
+  {
+    "p": 494,
+    "text": "3. Review paired-device count and state-change time."
+  },
+  {
+    "p": 495,
+    "text": ""
+  },
+  {
+    "p": 496,
+    "text": "5. Review sync source, measured time, and saved time."
+  },
+  {
+    "p": 497,
+    "text": ""
+  },
+  {
+    "p": 498,
+    "text": "7. Select Refresh."
+  },
+  {
+    "p": 499,
+    "text": ""
+  },
+  {
+    "p": 500,
+    "text": "2. Load connection states reported during onboarding and recent vital writes."
+  },
+  {
+    "p": 501,
+    "text": "    2.1. If saved connection or sync records exist, display the newest records."
+  },
+  {
+    "p": 502,
+    "text": "    2.2. Else, display an explicit empty state rather than live-device telemetry."
+  },
+  {
+    "p": 503,
+    "text": ""
+  },
+  {
+    "p": 504,
+    "text": "4. Label this as connection state, not live device telemetry."
+  },
+  {
+    "p": 505,
+    "text": ""
+  },
+  {
+    "p": 506,
+    "text": "6. Show the newest records and recent admin activity."
+  },
+  {
+    "p": 507,
+    "text": ""
+  },
+  {
+    "p": 508,
+    "text": "8. Reload the current monitor view and update the displayed refresh time."
+  },
+  {
+    "p": 509,
+    "text": ""
+  },
+  {
+    "p": 510,
+    "text": ""
+  },
+  {
+    "p": 511,
+    "text": "Figure 28: Export Admin Reports"
+  },
+  {
+    "p": 512,
+    "text": "The administrator exports a CSV for a selected saved-data category and date range, subject to the portal's 90-day and 2,000-row limits."
+  },
+  {
+    "p": 513,
+    "text": "Table 16"
+  },
+  {
+    "p": 514,
+    "text": "EXPORT ADMIN REPORTS"
+  },
+  {
+    "p": 515,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 516,
+    "text": "Export Admin Reports"
+  },
+  {
+    "p": 517,
+    "text": "Actor"
+  },
+  {
+    "p": 518,
+    "text": "Administrator"
+  },
+  {
+    "p": 519,
+    "text": "Brief Description"
+  },
+  {
+    "p": 520,
+    "text": "The administrator exports a CSV for a selected saved-data category and date range, subject to the portal's 90-day and 2,000-row limits."
+  },
+  {
+    "p": 521,
+    "text": "Trigger"
+  },
+  {
+    "p": 522,
+    "text": "The administrator opens Reports and submits a report request."
+  },
+  {
+    "p": 523,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 524,
+    "text": "An active administrator session exists and matching saved data may be available."
+  },
+  {
+    "p": 525,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 526,
+    "text": "A formula-safe CSV downloads when rows exist and the report action is recorded in administrative activity."
+  },
+  {
+    "p": 527,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 528,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 529,
+    "text": "Application"
+  },
+  {
+    "p": 530,
+    "text": ""
+  },
+  {
+    "p": 531,
+    "text": "1. Open Reports and select a report type."
+  },
+  {
+    "p": 532,
+    "text": ""
+  },
+  {
+    "p": 533,
+    "text": ""
+  },
+  {
+    "p": 534,
+    "text": "3. Choose From and To dates, then generate."
+  },
+  {
+    "p": 535,
+    "text": ""
+  },
+  {
+    "p": 536,
+    "text": ""
+  },
+  {
+    "p": 537,
+    "text": ""
+  },
+  {
+    "p": 538,
+    "text": ""
+  },
+  {
+    "p": 539,
+    "text": "5. Download the CSV when data exists."
+  },
+  {
+    "p": 540,
+    "text": ""
+  },
+  {
+    "p": 541,
+    "text": "2. Offer health readings, alerts, appointments, medications, medical history, or admin activity."
+  },
+  {
+    "p": 542,
+    "text": ""
+  },
+  {
+    "p": 543,
+    "text": "4. Validate the date range and retrieve no more than the configured limit."
+  },
+  {
+    "p": 544,
+    "text": "    4.1. If the date range is valid, retrieve up to the configured row limit."
+  },
+  {
+    "p": 545,
+    "text": "    4.2. Else, display the date-range validation error."
+  },
+  {
+    "p": 546,
+    "text": ""
+  },
+  {
+    "p": 547,
+    "text": "6. Escape spreadsheet-formula prefixes, create the file, and record the report event."
+  },
+  {
+    "p": 548,
+    "text": "    6.1. If matching rows exist, create and download the formula-safe CSV and record the report event."
+  },
+  {
+    "p": 549,
+    "text": "    6.2. Else, show that no matching records are available."
+  },
+  {
+    "p": 550,
+    "text": ""
+  },
+  {
+    "p": 551,
+    "text": ""
+  },
+  {
+    "p": 552,
+    "text": "Figure 29: Manage System Security"
+  },
+  {
+    "p": 553,
+    "text": "The administrator invites administrators, changes administrator or caregiver access, deletes non-current administrators, reviews audit activity, and signs out."
+  },
+  {
+    "p": 554,
+    "text": "Table 17"
+  },
+  {
+    "p": 555,
+    "text": "MANAGE SYSTEM SECURITY"
+  },
+  {
+    "p": 556,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 557,
+    "text": "Manage System Security"
+  },
+  {
+    "p": 558,
+    "text": "Actor"
+  },
+  {
+    "p": 559,
+    "text": "Administrator"
+  },
+  {
+    "p": 560,
+    "text": "Brief Description"
+  },
+  {
+    "p": 561,
+    "text": "The administrator invites administrators, changes administrator or caregiver access, deletes non-current administrators, reviews audit activity, and signs out."
+  },
+  {
+    "p": 562,
+    "text": "Trigger"
+  },
+  {
+    "p": 563,
+    "text": "The administrator opens Security."
+  },
+  {
+    "p": 564,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 565,
+    "text": "An active administrator session exists."
+  },
+  {
+    "p": 566,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 567,
+    "text": "Authorized security changes are applied and audited; safeguards prevent removal of the final active administrator."
+  },
+  {
+    "p": 568,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 569,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 570,
+    "text": "Application"
+  },
+  {
+    "p": 571,
+    "text": ""
+  },
+  {
+    "p": 572,
+    "text": "1. Open Security."
+  },
+  {
+    "p": 573,
+    "text": ""
+  },
+  {
+    "p": 574,
+    "text": ""
+  },
+  {
+    "p": 575,
+    "text": "3. Invite an administrator by email."
+  },
+  {
+    "p": 576,
+    "text": ""
+  },
+  {
+    "p": 577,
+    "text": "5. Activate, suspend, or delete an eligible administrator; or change caregiver access."
+  },
+  {
+    "p": 578,
+    "text": ""
+  },
+  {
+    "p": 579,
+    "text": ""
+  },
+  {
+    "p": 580,
+    "text": ""
+  },
+  {
+    "p": 581,
+    "text": ""
+  },
+  {
+    "p": 582,
+    "text": ""
+  },
+  {
+    "p": 583,
+    "text": ""
+  },
+  {
+    "p": 584,
+    "text": "7. Review activity or sign out."
+  },
+  {
+    "p": 585,
+    "text": ""
+  },
+  {
+    "p": 586,
+    "text": "2. Load administrators, caregiver status options, current session details, and recent audit rows."
+  },
+  {
+    "p": 587,
+    "text": ""
+  },
+  {
+    "p": 588,
+    "text": "4. Create the invitation and show its delivery result."
+  },
+  {
+    "p": 589,
+    "text": ""
+  },
+  {
+    "p": 590,
+    "text": ""
+  },
+  {
+    "p": 591,
+    "text": "6. Enforce current/final-admin safeguards and record accepted changes."
+  },
+  {
+    "p": 592,
+    "text": "    6.1. If the requested change passes the current-administrator and final-administrator safeguards, apply and audit it."
+  },
+  {
+    "p": 593,
+    "text": "    6.2. Else, block the change and explain the safeguard."
+  },
+  {
+    "p": 594,
+    "text": ""
+  },
+  {
+    "p": 595,
+    "text": "8. Clear the in-memory session and return to the locked portal."
+  },
+  {
+    "p": 596,
+    "text": ""
+  },
+  {
+    "p": 597,
+    "text": ""
+  },
+  {
+    "p": 598,
+    "text": "Figure 30: Wear Tracker"
+  },
+  {
+    "p": 599,
+    "text": "The caregiver authorizes Google Health API v4, while the older adult's compatible tracker is paired through the Google Health account rather than directly to ElderCareAI."
+  },
+  {
+    "p": 600,
+    "text": "Table 18"
+  },
+  {
+    "p": 601,
+    "text": "WEAR TRACKER"
+  },
+  {
+    "p": 602,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 603,
+    "text": "Wear Tracker"
+  },
+  {
+    "p": 604,
+    "text": "Actor"
+  },
+  {
+    "p": 605,
+    "text": "Elderly Person"
+  },
+  {
+    "p": 606,
+    "text": "Brief Description"
+  },
+  {
+    "p": 607,
+    "text": "The elderly person wears a compatible tracker so it can collect supported health measurements for later synchronization."
+  },
+  {
+    "p": 608,
+    "text": "Trigger"
+  },
+  {
+    "p": 609,
+    "text": "The elderly person puts on and uses the configured tracker."
+  },
+  {
+    "p": 610,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 611,
+    "text": "The tracker is charged, configured, and paired with the connected health service."
+  },
+  {
+    "p": 612,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 613,
+    "text": "Supported measurements are collected and become available to the connected health service when the device synchronizes."
+  },
+  {
+    "p": 614,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 615,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 616,
+    "text": "Application"
+  },
+  {
+    "p": 617,
+    "text": ""
+  },
+  {
+    "p": 618,
+    "text": "1. Wear the tracker as instructed."
+  },
+  {
+    "p": 619,
+    "text": ""
+  },
+  {
+    "p": 620,
+    "text": "3. Keep the tracker charged and use it during normal daily activity."
+  },
+  {
+    "p": 621,
+    "text": ""
+  },
+  {
+    "p": 622,
+    "text": "5. Allow the tracker or companion service to synchronize available readings."
+  },
+  {
+    "p": 623,
+    "text": ""
+  },
+  {
+    "p": 624,
+    "text": "2. Collect supported measurements."
+  },
+  {
+    "p": 625,
+    "text": ""
+  },
+  {
+    "p": 626,
+    "text": "4. Report the paired or disconnected state."
+  },
+  {
+    "p": 627,
+    "text": ""
+  },
+  {
+    "p": 628,
+    "text": ""
+  },
+  {
+    "p": 629,
+    "text": "6. Make synchronized readings available to ElderCareAI through the connected health service."
+  },
+  {
+    "p": 630,
+    "text": ""
+  },
+  {
+    "p": 631,
+    "text": "7. If the tracker is off, unpaired, or out of power, return no new measurements."
+  },
+  {
+    "p": 632,
+    "text": ""
+  },
+  {
+    "p": 633,
+    "text": ""
+  },
+  {
+    "p": 634,
+    "text": "Figure 31: View Vitals From Tracker"
+  },
+  {
+    "p": 635,
+    "text": "ElderCareAI reconciles available Google Health readings after manual requests, app foreground events, or supported webhook notifications and updates the caregiver view through Realtime."
+  },
+  {
+    "p": 636,
+    "text": "Table 19"
+  },
+  {
+    "p": 637,
+    "text": "VIEW VITALS FROM TRACKER"
+  },
+  {
+    "p": 638,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 639,
+    "text": "View Vitals From Tracker"
+  },
+  {
+    "p": 640,
+    "text": "Actor"
+  },
+  {
+    "p": 641,
+    "text": "Elderly Person"
+  },
+  {
+    "p": 642,
+    "text": "Brief Description"
+  },
+  {
+    "p": 643,
+    "text": "The elderly person views a supported current or recent measurement on the tracker or its paired device interface."
+  },
+  {
+    "p": 644,
+    "text": "Trigger"
+  },
+  {
+    "p": 645,
+    "text": "The elderly person checks the tracker for a vital reading."
+  },
+  {
+    "p": 646,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 647,
+    "text": "The tracker supports the selected vital and has a valid reading."
+  },
+  {
+    "p": 648,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 649,
+    "text": "The measurement is displayed for personal awareness without changing ElderCareAI records."
+  },
+  {
+    "p": 650,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 651,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 652,
+    "text": "Application"
+  },
+  {
+    "p": 653,
+    "text": ""
+  },
+  {
+    "p": 654,
+    "text": "1. Wake the tracker display."
+  },
+  {
+    "p": 655,
+    "text": ""
+  },
+  {
+    "p": 656,
+    "text": "2. Open the supported health or vital tile."
+  },
+  {
+    "p": 657,
+    "text": ""
+  },
+  {
+    "p": 658,
+    "text": ""
+  },
+  {
+    "p": 659,
+    "text": ""
+  },
+  {
+    "p": 660,
+    "text": ""
+  },
+  {
+    "p": 661,
+    "text": "5. Review the measurement and its time or status."
+  },
+  {
+    "p": 662,
+    "text": ""
+  },
+  {
+    "p": 663,
+    "text": ""
+  },
+  {
+    "p": 664,
+    "text": "7. Continue wearing the tracker so later readings can synchronize."
+  },
+  {
+    "p": 665,
+    "text": ""
+  },
+  {
+    "p": 666,
+    "text": ""
+  },
+  {
+    "p": 667,
+    "text": "3. Display the supported measurement."
+  },
+  {
+    "p": 668,
+    "text": ""
+  },
+  {
+    "p": 669,
+    "text": "4. If no valid reading exists, show the device-specific unavailable or retry state."
+  },
+  {
+    "p": 670,
+    "text": ""
+  },
+  {
+    "p": 671,
+    "text": "6. Treat the reading as informational and not as a medical diagnosis."
+  },
+  {
+    "p": 672,
+    "text": ""
+  },
+  {
+    "p": 673,
+    "text": ""
+  },
+  {
+    "p": 674,
+    "text": "Figure 32: Analyze Health Trends Analysis Flow"
+  },
+  {
+    "p": 675,
+    "text": "The app derives insights, short-term statistical trends, and anomaly flags from saved vital history without presenting a medical diagnosis."
+  },
+  {
+    "p": 676,
+    "text": "Table 20"
+  },
+  {
+    "p": 677,
+    "text": "ANALYZE HEALTH TRENDS"
+  },
+  {
+    "p": 678,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 679,
+    "text": "Analyze Health Trends"
+  },
+  {
+    "p": 680,
+    "text": "Actor"
+  },
+  {
+    "p": 681,
+    "text": "Caregiver"
+  },
+  {
+    "p": 682,
+    "text": "Brief Description"
+  },
+  {
+    "p": 683,
+    "text": "The app derives insights, short-term statistical trends, and anomaly flags from saved vital history without presenting a medical diagnosis."
+  },
+  {
+    "p": 684,
+    "text": "Trigger"
+  },
+  {
+    "p": 685,
+    "text": "The caregiver opens Health after synchronized data is loaded."
+  },
+  {
+    "p": 686,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 687,
+    "text": "A caregiver session exists; analysis can operate with partial data and reports its limitations."
+  },
+  {
+    "p": 688,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 689,
+    "text": "Available analysis results and confidence or insufficient-data states are displayed with access to metric details."
+  },
+  {
+    "p": 690,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 691,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 692,
+    "text": "Application"
+  },
+  {
+    "p": 693,
+    "text": ""
+  },
+  {
+    "p": 694,
+    "text": "1. Open Health."
+  },
+  {
+    "p": 695,
+    "text": ""
+  },
+  {
+    "p": 696,
+    "text": ""
+  },
+  {
+    "p": 697,
+    "text": "3. Review insights and projections."
+  },
+  {
+    "p": 698,
+    "text": ""
+  },
+  {
+    "p": 699,
+    "text": ""
+  },
+  {
+    "p": 700,
+    "text": ""
+  },
+  {
+    "p": 701,
+    "text": ""
+  },
+  {
+    "p": 702,
+    "text": ""
+  },
+  {
+    "p": 703,
+    "text": "5. Review anomalies."
+  },
+  {
+    "p": 704,
+    "text": ""
+  },
+  {
+    "p": 705,
+    "text": "7. Open metric details."
+  },
+  {
+    "p": 706,
+    "text": ""
+  },
+  {
+    "p": 707,
+    "text": "2. Load recent vital_sign_logs visible under caregiver access rules."
+  },
+  {
+    "p": 708,
+    "text": ""
+  },
+  {
+    "p": 709,
+    "text": "4. Compare personal averages and calculate supported linear trends."
+  },
+  {
+    "p": 710,
+    "text": "    4.1. If enough saved history exists, calculate the supported averages and trends."
+  },
+  {
+    "p": 711,
+    "text": "    4.2. Else, display the applicable insufficient-data state."
+  },
+  {
+    "p": 712,
+    "text": "6. Apply explicit thresholds and personal-baseline deviation checks."
+  },
+  {
+    "p": 713,
+    "text": ""
+  },
+  {
+    "p": 714,
+    "text": "8. Show recent values, context, source, and a metric-specific safety caution."
+  },
+  {
+    "p": 715,
+    "text": ""
+  },
+  {
+    "p": 716,
+    "text": ""
+  },
+  {
+    "p": 717,
+    "text": "Figure 33: Manage Care Plans"
+  },
+  {
+    "p": 718,
+    "text": "The caregiver creates or edits medication and appointment schedules, the device schedules local reminders when permission is available, and the caregiver records a taken dose."
+  },
+  {
+    "p": 719,
+    "text": "Table 21"
+  },
+  {
+    "p": 720,
+    "text": "MANAGE CARE PLANS"
+  },
+  {
+    "p": 721,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 722,
+    "text": "Manage Care Plans"
+  },
+  {
+    "p": 723,
+    "text": "Actor"
+  },
+  {
+    "p": 724,
+    "text": "Caregiver, Older Adult"
+  },
+  {
+    "p": 725,
+    "text": "Brief Description"
+  },
+  {
+    "p": 726,
+    "text": "The caregiver creates or edits medication and appointment schedules, the device schedules local reminders when permission is available, and the caregiver records a taken dose."
+  },
+  {
+    "p": 727,
+    "text": "Trigger"
+  },
+  {
+    "p": 728,
+    "text": "The caregiver opens Care and selects Medications or Appointments."
+  },
+  {
+    "p": 729,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 730,
+    "text": "A caregiver session and older-adult profile exist; device notification permission is required for scheduled reminders."
+  },
+  {
+    "p": 731,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 732,
+    "text": "The care item is saved, local notification identifiers are stored when scheduled, and taken doses are recorded in medication_logs."
+  },
+  {
+    "p": 733,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 734,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 735,
+    "text": "Application"
+  },
+  {
+    "p": 736,
+    "text": ""
+  },
+  {
+    "p": 737,
+    "text": "1. Open Care and add or edit a medication or future appointment."
+  },
+  {
+    "p": 738,
+    "text": ""
+  },
+  {
+    "p": 739,
+    "text": ""
+  },
+  {
+    "p": 740,
+    "text": ""
+  },
+  {
+    "p": 741,
+    "text": ""
+  },
+  {
+    "p": 742,
+    "text": ""
+  },
+  {
+    "p": 743,
+    "text": "3. Save the care item."
+  },
+  {
+    "p": 744,
+    "text": ""
+  },
+  {
+    "p": 745,
+    "text": ""
+  },
+  {
+    "p": 746,
+    "text": ""
+  },
+  {
+    "p": 747,
+    "text": ""
+  },
+  {
+    "p": 748,
+    "text": ""
+  },
+  {
+    "p": 749,
+    "text": "5. Record a dose after the older adult takes the medication."
+  },
+  {
+    "p": 750,
+    "text": ""
+  },
+  {
+    "p": 751,
+    "text": "7. Review reminder or permission feedback."
+  },
+  {
+    "p": 752,
+    "text": ""
+  },
+  {
+    "p": 753,
+    "text": "2. Validate required fields, reminder time, and future appointment date."
+  },
+  {
+    "p": 754,
+    "text": "    2.1. If the required fields and dates are valid, allow the care item to be saved."
+  },
+  {
+    "p": 755,
+    "text": "    2.2. Else, keep the form open and display validation feedback."
+  },
+  {
+    "p": 756,
+    "text": ""
+  },
+  {
+    "p": 757,
+    "text": "4. Store the schedule and request local notifications when applicable."
+  },
+  {
+    "p": 758,
+    "text": "    4.1. If notification permission is available, schedule the local reminder and store its identifier."
+  },
+  {
+    "p": 759,
+    "text": "    4.2. Else, save the care item without a scheduled notification."
+  },
+  {
+    "p": 760,
+    "text": ""
+  },
+  {
+    "p": 761,
+    "text": "6. Insert a taken medication log and recalculate today's due/taken status."
+  },
+  {
+    "p": 762,
+    "text": ""
+  },
+  {
+    "p": 763,
+    "text": "8. Keep the care item saved even if notification permission is not granted."
+  },
+  {
+    "p": 764,
+    "text": ""
+  },
+  {
+    "p": 765,
+    "text": ""
+  },
+  {
+    "p": 766,
+    "text": "Figure 34: View Sync Location"
+  },
+  {
+    "p": 767,
+    "text": "With optional foreground permission, a successful app-initiated health sync may save the caregiver phone's location for later map viewing."
+  },
+  {
+    "p": 768,
+    "text": "Table 22"
+  },
+  {
+    "p": 769,
+    "text": "VIEW SYNC LOCATION"
+  },
+  {
+    "p": 770,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 771,
+    "text": "View Sync Location"
+  },
+  {
+    "p": 772,
+    "text": "Actor"
+  },
+  {
+    "p": 773,
+    "text": "Caregiver"
+  },
+  {
+    "p": 774,
+    "text": "Brief Description"
+  },
+  {
+    "p": 775,
+    "text": "With optional foreground permission, a successful app-initiated health sync may save the caregiver phone's location for later map viewing."
+  },
+  {
+    "p": 776,
+    "text": "Trigger"
+  },
+  {
+    "p": 777,
+    "text": "The caregiver opens Last sync location or completes a successful eligible sync."
+  },
+  {
+    "p": 778,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 779,
+    "text": "Foreground phone-location consent is enabled and an eligible health sync succeeds; otherwise an empty state is valid."
+  },
+  {
+    "p": 780,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 781,
+    "text": "The newest authorized phone-location event is shown on an OpenStreetMap-backed map, or the app explains why no location is available."
+  },
+  {
+    "p": 782,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 783,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 784,
+    "text": "Application"
+  },
+  {
+    "p": 785,
+    "text": ""
+  },
+  {
+    "p": 786,
+    "text": "1. Allow foreground phone location or leave it disabled."
+  },
+  {
+    "p": 787,
+    "text": ""
+  },
+  {
+    "p": 788,
+    "text": "3. Complete an eligible successful sync while the app is open."
+  },
+  {
+    "p": 789,
+    "text": ""
+  },
+  {
+    "p": 790,
+    "text": ""
+  },
+  {
+    "p": 791,
+    "text": ""
+  },
+  {
+    "p": 792,
+    "text": ""
+  },
+  {
+    "p": 793,
+    "text": ""
+  },
+  {
+    "p": 794,
+    "text": ""
+  },
+  {
+    "p": 795,
+    "text": "5. Open Last sync location."
+  },
+  {
+    "p": 796,
+    "text": ""
+  },
+  {
+    "p": 797,
+    "text": "2. Store the caregiver's consent choice without requesting background tracking."
+  },
+  {
+    "p": 798,
+    "text": ""
+  },
+  {
+    "p": 799,
+    "text": ""
+  },
+  {
+    "p": 800,
+    "text": "4. Save one phone-location event when permission and sync conditions are met."
+  },
+  {
+    "p": 801,
+    "text": "    4.1. If foreground location permission and eligible-sync conditions are met, save one phone-location event."
+  },
+  {
+    "p": 802,
+    "text": "    4.2. Else, complete the sync without saving a location."
+  },
+  {
+    "p": 803,
+    "text": ""
+  },
+  {
+    "p": 804,
+    "text": "6. Load the newest wearable_sync_locations row and render it with Leaflet, or show an empty state."
+  },
+  {
+    "p": 805,
+    "text": "    6.1. If a saved location exists, render the newest event on the map."
+  },
+  {
+    "p": 806,
+    "text": "    6.2. Else, display the no-location-available state."
+  },
+  {
+    "p": 807,
+    "text": ""
+  },
+  {
+    "p": 808,
+    "text": ""
+  },
+  {
+    "p": 809,
+    "text": "Figure 35: Activate SOS Emergency"
+  },
+  {
+    "p": 810,
+    "text": "The caregiver confirms SOS, after which the app logs an emergency event, creates a critical health alert and in-app notification, and calls the saved emergency contact when a number exists."
+  },
+  {
+    "p": 811,
+    "text": "Table 23"
+  },
+  {
+    "p": 812,
+    "text": "ACTIVATE SOS EMERGENCY"
+  },
+  {
+    "p": 813,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 814,
+    "text": "Activate SOS Emergency"
+  },
+  {
+    "p": 815,
+    "text": "Actor"
+  },
+  {
+    "p": 816,
+    "text": "Caregiver"
+  },
+  {
+    "p": 817,
+    "text": "Brief Description"
+  },
+  {
+    "p": 818,
+    "text": "The caregiver confirms SOS, after which the app logs an emergency event, creates a critical health alert and in-app notification, and calls the saved emergency contact when a number exists."
+  },
+  {
+    "p": 819,
+    "text": "Trigger"
+  },
+  {
+    "p": 820,
+    "text": "The caregiver presses SOS on the Alerts screen and confirms activation."
+  },
+  {
+    "p": 821,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 822,
+    "text": "A caregiver session and older-adult profile exist; a saved emergency phone is needed for automatic calling."
+  },
+  {
+    "p": 823,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 824,
+    "text": "The emergency, alert, and notification are saved; the phone dialer opens when a valid emergency contact number is available."
+  },
+  {
+    "p": 825,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 826,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 827,
+    "text": "Application"
+  },
+  {
+    "p": 828,
+    "text": ""
+  },
+  {
+    "p": 829,
+    "text": "1. Press SOS and review the confirmation warning."
+  },
+  {
+    "p": 830,
+    "text": ""
+  },
+  {
+    "p": 831,
+    "text": ""
+  },
+  {
+    "p": 832,
+    "text": ""
+  },
+  {
+    "p": 833,
+    "text": ""
+  },
+  {
+    "p": 834,
+    "text": ""
+  },
+  {
+    "p": 835,
+    "text": ""
+  },
+  {
+    "p": 836,
+    "text": "3. Confirm activation."
+  },
+  {
+    "p": 837,
+    "text": ""
+  },
+  {
+    "p": 838,
+    "text": ""
+  },
+  {
+    "p": 839,
+    "text": "5. Continue the emergency action."
+  },
+  {
+    "p": 840,
+    "text": ""
+  },
+  {
+    "p": 841,
+    "text": ""
+  },
+  {
+    "p": 842,
+    "text": ""
+  },
+  {
+    "p": 843,
+    "text": ""
+  },
+  {
+    "p": 844,
+    "text": ""
+  },
+  {
+    "p": 845,
+    "text": ""
+  },
+  {
+    "p": 846,
+    "text": ""
+  },
+  {
+    "p": 847,
+    "text": "7. Mark the event resolved later when appropriate."
+  },
+  {
+    "p": 848,
+    "text": ""
+  },
+  {
+    "p": 849,
+    "text": "2. Require explicit confirmation because SOS creates records and starts a call."
+  },
+  {
+    "p": 850,
+    "text": "    2.1. If the caregiver confirms, continue with the emergency workflow."
+  },
+  {
+    "p": 851,
+    "text": "    2.2. Else, cancel without creating records or starting a call."
+  },
+  {
+    "p": 852,
+    "text": ""
+  },
+  {
+    "p": 853,
+    "text": "4. Vibrate/play the alert sound and save emergency_events with the latest available vital snapshot."
+  },
+  {
+    "p": 854,
+    "text": ""
+  },
+  {
+    "p": 855,
+    "text": "6. Create a critical health alert and in-app notification, then open the phone dialer for the saved contact."
+  },
+  {
+    "p": 856,
+    "text": "    6.1. If a valid emergency phone exists, open the phone dialer after saving the emergency records."
+  },
+  {
+    "p": 857,
+    "text": "    6.2. Else, save the emergency records and show that no call could be started."
+  },
+  {
+    "p": 858,
+    "text": ""
+  },
+  {
+    "p": 859,
+    "text": "8. Save responder and response time while keeping emergency history."
+  },
+  {
+    "p": 860,
+    "text": ""
+  },
+  {
+    "p": 861,
+    "text": ""
+  },
+  {
+    "p": 862,
+    "text": "Figure 36: Manage Care Plans"
+  },
+  {
+    "p": 863,
+    "text": "The caregiver creates, edits, pins, unpins, and deletes care notes associated with the older adult."
+  },
+  {
+    "p": 864,
+    "text": "Table 24"
+  },
+  {
+    "p": 865,
+    "text": "MANAGE CARE PLANS"
+  },
+  {
+    "p": 866,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 867,
+    "text": "Manage Care Plans"
+  },
+  {
+    "p": 868,
+    "text": "Actor"
+  },
+  {
+    "p": 869,
+    "text": "Caregiver"
+  },
+  {
+    "p": 870,
+    "text": "Brief Description"
+  },
+  {
+    "p": 871,
+    "text": "The caregiver creates, edits, pins, unpins, and deletes care notes associated with the older adult."
+  },
+  {
+    "p": 872,
+    "text": "Trigger"
+  },
+  {
+    "p": 873,
+    "text": "The caregiver opens Care and selects Notes."
+  },
+  {
+    "p": 874,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 875,
+    "text": "A caregiver session and older-adult profile exist."
+  },
+  {
+    "p": 876,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 877,
+    "text": "The note list reflects the saved content and pin state, or removes a note after confirmed deletion."
+  },
+  {
+    "p": 878,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 879,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 880,
+    "text": "Application"
+  },
+  {
+    "p": 881,
+    "text": ""
+  },
+  {
+    "p": 882,
+    "text": "1. Open Care and select Notes."
+  },
+  {
+    "p": 883,
+    "text": ""
+  },
+  {
+    "p": 884,
+    "text": "3. Add note content or edit an existing note."
+  },
+  {
+    "p": 885,
+    "text": ""
+  },
+  {
+    "p": 886,
+    "text": ""
+  },
+  {
+    "p": 887,
+    "text": ""
+  },
+  {
+    "p": 888,
+    "text": ""
+  },
+  {
+    "p": 889,
+    "text": ""
+  },
+  {
+    "p": 890,
+    "text": "5. Pin or unpin a note."
+  },
+  {
+    "p": 891,
+    "text": ""
+  },
+  {
+    "p": 892,
+    "text": "7. Confirm deletion when needed."
+  },
+  {
+    "p": 893,
+    "text": ""
+  },
+  {
+    "p": 894,
+    "text": "2. Load notes for the current older-adult profile."
+  },
+  {
+    "p": 895,
+    "text": ""
+  },
+  {
+    "p": 896,
+    "text": "4. Validate non-empty content and insert or update caregiver_notes."
+  },
+  {
+    "p": 897,
+    "text": "    4.1. If the note contains non-empty content, insert or update it."
+  },
+  {
+    "p": 898,
+    "text": "    4.2. Else, reject the save and keep the note editor open."
+  },
+  {
+    "p": 899,
+    "text": ""
+  },
+  {
+    "p": 900,
+    "text": "6. Save is_pinned and refresh ordering."
+  },
+  {
+    "p": 901,
+    "text": ""
+  },
+  {
+    "p": 902,
+    "text": "8. Delete only the selected note and refresh the list."
+  },
+  {
+    "p": 903,
+    "text": "    8.1. If deletion is confirmed, delete only the selected note and refresh the list."
+  },
+  {
+    "p": 904,
+    "text": "    8.2. Else, leave the note unchanged."
+  },
+  {
+    "p": 905,
+    "text": ""
+  },
+  {
+    "p": 906,
+    "text": ""
+  },
+  {
+    "p": 907,
+    "text": "Figure 37: Export Care Reports"
+  },
+  {
+    "p": 908,
+    "text": "The caregiver generates a branded, shareable PDF for synchronized health readings or active medication schedules from Settings."
+  },
+  {
+    "p": 909,
+    "text": "Table 25"
+  },
+  {
+    "p": 910,
+    "text": "EXPORT CARE REPORTS"
+  },
+  {
+    "p": 911,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 912,
+    "text": "Export Care Reports"
+  },
+  {
+    "p": 913,
+    "text": "Actor"
+  },
+  {
+    "p": 914,
+    "text": "Caregiver"
+  },
+  {
+    "p": 915,
+    "text": "Brief Description"
+  },
+  {
+    "p": 916,
+    "text": "The caregiver generates a branded, shareable PDF for synchronized health readings or active medication schedules from Settings."
+  },
+  {
+    "p": 917,
+    "text": "Trigger"
+  },
+  {
+    "p": 918,
+    "text": "The caregiver selects Health vitals PDF or Medication schedule PDF under Data Management."
+  },
+  {
+    "p": 919,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 920,
+    "text": "A caregiver session and older-adult profile exist; the selected report needs at least one matching record."
+  },
+  {
+    "p": 921,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 922,
+    "text": "The app generates a PDF with patient and caregiver details, tables, timestamps, summaries, and safety notes, then opens the share sheet."
+  },
+  {
+    "p": 923,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 924,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 925,
+    "text": "Application"
+  },
+  {
+    "p": 926,
+    "text": ""
+  },
+  {
+    "p": 927,
+    "text": "1. Open Settings and select a report type."
+  },
+  {
+    "p": 928,
+    "text": ""
+  },
+  {
+    "p": 929,
+    "text": ""
+  },
+  {
+    "p": 930,
+    "text": ""
+  },
+  {
+    "p": 931,
+    "text": ""
+  },
+  {
+    "p": 932,
+    "text": ""
+  },
+  {
+    "p": 933,
+    "text": "3. Continue when records exist."
+  },
+  {
+    "p": 934,
+    "text": ""
+  },
+  {
+    "p": 935,
+    "text": ""
+  },
+  {
+    "p": 936,
+    "text": "5. Share the report. "
+  },
+  {
+    "p": 937,
+    "text": ""
+  },
+  {
+    "p": 938,
+    "text": ""
+  },
+  {
+    "p": 939,
+    "text": "2. Verify the older-adult profile and load the matching records."
+  },
+  {
+    "p": 940,
+    "text": "    2.1. If matching health or medication records exist, enable report generation."
+  },
+  {
+    "p": 941,
+    "text": "    2.2. Else, explain that the selected report has no records to export."
+  },
+  {
+    "p": 942,
+    "text": ""
+  },
+  {
+    "p": 943,
+    "text": "4. Build a branded report with organized tables, summary details, and safety notes."
+  },
+  {
+    "p": 944,
+    "text": ""
+  },
+  {
+    "p": 945,
+    "text": "6. Print HTML to PDF and open the platform share dialog."
+  },
+  {
+    "p": 946,
+    "text": " "
+  },
+  {
+    "p": 947,
+    "text": "  "
+  },
+  {
+    "p": 948,
+    "text": "Figure 38: Configure App Settings"
+  },
+  {
+    "p": 949,
+    "text": "The caregiver manages Google Health connection, notification permission, foreground phone-location consent, dark mode, and sign-out from Settings."
+  },
+  {
+    "p": 950,
+    "text": "Table 26"
+  },
+  {
+    "p": 951,
+    "text": "CONFIGURE APP SETTINGS"
+  },
+  {
+    "p": 952,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 953,
+    "text": "Configure App Settings"
+  },
+  {
+    "p": 954,
+    "text": "Actor"
+  },
+  {
+    "p": 955,
+    "text": "Caregiver"
+  },
+  {
+    "p": 956,
+    "text": "Brief Description"
+  },
+  {
+    "p": 957,
+    "text": "The caregiver manages Google Health connection, notification permission, foreground phone-location consent, dark mode, and sign-out from Settings."
+  },
+  {
+    "p": 958,
+    "text": "Trigger"
+  },
+  {
+    "p": 959,
+    "text": "The caregiver opens Settings and selects an integration, permission, preference, or account action."
+  },
+  {
+    "p": 960,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 961,
+    "text": "Authentication and onboarding are complete; phone settings may restrict permission changes."
+  },
+  {
+    "p": 962,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 963,
+    "text": "The chosen setting is updated or the relevant phone settings page opens with clear status feedback."
+  },
+  {
+    "p": 964,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 965,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 966,
+    "text": "Application"
+  },
+  {
+    "p": 967,
+    "text": ""
+  },
+  {
+    "p": 968,
+    "text": "1. Open Settings."
+  },
+  {
+    "p": 969,
+    "text": ""
+  },
+  {
+    "p": 970,
+    "text": "3. Connect/disconnect Google Health or manage phone permissions."
+  },
+  {
+    "p": 971,
+    "text": ""
+  },
+  {
+    "p": 972,
+    "text": "5. Toggle Dark Mode."
+  },
+  {
+    "p": 973,
+    "text": ""
+  },
+  {
+    "p": 974,
+    "text": "7. Sign out when desired."
+  },
+  {
+    "p": 975,
+    "text": ""
+  },
+  {
+    "p": 976,
+    "text": "2. Load integration, notification, location, and theme status."
+  },
+  {
+    "p": 977,
+    "text": ""
+  },
+  {
+    "p": 978,
+    "text": "4. Run the supported app action or open system settings when required."
+  },
+  {
+    "p": 979,
+    "text": "6. Persist and apply the theme preference."
+  },
+  {
+    "p": 980,
+    "text": "8. Clear the Supabase session and return to Login."
+  },
+  {
+    "p": 981,
+    "text": ""
+  },
+  {
+    "p": 982,
+    "text": ""
+  },
+  {
+    "p": 983,
+    "text": "Figure 39: Review Emergency Records"
+  },
+  {
+    "p": 984,
+    "text": "The administrator reviews saved health alerts, caregiver notifications, and emergency history in the portal."
+  },
+  {
+    "p": 985,
+    "text": "Table 27"
+  },
+  {
+    "p": 986,
+    "text": "REVIEW EMERGENCY RECORDS"
+  },
+  {
+    "p": 987,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 988,
+    "text": "Review Emergency Records"
+  },
+  {
+    "p": 989,
+    "text": "Actor"
+  },
+  {
+    "p": 990,
+    "text": "Administrator"
+  },
+  {
+    "p": 991,
+    "text": "Brief Description"
+  },
+  {
+    "p": 992,
+    "text": "The administrator reviews saved emergency events and their related critical alerts and delivery status."
+  },
+  {
+    "p": 993,
+    "text": "Trigger"
+  },
+  {
+    "p": 994,
+    "text": "The administrator opens Emergency records or follows an overview activity link."
+  },
+  {
+    "p": 995,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 996,
+    "text": "An active administrator session exists."
+  },
+  {
+    "p": 997,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 998,
+    "text": "The latest emergency status, response details, related alerts, and event times are displayed."
+  },
+  {
+    "p": 999,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 1000,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 1001,
+    "text": "Application"
+  },
+  {
+    "p": 1002,
+    "text": ""
+  },
+  {
+    "p": 1003,
+    "text": "1. Open Emergency records."
+  },
+  {
+    "p": 1004,
+    "text": ""
+  },
+  {
+    "p": 1005,
+    "text": ""
+  },
+  {
+    "p": 1006,
+    "text": ""
+  },
+  {
+    "p": 1007,
+    "text": ""
+  },
+  {
+    "p": 1008,
+    "text": ""
+  },
+  {
+    "p": 1009,
+    "text": ""
+  },
+  {
+    "p": 1010,
+    "text": "5. Review the selected event, elderly-person identifier, event time, responder, response time, and resolution status."
+  },
+  {
+    "p": 1011,
+    "text": ""
+  },
+  {
+    "p": 1012,
+    "text": "6. Open related account or alert details when needed."
+  },
+  {
+    "p": 1013,
+    "text": ""
+  },
+  {
+    "p": 1014,
+    "text": ""
+  },
+  {
+    "p": 1015,
+    "text": "8. Refresh the records."
+  },
+  {
+    "p": 1016,
+    "text": ""
+  },
+  {
+    "p": 1017,
+    "text": "2. Load recent emergency events and related critical alerts."
+  },
+  {
+    "p": 1018,
+    "text": ""
+  },
+  {
+    "p": 1019,
+    "text": "3. Display saved records in time order."
+  },
+  {
+    "p": 1020,
+    "text": ""
+  },
+  {
+    "p": 1021,
+    "text": "4. If no records exist, show an empty state."
+  },
+  {
+    "p": 1022,
+    "text": ""
+  },
+  {
+    "p": 1023,
+    "text": ""
+  },
+  {
+    "p": 1024,
+    "text": ""
+  },
+  {
+    "p": 1025,
+    "text": ""
+  },
+  {
+    "p": 1026,
+    "text": ""
+  },
+  {
+    "p": 1027,
+    "text": ""
+  },
+  {
+    "p": 1028,
+    "text": "7. Do not present saved records as live emergency-device monitoring."
+  },
+  {
+    "p": 1029,
+    "text": ""
+  },
+  {
+    "p": 1030,
+    "text": ""
+  },
+  {
+    "p": 1031,
+    "text": "Figure 40: Recover Admin Password"
+  },
+  {
+    "p": 1032,
+    "text": "An administrator requests a recovery email, verifies the newest one-time code, sets a new password, and returns to sign in."
+  },
+  {
+    "p": 1033,
+    "text": "Table 28"
+  },
+  {
+    "p": 1034,
+    "text": "RECOVER ADMIN PASSWORD"
+  },
+  {
+    "p": 1035,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 1036,
+    "text": "Recover Admin Password"
+  },
+  {
+    "p": 1037,
+    "text": "Actor"
+  },
+  {
+    "p": 1038,
+    "text": "Administrator"
+  },
+  {
+    "p": 1039,
+    "text": "Brief Description"
+  },
+  {
+    "p": 1040,
+    "text": "An administrator requests a recovery email, verifies the newest one-time code, sets a new password, and returns to sign in."
+  },
+  {
+    "p": 1041,
+    "text": "Trigger"
+  },
+  {
+    "p": 1042,
+    "text": "The administrator selects Forgot password on the portal."
+  },
+  {
+    "p": 1043,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 1044,
+    "text": "The administrator enters the configured admin username or email and can access that email account."
+  },
+  {
+    "p": 1045,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 1046,
+    "text": "A valid recovery session updates the password; invalid, expired, or rate-limited attempts show safe feedback without opening the portal."
+  },
+  {
+    "p": 1047,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 1048,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 1049,
+    "text": "Application"
+  },
+  {
+    "p": 1050,
+    "text": ""
+  },
+  {
+    "p": 1051,
+    "text": "1. Enter the admin username or email and select Forgot password."
+  },
+  {
+    "p": 1052,
+    "text": ""
+  },
+  {
+    "p": 1053,
+    "text": ""
+  },
+  {
+    "p": 1054,
+    "text": "3. Enter the newest 6- to 8-digit verification code."
+  },
+  {
+    "p": 1055,
+    "text": ""
+  },
+  {
+    "p": 1056,
+    "text": ""
+  },
+  {
+    "p": 1057,
+    "text": ""
+  },
+  {
+    "p": 1058,
+    "text": ""
+  },
+  {
+    "p": 1059,
+    "text": ""
+  },
+  {
+    "p": 1060,
+    "text": ""
+  },
+  {
+    "p": 1061,
+    "text": "5. Enter and confirm a new password."
+  },
+  {
+    "p": 1062,
+    "text": ""
+  },
+  {
+    "p": 1063,
+    "text": ""
+  },
+  {
+    "p": 1064,
+    "text": ""
+  },
+  {
+    "p": 1065,
+    "text": ""
+  },
+  {
+    "p": 1066,
+    "text": ""
+  },
+  {
+    "p": 1067,
+    "text": ""
+  },
+  {
+    "p": 1068,
+    "text": "7. Sign in with the new password."
+  },
+  {
+    "p": 1069,
+    "text": ""
+  },
+  {
+    "p": 1070,
+    "text": ""
+  },
+  {
+    "p": 1071,
+    "text": "2. Request a Supabase recovery email and show non-enumerating feedback."
+  },
+  {
+    "p": 1072,
+    "text": ""
+  },
+  {
+    "p": 1073,
+    "text": "4. Verify the code and recovery session for the same email."
+  },
+  {
+    "p": 1074,
+    "text": "    4.1. If the newest code and recovery session are valid, allow the administrator to set a new password."
+  },
+  {
+    "p": 1075,
+    "text": "    4.2. Else, show invalid, expired, or rate-limited feedback and keep the portal locked."
+  },
+  {
+    "p": 1076,
+    "text": ""
+  },
+  {
+    "p": 1077,
+    "text": "6. Update the authenticated user's password and clear the recovery session."
+  },
+  {
+    "p": 1078,
+    "text": "    6.1. If the password update succeeds, clear the recovery session and return to sign in."
+  },
+  {
+    "p": 1079,
+    "text": "    6.2. Else, retain the recovery screen and display the update error."
+  },
+  {
+    "p": 1080,
+    "text": ""
+  },
+  {
+    "p": 1081,
+    "text": "8. Return to the normal admin sign-in form."
+  },
+  {
+    "p": 1082,
+    "text": "Figure 41: View System Overview"
+  },
+  {
+    "p": 1083,
+    "text": "The administrator reviews system summaries and recent activity before opening the relevant management page."
+  },
+  {
+    "p": 1084,
+    "text": "Table 29"
+  },
+  {
+    "p": 1085,
+    "text": "VIEW SYSTEM OVERVIEW"
+  },
+  {
+    "p": 1086,
+    "text": "Use Case Name"
+  },
+  {
+    "p": 1087,
+    "text": "View System Overview"
+  },
+  {
+    "p": 1088,
+    "text": "Actor"
+  },
+  {
+    "p": 1089,
+    "text": "Administrator"
+  },
+  {
+    "p": 1090,
+    "text": "Brief Description"
+  },
+  {
+    "p": 1091,
+    "text": "The administrator reviews current account, synchronization, alert, emergency, and administrative activity summaries."
+  },
+  {
+    "p": 1092,
+    "text": "Trigger"
+  },
+  {
+    "p": 1093,
+    "text": "An authenticated administrator opens Overview."
+  },
+  {
+    "p": 1094,
+    "text": "Pre-Conditions"
+  },
+  {
+    "p": 1095,
+    "text": "An active administrator session exists."
+  },
+  {
+    "p": 1096,
+    "text": "Post Conditions"
+  },
+  {
+    "p": 1097,
+    "text": "Current summary counts and recent saved activity are displayed with a refresh time."
+  },
+  {
+    "p": 1098,
+    "text": "Flow of Activities"
+  },
+  {
+    "p": 1099,
+    "text": "Actor(s)"
+  },
+  {
+    "p": 1100,
+    "text": "Application"
+  },
+  {
+    "p": 1101,
+    "text": ""
+  },
+  {
+    "p": 1102,
+    "text": "1. Open Overview."
+  },
+  {
+    "p": 1103,
+    "text": ""
+  },
+  {
+    "p": 1104,
+    "text": ""
+  },
+  {
+    "p": 1105,
+    "text": ""
+  },
+  {
+    "p": 1106,
+    "text": ""
+  },
+  {
+    "p": 1107,
+    "text": ""
+  },
+  {
+    "p": 1108,
+    "text": ""
+  },
+  {
+    "p": 1109,
+    "text": ""
+  },
+  {
+    "p": 1110,
+    "text": "4. Review the available summary cards and recent activity."
+  },
+  {
+    "p": 1111,
+    "text": ""
+  },
+  {
+    "p": 1112,
+    "text": "5. Select an account, monitor, emergency, report, or security page."
+  },
+  {
+    "p": 1113,
+    "text": ""
+  },
+  {
+    "p": 1114,
+    "text": "7. Return to Overview and request a refresh when needed."
+  },
+  {
+    "p": 1115,
+    "text": ""
+  },
+  {
+    "p": 1116,
+    "text": "2. Load current account counts, access status, recent synchronization records, alerts, emergencies, and audit activity."
+  },
+  {
+    "p": 1117,
+    "text": ""
+  },
+  {
+    "p": 1118,
+    "text": "3. Display the summary cards, recent activity, and refresh time. Show zero counts or empty states when a category has no records."
+  },
+  {
+    "p": 1119,
+    "text": ""
+  },
+  {
+    "p": 1120,
+    "text": ""
+  },
+  {
+    "p": 1121,
+    "text": ""
+  },
+  {
+    "p": 1122,
+    "text": ""
+  },
+  {
+    "p": 1123,
+    "text": "6. Open the selected management page."
+  },
+  {
+    "p": 1124,
+    "text": ""
+  },
+  {
+    "p": 1125,
+    "text": ""
+  },
+  {
+    "p": 1126,
+    "text": "8. Load and display the latest saved data and update the refresh time."
+  },
+  {
+    "p": 1127,
+    "text": "9. If refresh fails, preserve the last displayed data and show an error."
+  },
+  {
+    "p": 1128,
+    "text": ""
+  },
+  {
+    "p": 1129,
+    "text": ""
+  },
+  {
+    "p": 1130,
+    "text": ""
+  },
+  {
+    "p": 1131,
+    "text": ""
+  },
+  {
+    "p": 1132,
+    "text": ""
+  }
+]

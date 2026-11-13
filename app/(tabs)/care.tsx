@@ -2,6 +2,8 @@ import {PrescriptionEntryCard} from '@/src/components/PrescriptionEntryCard';
 import {MedicationEditor} from '@/src/components/MedicationEditor';
 import {PrescriptionImport} from '@/src/components/PrescriptionImport';
 import {CareImage} from '@/src/components/CareImage';
+import {AppointmentLocationField} from '@/src/components/AppointmentLocationField';
+import {appointmentMapUrl,decodeAppointmentLocation} from '@/src/lib/appointment-location';
 import {formatCareTime,formatCareDateTime,nextMedicationAt,appointmentPhase,medicationDayDoses,careZoneParts} from '@/src/lib/care-time';
 import {medicationSelect,type MedicationRecord} from '@/src/lib/medication';
 import type {PrescriptionDraft} from '@/src/lib/prescription';
@@ -12,6 +14,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
+  Linking,
   Modal,
   Platform,
   Pressable,
@@ -61,7 +64,7 @@ export default function CareScreen() {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
   const { session } = useAuth();
-  const { elderly } = useHealthData();
+  const { elderly, galaxyWatch } = useHealthData();
   useMinuteClock();
   const [importOpen,setImportOpen]=useState(false);
   const [drafts,setDrafts]=useState<PrescriptionDraft[]>([]);
@@ -134,16 +137,17 @@ export default function CareScreen() {
   useCareRefresh(elderly?.elderly_id,load);
 
   const openForm = (item: Editing = null) => {
+    const formTab = tab === 'Schedule' ? 'Appointments' : tab;
     if(tab==='Schedule'){setTab('Appointments');}
     if(!item){setDrafts([]);setPrescriptionPath(null);}
     setEditing(item);
     setDatePickerOpen(false);
     setAppointmentTimePickerOpen(false);
     setMedicationTimePickerOpen(false);
-    if (tab === 'Medications') {
+    if (formTab === 'Medications') {
       const med = item as Medication | null;
       setName(med?.medication_name ?? ''); setSecondary(med?.dosage ?? ''); setDetails(med?.instructions ?? ''); setFrequency(med?.frequency ?? frequencies[0]); setTag(med?.color_tag ?? colorTags[0]); setReminderTime(med?.times_of_day?.[0] ?? '08:00');
-    } else if (tab === 'Appointments') {
+    } else if (formTab === 'Appointments') {
       const appointment = item as Appointment | null;
       setName(appointment?.title ?? ''); setSecondary(appointment?.doctor_name ?? ''); setLocation(appointment?.location ?? ''); setDetails(appointment?.notes ?? ''); setDate(appointment ? new Date(appointment.appointment_at) : new Date(Date.now() + 86_400_000));
     } else {
@@ -156,7 +160,7 @@ export default function CareScreen() {
   const save = async () => {
     if(saveInFlight.current)return;
     if (!session || !elderly || (tab !== 'Notes' && !name.trim()) || (tab === 'Notes' && !details.trim())) { Alert.alert('Missing information', tab === 'Notes' ? 'Add note content.' : 'Add a name or title.'); return; }
-    if (tab === 'Appointments' && date.getTime() < Date.now()) { Alert.alert('Choose a future time', 'Appointments cannot be scheduled in the past.'); return; }
+    if (tab === 'Appointments' && (!Number.isFinite(date.getTime()) || date.getTime() < Date.now())) { Alert.alert('Choose a future time', 'Choose a valid appointment date and time in the future.'); return; }
     if (tab === 'Medications' && frequency !== 'As needed' && !isValidReminderTime(reminderTime)) { Alert.alert('Invalid reminder time', 'Use 24-hour HH:MM format, for example 08:00 or 20:30.'); return; }
     saveInFlight.current=true;setSaving(true);
     try {
@@ -236,7 +240,7 @@ export default function CareScreen() {
       const phase=taken?'Completed':at.getTime()<Date.now()-300000?'Past · review':at.getTime()<=Date.now()?'Due now':'Upcoming';
       return {id:`${item.id}:${at.getTime()}`,at:at.toISOString(),title:item.medication_name,kind:'Medication',phase,detail:[item.dosage,item.frequency].filter(Boolean).join(' · ')};
     });
-  }),...appointments.map(item=>({id:item.id,at:item.appointment_at,title:item.title,kind:'Appointment',phase:appointmentPhase(item),detail:[item.doctor_name,item.location].filter(Boolean).join(' · ')}))].sort((a,b)=>{
+  }),...appointments.map(item=>({id:item.id,at:item.appointment_at,title:item.title,kind:'Appointment',phase:appointmentPhase(item),detail:[item.doctor_name,decodeAppointmentLocation(item.location).label].filter(Boolean).join(' · ')}))].sort((a,b)=>{
     const rank=(phase:string)=>phase==='Ongoing'||phase==='Due now'?0:phase==='Upcoming'?1:phase==='Past · review'?2:3;
     return rank(a.phase)-rank(b.phase)||Date.parse(a.at)-Date.parse(b.at)||a.id.localeCompare(b.id);
   });
@@ -251,7 +255,10 @@ export default function CareScreen() {
         const status = medicationDoseStatus(item, medicationLogs);
         return <View key={item.id} style={[styles.card, { backgroundColor: isDark ? theme.cardElevated : status.tone === 'taken' ? palette.mintSurface : status.tone === 'due' || status.tone === 'soon' ? palette.lemonSurface : theme.cardElevated }]}><View style={[styles.colorBar, { backgroundColor: item.color_tag ?? medicationToneColor(status.tone) }]} /><View style={styles.leadingArtwork}><CareImage path={item.image_path} size={52}/></View><View style={styles.cardBody}><View style={styles.medTop}><View style={styles.medTitleWrap}><Text style={[styles.cardTitle, { color: theme.text }]}>{item.medication_name}</Text><Text style={[styles.meta, { color: theme.subtitle }]}>{[item.dosage, item.frequency].filter(Boolean).join(' • ')}</Text></View><MedicationStatusPill status={status} /></View>{item.reminder_enabled && item.times_of_day?.length ? <View style={styles.reminderRow}><Ionicons name="notifications-outline" size={14} color={palette.primaryDark} /><Text style={styles.reminderText}>{item.times_of_day.map(formatCareTime).join(' and ')}</Text></View> : null}{item.start_date||item.end_date?<Text style={[styles.meta,{color:theme.subtitle}]}>{item.start_date??'Start not specified'}{item.end_date?` → ${item.end_date}`:''} · {item.timezone??'Local time'}</Text>:null}{item.instructions ? <Text style={[styles.body, { color: theme.subtitle }]}>{item.instructions}</Text> : null}<View style={styles.actions}><Action icon="checkmark" label="Taken" color={palette.accentDark} onPress={() => void markTaken(item)} /><Action icon="create-outline" label="Edit" color={palette.primaryDark} onPress={() => openForm(item)} /><Action icon="trash-outline" label="Delete" color={palette.error} onPress={() => remove(tab, item)} /></View></View></View>;
       }) : null}
-      {tab === 'Appointments' ? orderedAppointments.map((item) => <View key={item.id} style={[styles.card, { backgroundColor: theme.cardElevated }]}><View style={styles.leadingArtwork}><CareArtwork kind="appointment" size={52} /></View><View style={styles.cardBody}><Text style={[styles.cardTitle, { color: theme.text }]}>{item.title}</Text><Text style={[styles.meta, { color: theme.subtitle }]}>{formatCareDateTime(item.appointment_at)} · {appointmentPhase(item)}</Text>{item.doctor_name || item.location ? <Text style={[styles.body, { color: theme.subtitle }]}>{[item.doctor_name, item.location].filter(Boolean).join(' • ')}</Text> : null}{item.notes?<Text style={[styles.body,{color:theme.subtitle}]}>{item.notes}</Text>:null}<View style={styles.actions}>{!['Completed','Cancelled'].includes(appointmentPhase(item))?<Action icon="checkmark" label="Complete" color={palette.accentDark} onPress={()=>void finishAppointment(item)}/>:null}<Action icon="create-outline" label="Edit" color={palette.primaryDark} onPress={() => openForm(item)} /><Action icon="trash-outline" label="Delete" color={palette.error} onPress={() => remove(tab, item)} /></View></View></View>) : null}
+      {tab === 'Appointments' ? orderedAppointments.map((item) => {
+        const destination=decodeAppointmentLocation(item.location);
+        return <View key={item.id} style={[styles.card, { backgroundColor: theme.cardElevated }]}><View style={styles.leadingArtwork}><CareArtwork kind="appointment" size={52} /></View><View style={styles.cardBody}><Text style={[styles.cardTitle, { color: theme.text }]}>{item.title}</Text><Text style={[styles.meta, { color: theme.subtitle }]}>{formatCareDateTime(item.appointment_at)} · {appointmentPhase(item)}</Text>{item.doctor_name || item.location ? <Text style={[styles.body, { color: theme.subtitle }]}>{[item.doctor_name, destination.label].filter(Boolean).join(' • ')}</Text> : null}{destination.point?<Action icon="map-outline" label="Open map" color={palette.primaryDark} onPress={()=>void Linking.openURL(appointmentMapUrl(destination.point!)).catch(()=>Alert.alert('Map unavailable','Please try again.'))}/>:null}{item.notes?<Text style={[styles.body,{color:theme.subtitle}]}>{item.notes}</Text>:null}<View style={styles.actions}>{!['Completed','Cancelled'].includes(appointmentPhase(item))?<Action icon="checkmark" label="Complete" color={palette.accentDark} onPress={()=>void finishAppointment(item)}/>:null}<Action icon="create-outline" label="Edit" color={palette.primaryDark} onPress={() => openForm(item)} /><Action icon="trash-outline" label="Delete" color={palette.error} onPress={() => remove(tab, item)} /></View></View></View>;
+      }) : null}
       {tab === 'Notes' ? notes.map((item) => <Pressable key={item.id} onPress={() => openForm(item)} style={[styles.noteCard, { backgroundColor: theme.cardElevated }]}><View style={styles.noteTop}><CareArtwork kind="note" size={43} /><Text numberOfLines={2} style={[styles.cardTitle, styles.noteTitle, { color: theme.text }]}>{item.title || 'Untitled note'}</Text><Pressable hitSlop={10} onPress={() => void togglePin(item)}><Ionicons name={item.is_pinned ? 'pin' : 'pin-outline'} size={19} color={item.is_pinned ? palette.warning : theme.subtitle} /></Pressable></View><Text numberOfLines={4} style={[styles.body, { color: theme.subtitle }]}>{item.content}</Text><View style={styles.actions}><Action icon="create-outline" label="Edit" color={palette.primaryDark} onPress={() => openForm(item)} /><Action icon="trash-outline" label="Delete" color={palette.error} onPress={() => remove(tab, item)} /></View></Pressable>) : null}
       {tab!=='Schedule'&&(tab === 'Medications' ? visibleMeds : tab === 'Appointments' ? appointments : notes).length === 0 && !refreshing ? <View style={styles.empty}><Ionicons name={tab === 'Medications' ? 'medkit-outline' : tab === 'Appointments' ? 'calendar-outline' : 'document-text-outline'} size={42} color={theme.subtitle} /><Text style={[styles.emptyTitle, { color: theme.text }]}>No {tab.toLowerCase()} yet</Text><Text style={[styles.emptyBody, { color: theme.subtitle }]}>Tap + to create the first one.</Text></View> : null}
     </ScrollView>
@@ -261,7 +268,7 @@ export default function CareScreen() {
       {tab !== 'Notes' ? <Field label={tab === 'Medications' ? 'Dosage' : 'Doctor name'} value={secondary} onChangeText={setSecondary} /> : null}
       {tab === 'Medications' ? <><Text style={[styles.fieldLabel, { color: theme.subtitle }]}>FREQUENCY</Text><View style={styles.choices}>{frequencies.map((item) => <Pressable key={item} onPress={() => setFrequency(item)} style={[styles.choice, { backgroundColor: theme.card, borderColor: theme.border }, frequency === item && styles.choiceActive]}><Text style={[styles.choiceText, { color: frequency === item ? palette.text : theme.text }]}>{item}</Text></Pressable>)}</View>{frequency !== 'As needed' ? <><Text style={[styles.fieldLabel, { color: theme.subtitle }]}>REMINDER TIME</Text><Pressable accessibilityRole="button" accessibilityLabel="Choose medication reminder time" onPress={() => setMedicationTimePickerOpen(true)} style={[styles.dateButton, { backgroundColor: theme.card, borderColor: theme.border }]}><Ionicons name="time-outline" size={18} color={palette.primaryDark} /><Text style={[styles.dateButtonText, { color: theme.text }]}>{medicationTime.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}</Text><Ionicons name="chevron-down" size={16} color={theme.subtitle} /></Pressable>{frequency === 'Twice daily' && isValidReminderTime(reminderTime) ? <Text style={[styles.timeHint, { color: theme.subtitle }]}>Reminders at {reminderTime} and {secondDailyTime(reminderTime)}</Text> : null}</> : <Text style={[styles.timeHint, { color: theme.subtitle }]}>As-needed medications do not receive scheduled reminders.</Text>}<Text style={[styles.fieldLabel, { color: theme.subtitle }]}>COLOR TAG</Text><View style={styles.colorChoices}>{colorTags.map((color) => <Pressable key={color} onPress={() => setTag(color)} style={[styles.colorChoice, { backgroundColor: color }, tag === color && styles.colorActive]} />)}</View></> : null}
       {tab === 'Appointments' ? <><Text style={[styles.fieldLabel, { color: theme.subtitle }]}>APPOINTMENT DATE & TIME</Text><View style={styles.dateTimeRow}><Pressable accessibilityRole="button" accessibilityLabel="Choose appointment date" onPress={() => setDatePickerOpen(true)} style={[styles.dateButton, styles.dateTimeButton, { backgroundColor: theme.card, borderColor: theme.border }]}><CareArtwork kind="appointment" size={27} /><Text numberOfLines={1} style={[styles.dateButtonText, { color: theme.text }]}>{date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</Text></Pressable><Pressable accessibilityRole="button" accessibilityLabel="Choose appointment time" onPress={() => setAppointmentTimePickerOpen(true)} style={[styles.dateButton, styles.dateTimeButton, { backgroundColor: theme.card, borderColor: theme.border }]}><Ionicons name="time-outline" size={18} color={palette.primaryDark} /><Text numberOfLines={1} style={[styles.dateButtonText, { color: theme.text }]}>{formatCareTime(`${date.getHours()}:${String(date.getMinutes()).padStart(2,'0')}`)}</Text></Pressable></View></> : null}
-      {tab === 'Appointments' ? <Field label="Location" value={location} onChangeText={setLocation} /> : null}
+      {tab === 'Appointments' ? <AppointmentLocationField value={location} onChange={setLocation} initialCenter={galaxyWatch?.latitude!=null&&galaxyWatch?.longitude!=null?{latitude:galaxyWatch.latitude,longitude:galaxyWatch.longitude}:null}/> : null}
       <Field label={tab === 'Appointments' ? 'Notes' : tab === 'Medications' ? 'Instructions' : 'Note content'} value={details} onChangeText={setDetails} multiline />
       <Pressable onPress={() => void save()} disabled={saving} style={styles.save}><Text style={styles.saveText}>{saving ? 'Saving…' : 'Save'}</Text></Pressable>
     </ScrollView></View></KeyboardAvoidingView></Modal>
