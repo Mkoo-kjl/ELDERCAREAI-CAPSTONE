@@ -12,7 +12,7 @@ The recommendation is Best with Galaxy Watch6. The Android phone APK and Wear OS
 
 ## Team photos
 
-The three team cards use the supplied portraits in `assets/team/`: `kristoffer.jpg`, `melvence.png`, and `john-wayne.jpg`, in the order provided. Photo areas stay square (1:1) on desktop and mobile, with cover cropping positioned toward the top to keep faces visible. The initials remain behind the photo as a fallback.
+The three team cards use the supplied portraits in `assets/team/`: `kristoffer.png` (member 2, Kristoffer James G. Layos), `melvence.jpg` (member 1), and `john-wayne.jpg` (member 3). Photo areas stay square (1:1) on desktop and mobile, with cover cropping aligned to the top to keep heads fully visible. The initials remain behind the photo as a fallback.
 
 ## Contact details
 

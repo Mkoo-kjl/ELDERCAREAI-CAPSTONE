@@ -1,1 +1,1 @@
-Place the team's real portraits here when they are available. See `../../README.md` for the filenames and markup.
+The supplied team portraits are stored here. See `../../README.md` for the current photo assignments and filenames.

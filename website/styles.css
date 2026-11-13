@@ -135,7 +135,7 @@ section[id]{scroll-margin-top:90px}
 .team-member:nth-child(3) .team-placeholder{color:#8b8576}
 .team-placeholder strong{font-size:3.4rem;font-weight:500;line-height:1}
 .team-placeholder span{font-size:.73rem;font-weight:500}
-.team-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%}
+.team-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top}
 .team-photo img[hidden]{display:none}
 .team-details{padding:20px 6px 0}
 .team-role{font-size:.76rem;color:var(--blue);font-weight:700;margin-bottom:8px}
