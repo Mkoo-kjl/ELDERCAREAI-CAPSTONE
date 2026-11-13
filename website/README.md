@@ -12,7 +12,7 @@ The recommendation is Best with Galaxy Watch6. The Android phone APK and Wear OS
 
 ## Team photos
 
-The three team cards deliberately show photo placeholders. To add portraits later, place `kristoffer.jpg`, `melvence.jpg`, and `john-wayne.jpg` in `assets/team/`. Add the corresponding `<img src="assets/team/..." alt="...">` inside each `.team-photo` element in `index.html`; the existing CSS fills the photo area. The initials remain behind the photo as a fallback.
+The three team cards use the supplied portraits in `assets/team/`: `kristoffer.jpg`, `melvence.png`, and `john-wayne.jpg`, in the order provided. Photo areas stay square (1:1) on desktop and mobile, with cover cropping positioned toward the top to keep faces visible. The initials remain behind the photo as a fallback.
 
 ## Contact details
 
