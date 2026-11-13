@@ -116,7 +116,7 @@ section[id]{scroll-margin-top:90px}
 .about-points span{font-size:.75rem;font-weight:700;color:var(--blue)}
 .about-points p{font-size:.9rem;line-height:1.5;margin:0;color:#40524a}
 .device-display{background:#fff;min-height:480px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:22px 30px 34px}
-.device-display img{width:min(100%,340px);mix-blend-mode:multiply}
+.device-display img{width:min(100%,340px);height:auto;object-fit:contain;mix-blend-mode:multiply}
 .device-copy{width:100%;border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:8px}
 .device-copy strong{font-size:.98rem}
 .device-copy span{font-size:.86rem;line-height:1.55;color:var(--muted)}
