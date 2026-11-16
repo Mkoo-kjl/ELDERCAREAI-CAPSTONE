@@ -1,0 +1,28 @@
+jest.mock('react-native-safe-area-context',()=>({...jest.requireActual('react-native-safe-area-context'),useSafeAreaInsets:()=>({top:0,bottom:0,left:0,right:0})}));
+import {fireEvent,render,screen,waitFor} from '@testing-library/react-native';
+import {PrescriptionReview} from '@/src/components/PrescriptionReview';
+import {prescriptionDrafts} from '@/src/lib/prescription';
+const mockRpc=jest.fn(),mockSaved=jest.fn();
+jest.mock('expo-crypto',()=>({randomUUID:()=> '11111111-1111-4111-8111-111111111111'}));
+jest.mock('@/src/providers/AuthProvider',()=>({useAuth:()=>({session:{user:{id:'owner'}}})}));
+jest.mock('@/src/providers/HealthDataProvider',()=>({useHealthData:()=>({elderly:{elderly_id:'patient',full_name:'Fixture patient'}})}));
+jest.mock('@/src/lib/supabase',()=>({supabase:{rpc:(...args:unknown[])=>mockRpc(...args)}}));
+jest.mock('@/src/lib/watch-push',()=>({isCarePushRegistered:jest.fn().mockResolvedValue(true)}));
+jest.mock('@/src/lib/notifications',()=>({scheduleMedicationNotifications:jest.fn().mockResolvedValue(true)}));
+jest.mock('@/src/lib/care-files',()=>({careFileUrl:jest.fn()}));
+jest.mock('@/src/components/CareImage',()=>({CareImage:()=>null}));
+const drafts=prescriptionDrafts({medications:[{medication_name:'Drug A',dosage:'Fixture dose A',frequency:'Twice daily',times_of_day:['08:00','20:00'],start_date:'2026-11-15',prescription_date:'2026-11-14'},{medication_name:'Drug B',dosage:'Fixture dose B',frequency:'Daily',times_of_day:['09:00'],start_date:'2026-11-15',prescription_date:'2026-11-14'}]});
+test('review shows both drugs, retains the entire group after failure and retries the same request once confirmed',async()=>{
+  mockRpc.mockResolvedValueOnce({error:{message:'offline'}}).mockResolvedValueOnce({data:[{id:'a',item_index:0},{id:'b',item_index:1}],error:null});
+  await render(<PrescriptionReview visible drafts={drafts} path="owner/patient/prescription-fixture.jpg" onClose={jest.fn()} onSaved={mockSaved}/>);
+  expect(screen.getByDisplayValue('Drug A')).toBeTruthy();expect(screen.getByDisplayValue('Drug B')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Confirm and save all 2 medications'));
+  expect(mockRpc).not.toHaveBeenCalled();
+  for(const checkbox of screen.getAllByRole('checkbox'))await fireEvent.press(checkbox);
+  await fireEvent.press(screen.getByText('Confirm and save all 2 medications'));
+  await screen.findByText(/prescription group could not save/);expect(mockSaved).not.toHaveBeenCalled();
+  expect(screen.getByDisplayValue('Drug A')).toBeTruthy();expect(screen.getByDisplayValue('Drug B')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Confirm and save all 2 medications'));await waitFor(()=>expect(mockSaved).toHaveBeenCalledTimes(1));
+  const [,first]=mockRpc.mock.calls[0],[,second]=mockRpc.mock.calls[1];expect(first.p_request).toBe(second.p_request);
+  expect(first.p_medications).toHaveLength(2);expect(first.p_medications[0]).toMatchObject({medication_name:'Drug A',prescription_date:'2026-11-14',times_of_day:['08:00','20:00']});
+});

@@ -1,0 +1,20 @@
+jest.mock('react-native-safe-area-context',()=>({useSafeAreaInsets:()=>({top:0,bottom:0,left:0,right:0})}));
+import {fireEvent,render,screen,waitFor} from '@testing-library/react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AppWalkthrough} from '@/src/components/AppWalkthrough';
+import {router} from 'expo-router';
+let mockParams:{walkthrough?:string}={};
+jest.mock('expo-router',()=>({router:{replace:jest.fn()},usePathname:()=>'/dashboard',useGlobalSearchParams:()=>mockParams}));
+jest.mock('@/src/providers/AuthProvider',()=>({useAuth:()=>({session:{user:{id:'owner'}},onboarding:{completed_at:'2026-11-15'}})}));
+jest.mock('@/src/providers/HealthDataProvider',()=>({useHealthData:()=>({elderly:{elderly_id:'patient'}})}));
+test('first-use tour opens the real settings screen, persists completion per patient and can be replayed',async()=>{
+  await AsyncStorage.clear();mockParams={};
+  const view=await render(<AppWalkthrough/>);await screen.findByText('Your care starts here');
+  await fireEvent.press(screen.getByText('Next →'));expect(screen.getByText('Your patient')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Next →'));await fireEvent.press(screen.getByText('Next →'));expect(screen.getByText('Save the people to call')).toBeTruthy();
+  expect(router.replace).toHaveBeenCalledWith('/profile');
+  await fireEvent.press(screen.getByLabelText('Skip tour'));await waitFor(()=>expect(screen.queryByText('Save the people to call')).toBeNull());
+  expect(await AsyncStorage.getItem('walkthrough-v1:owner:patient')).toBe('complete');
+  await view.unmount();const next=await render(<AppWalkthrough/>);expect(screen.queryByText('Your care starts here')).toBeNull();
+  mockParams={walkthrough:'replay-1'};await next.rerender(<AppWalkthrough/>);await screen.findByText('Your care starts here');
+});

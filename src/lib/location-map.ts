@@ -21,9 +21,38 @@ export function distanceMeters(a: MapPosition, b: MapPosition) {
   const h = Math.sin(lat/2)**2 + Math.cos(a.latitude*rad)*Math.cos(b.latitude*rad)*Math.sin(lng/2)**2;
   return 6_371_000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(Math.max(0,1-h)));
 }
+/** Keep raw samples in storage; draw movement only after it exceeds GPS uncertainty.
+ * Three coherent fixes over eight seconds reject single spikes and indoor drift.
+ * Rejected fixes still advance freshness and enlarge the displayed uncertainty.
+ */
+export function stabilizedWatchTrack(points:MapPosition[]){
+  const ordered=points.filter(validMapPosition).sort((a,b)=>Date.parse(a.measured_at)-Date.parse(b.measured_at));
+  const output:MapPosition[]=[];let anchor:MapPosition|null=null,pending:MapPosition|null=null,count=0;
+  let lastTime=-Infinity;
+  for(const point of ordered){
+    const time=Date.parse(point.measured_at);if(time<=lastTime)continue;lastTime=time;
+    if(anchor&&(anchor.accuracy_m??1000)>50&&(point.accuracy_m??1000)<=50){anchor=null;}
+    if(!anchor||Date.parse(point.measured_at)-Date.parse(anchor.measured_at)>120000){anchor=point;pending=null;count=0;}
+    else{
+      const distance=distanceMeters(anchor,point),deadband=Math.max(8,1.5*Math.max(anchor.accuracy_m??100,point.accuracy_m??100));
+      const refining=(point.accuracy_m??1000)<(anchor.accuracy_m??1000)*0.5&&distance>Math.max(3,point.accuracy_m??1000);
+      if((distance>deadband||refining)&&(point.accuracy_m??1000)<=50){
+        if(!pending||pending.location_source!==point.location_source||distanceMeters(pending,point)>Math.max(15,2*(point.accuracy_m??10))){pending=point;count=1;}else count++;
+        if(count>=3&&Date.parse(point.measured_at)-Date.parse(pending.measured_at)>=8000){anchor=point;pending=null;count=0;}
+      }else{pending=null;count=0;}
+    }
+    output.push({...point,latitude:anchor.latitude,longitude:anchor.longitude,accuracy_m:point.accuracy_m==null?null:Math.max(point.accuracy_m,distanceMeters(anchor,point))});
+    // Use receipt freshness for gap detection without walking the stationary anchor.
+    anchor={...anchor,measured_at:point.measured_at};
+  }
+  return output;
+}
+export function stabilizedWatchPosition(snapshot:MapPosition|null,points:MapPosition[],now=Date.now()){
+  return stabilizedWatchTrack([...points,...(snapshot?[snapshot]:[])].filter(point=>Date.parse(point.measured_at)<=now+10000)).at(-1)??null;
+}
 /** Break the trail at source switches, poor accuracy, long gaps and implausible jumps. */
 export function routeSegments(points: MapPosition[]) {
-  const ordered = points.filter(validMapPosition).sort((a,b)=>Date.parse(a.measured_at)-Date.parse(b.measured_at)).slice(-500);
+  const ordered = stabilizedWatchTrack(points).slice(-500);
   const segments: number[][][] = []; let previous: MapPosition | null = null; let line: number[][] = [];
   for (const point of ordered) {
     if ((point.accuracy_m ?? 1000) > 100) { previous = null; line = []; continue; }
@@ -32,7 +61,7 @@ export function routeSegments(points: MapPosition[]) {
     if (!previous || elapsed > 30 || point.location_source !== previous.location_source || distanceMeters(previous,point) > Math.max(100,elapsed*35 + (point.accuracy_m ?? 0) + (previous.accuracy_m ?? 0))) {
       line = []; segments.push(line);
     }
-    line.push([point.latitude,point.longitude]); previous = point;
+    if(!previous||distanceMeters(previous,point)>0.5)line.push([point.latitude,point.longitude]); previous = point;
   }
   return segments.filter((segment)=>segment.length>1);
 }

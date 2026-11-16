@@ -1,8 +1,8 @@
+import {useHealthData} from '@/src/providers/HealthDataProvider';
 import {VitalStatusBadge} from './VitalStatusBadge';
 import {vitalStatus,vitalWellnessSuggestion} from '@/src/lib/vital-status';
 import { Ionicons } from '@expo/vector-icons';
 import { stressIndexValue, stressIndexCaption } from '@/src/lib/stress-index';
-import {vitalReviewWarnings} from '@/src/lib/vital-review';
 import { useEffect, useRef, useState } from 'react';
 import type { ImageSourcePropType } from 'react-native';
 import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
@@ -54,16 +54,10 @@ function valueFor(row: VitalLog, metric: VitalMetricKey) {
 }
 function formatValue(value: number | null, config: MetricConfig) { return value === null ? '--' : metricNumber(value, config.digits); }
 function metricNumber(value: number, digits: number) { return digits ? value.toFixed(digits) : Math.round(value).toLocaleString(); }
-function isConcerning(metric: VitalMetricKey, value: number | null) {
-  if (value === null) return false;
-  if (metric === 'heart_rate_bpm' || metric === 'spo2_percent') return vitalReviewWarnings({[metric]:value}).length>0;
-  if (metric === 'sleep_hours') return value < 5;
-  return false;
-}
-
 export function VitalDetailModal({ visible, metric, history, currentVital, sensorStatus, sleepSessions = [], onClose }: { visible: boolean; metric: VitalMetricKey | null; history: VitalLog[]; currentVital?: VitalLog | null; sensorStatus?: string; sleepSessions?: SleepSession[]; onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const theme = getTheme(useColorScheme() === 'dark');
+  const {elderly}=useHealthData();
   const insightCache = useRef(new Map<string, string>());
   if (!metric) return null;
   const config = configs[metric];
@@ -74,7 +68,7 @@ export function VitalDetailModal({ visible, metric, history, currentVital, senso
   const minimum = recent.length ? Math.min(...recent.map((item) => item.value)) : 0;
   const maximum = recent.length ? Math.max(...recent.map((item) => item.value)) : 0;
   const range = maximum - minimum || 1;
-  const concerning = isConcerning(metric, latest);
+  const concerning = ['attention','critical'].includes(vitalStatus(metric,latestRow,history,elderly?.vital_thresholds).tone);
   const emotion = latest === null ? 'neutral' : concerning ? 'worried' : 'happy';
   const sleepContext = metric === 'sleep_hours' ? sleepDurationContext(latest) : null;
   const savedSleep = sleepSessions.length ? sleepSessions : history.flatMap((row) => {
@@ -94,7 +88,7 @@ export function VitalDetailModal({ visible, metric, history, currentVital, senso
         <View style={styles.handle} />
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
           <View style={styles.header}><View style={[styles.heroIcon, { backgroundColor: `${config.color}16` }]}><Ionicons name={config.icon} size={29} color={config.color} /></View><View style={styles.headerCopy}><Text style={[styles.eyebrow, { color: config.color }]}>VITAL DETAILS</Text><Text style={[styles.title, { color: theme.text }]}>{config.title}</Text></View><Pressable accessibilityLabel="Close details" onPress={onClose} style={[styles.close, { backgroundColor: theme.card }]}><Ionicons name="close" size={22} color={theme.text} /></Pressable></View>
-          <View style={[styles.readingCard, { backgroundColor: theme.card }]}><Text style={[styles.readingLabel, { color: theme.subtitle }]}>{metric === 'hrv_rmssd_ms' ? 'RAW HRV MEASUREMENT' : 'LATEST SYNCHRONIZED READING'}</Text><VitalStatusBadge status={vitalStatus(metric,latestRow,history)}/><View style={styles.readingRow}><Text style={[styles.reading, { color: theme.text }]}>{metric === 'hrv_rmssd_ms' && latest != null ? 'HRV ' : ''}{formatValue(latest, config)}</Text><Text style={[styles.unit, { color: theme.subtitle }]}>{config.unit}</Text></View><Text style={[styles.time, { color: theme.subtitle }]}>{vitalTimeLabel(latestRow, metric)}</Text><Text style={[styles.time,{color:theme.subtitle}]}>{latestRow ? new Date(latestRow.measurement_times?.[metric]??latestRow.recorded_at).toLocaleString() : ""}</Text><Text style={[styles.time,{color:theme.text}]}>{vitalStatus(metric,latestRow,history).detail}</Text><Text style={[styles.time,{color:theme.subtitle}]}>General wellness: {vitalWellnessSuggestion(metric)}</Text>{sleepContext ? <View style={styles.sleepScore}><Text style={[styles.sleepScoreValue, { color: palette.purple }]}>{sleepContext.label}</Text><Text style={[styles.sleepScoreNote, { color: theme.subtitle }]}>{sleepContext.note}</Text></View> : null}</View>
+          <View style={[styles.readingCard, { backgroundColor: theme.card }]}><Text style={[styles.readingLabel, { color: theme.subtitle }]}>{metric === 'hrv_rmssd_ms' ? 'RAW HRV MEASUREMENT' : 'LATEST SYNCHRONIZED READING'}</Text><VitalStatusBadge status={vitalStatus(metric,latestRow,history,elderly?.vital_thresholds)}/><View style={styles.readingRow}><Text style={[styles.reading, { color: theme.text }]}>{metric === 'hrv_rmssd_ms' && latest != null ? 'HRV ' : ''}{formatValue(latest, config)}</Text><Text style={[styles.unit, { color: theme.subtitle }]}>{config.unit}</Text></View><Text style={[styles.time, { color: theme.subtitle }]}>{vitalTimeLabel(latestRow, metric)}</Text><Text style={[styles.time,{color:theme.subtitle}]}>{latestRow ? new Date(latestRow.measurement_times?.[metric]??latestRow.recorded_at).toLocaleString() : ""}</Text><Text style={[styles.time,{color:theme.text}]}>{vitalStatus(metric,latestRow,history,elderly?.vital_thresholds).detail}</Text><Text style={[styles.time,{color:theme.subtitle}]}>General wellness: {vitalWellnessSuggestion(metric)}</Text>{sleepContext ? <View style={styles.sleepScore}><Text style={[styles.sleepScoreValue, { color: palette.purple }]}>{sleepContext.label}</Text><Text style={[styles.sleepScoreNote, { color: theme.subtitle }]}>{sleepContext.note}</Text></View> : null}</View>
 
           {metric==='hrv_rmssd_ms'?<View style={[styles.readingCard,{backgroundColor:theme.card}]}><Text style={[styles.readingLabel,{color:theme.subtitle}]}>EXPERIMENTAL STRESS ESTIMATE · NOT MEDICAL GRADE</Text><Text style={[styles.reading,{color:theme.text}]}>{stressIndexValue(currentVital)} /100</Text><Text style={[styles.time,{color:theme.subtitle}]}>{stressIndexCaption(currentVital)}</Text><Text style={[styles.time,{color:theme.subtitle}]}>An illustrative HRV index, not a validated stress measurement or Samsung stress score. It compares current RMSSD with the median of your completed five-minute HRV averages from the last seven days. At least 12 periods are needed. Baseline maps to 50; half the baseline maps to 100; twice the baseline maps to 0. Values are capped at 0–100. Activity, illness, sleep and sensor conditions can change it.</Text></View>:null}
           {visible ? <VitalInsight key={`${latestRow?.elderly_id ?? 'none'}:${metric}`} metric={metric} row={latestRow} value={latest} config={config} emotion={emotion} cache={insightCache.current} /> : null}

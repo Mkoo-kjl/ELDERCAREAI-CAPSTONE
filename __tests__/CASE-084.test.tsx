@@ -7,15 +7,17 @@ jest.mock('react-native-webview',()=>{
 });
 const point={latitude:10,longitude:123,accuracy_m:5,measured_at:'2026-11-02T10:00:00Z',location_source:'watch_gps' as const};
 beforeEach(()=>mockInject.mockClear());
-test('retains its document and sends the newest fix when map initialization finishes',async()=>{
+test('retains its document, filters a single jump and sends confirmed movement after initialization',async()=>{
   const result=await render(<LiveLocationMap position={point} live/>);const source=mockProps.source;
   const next={...point,latitude:10.001,measured_at:'2026-11-02T10:00:02Z'};
   await result.rerender(<LiveLocationMap position={next} live/>);
   expect(mockProps.source).toBe(source);expect(mockInject).not.toHaveBeenCalled();
   await act(async()=>mockProps.onMessage({nativeEvent:{data:JSON.stringify({type:'ready'})}}));
-  expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('10.001'));
-  await result.rerender(<LiveLocationMap position={{...next,latitude:10.002}} live/>);
-  expect(mockProps.source).toBe(source);expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('10.002'));
+  expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('\"latitude\":10,'));
+  expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('2026-11-02T10:00:02Z'));
+  await result.rerender(<LiveLocationMap position={{...next,latitude:10.00101,measured_at:'2026-11-02T10:00:06Z'}} live/>);
+  await result.rerender(<LiveLocationMap position={{...next,latitude:10.00102,measured_at:'2026-11-02T10:00:10Z'}} live/>);
+  expect(mockProps.source).toBe(source);expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('10.00102'));
 });
 test('offers a follow control after the user drags the map',async()=>{
   await render(<LiveLocationMap position={point}/>);

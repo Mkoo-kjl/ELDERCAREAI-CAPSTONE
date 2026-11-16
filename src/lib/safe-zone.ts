@@ -3,10 +3,11 @@ export type ZoneOverlay = Pick<SafeZone,'name'|'latitude'|'longitude'|'radius_m'
 export type SafeZoneState = {elderly_id:string;status:'unknown'|'inside'|'outside';last_fix_at:string|null;confirmed_at:string|null;distance_m:number|null;last_check:string|null;candidate?:string|null;candidate_count?:number};
 export type SafeZoneEvent = {id:string;direction:'inside'|'outside';zone_name:string;distance_m:number;measured_at:string;alert_id:string|null};
 export const SAFE_ZONE_RADIUS = {min:10,max:5000,default:20,presets:[10,20,50,100,300,500,1000]} as const;
-export function safeZoneAccuracyLimit(radius:number){return Math.min(100,Math.max(50,radius));}
+export function safeZoneAccuracyLimit(radius:number){return Math.min(50,Math.max(5,radius/2));}
 export function safeZoneGpsHint(zone:SafeZone|null,fix:{location_source:string;accuracy_m:number|null;measured_at:string}|null,monitoring?:boolean,now=Date.now()){
   if(!zone?.enabled)return null;
   if(monitoring===false)return 'Start monitoring on the watch to check the safe zone.';
+  if(fix?.location_source==='network')return 'Network estimates are shown on the map but do not trigger safe-zone crossings. Waiting for precise GPS or fused location.';
   if(!fix)return 'Waiting for GPS, fused or network location uploaded by the watch. Enable Location, monitoring and internet.';
   const age=now-Date.parse(fix.measured_at),limit=safeZoneAccuracyLimit(zone.radius_m);
   if(!Number.isFinite(age)||age>90_000||age< -10_000)return 'The last location is too old or has an incorrect time. Check watch Location, automatic time and internet.';

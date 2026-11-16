@@ -1,3 +1,4 @@
+import {useWalkthroughAnchor} from '@/src/providers/WalkthroughProvider';
 import {VitalStatusBadge} from './VitalStatusBadge';
 import type {VitalStatus} from '@/src/lib/vital-status';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,13 +9,15 @@ import { AppText as Text } from '@/src/components/AppText';
 import { getTheme } from '@/src/theme/colors';
 import { fontFamily, typeScale } from '@/src/theme/typography';
 
-type Props = { status?: VitalStatus; icon: ComponentProps<typeof Ionicons>['name']; title: string; value: string; unit: string; timestamp: string; color: string; surface?: string; fullWidth?: boolean; annotation?: string; onPress?: () => void };
+type Props = {
+  walkthroughId?:string; status?: VitalStatus; icon: ComponentProps<typeof Ionicons>['name']; title: string; value: string; unit: string; timestamp: string; color: string; surface?: string; fullWidth?: boolean; annotation?: string; onPress?: () => void };
 
-export function MetricCard({ icon, title, value, unit, timestamp, color, surface, fullWidth, annotation, onPress, status }: Props) {
+export function MetricCard({walkthroughId, icon, title, value, unit, timestamp, color, surface, fullWidth, annotation, onPress, status }: Props) {
   const isDark = useColorScheme() === 'dark';
+  const anchor=useWalkthroughAnchor(walkthroughId);
   const theme = getTheme(isDark);
   return (
-    <Pressable accessibilityRole="button" accessibilityHint="Opens details and recent readings" disabled={!onPress} onPress={onPress} style={({ pressed }) => [styles.card, fullWidth ? styles.full : styles.half, { backgroundColor: isDark ? theme.cardElevated : surface ?? theme.cardElevated }, pressed && styles.pressed]}>
+    <Pressable ref={anchor} collapsable={false} accessibilityRole="button" accessibilityHint="Opens details and recent readings" disabled={!onPress} onPress={onPress} style={({ pressed }) => [styles.card, fullWidth ? styles.full : styles.half, { backgroundColor: isDark ? theme.cardElevated : surface ?? theme.cardElevated }, pressed && styles.pressed]}>
       <View style={styles.topRow}>
         <Ionicons name={icon} size={17} color={color} />
         {onPress ? <Ionicons name="chevron-forward" size={15} color={theme.subtitle} /> : null}

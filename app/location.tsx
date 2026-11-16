@@ -1,3 +1,4 @@
+import {WalkthroughScrollView,useWalkthroughAnchor} from '@/src/providers/WalkthroughProvider';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef,useState } from 'react';
@@ -14,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { relativeTime } from '@/src/lib/format';
 import { watchMapPosition,watchReadingFresh,trackingSourceLabel } from '@/src/lib/galaxy-watch';
-import {newestWatchPosition} from '@/src/lib/location-map';
+import {stabilizedWatchPosition} from '@/src/lib/location-map';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { useHealthData } from '@/src/providers/HealthDataProvider';
 import { getTheme, palette } from '@/src/theme/colors';
@@ -32,7 +33,7 @@ export default function LastSyncLocationScreen() {
   const track = useWatchTrack(elderly?.elderly_id, galaxyWatch?.device_id);
   const [now,setNow]=useState(Date.now());
   useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),1_000);return()=>clearInterval(timer);},[]);
-  const watchFix=newestWatchPosition(watchMapPosition(galaxyWatch),track.points,now);
+  const watchFix=stabilizedWatchPosition(watchMapPosition(galaxyWatch),track.points,now);
   const location=watchFix?{...watchFix,id:galaxyWatch!.device_id,recorded_at:watchFix.measured_at}:null;
   const gpsLive=Boolean(galaxyWatch?.monitoring&&watchFix&&watchReadingFresh(watchFix.measured_at,now,15_000));
   const watchConnected=watchReadingFresh(galaxyWatch?.received_at,now,30_000);
@@ -40,6 +41,7 @@ export default function LastSyncLocationScreen() {
   const zone=useSafeZone(session?.user.id,elderly?.elderly_id);
   const [preview,setPreview]=useState<ZoneOverlay|null>(null),[selecting,setSelecting]=useState(false),[picked,setPicked]=useState<{latitude:number;longitude:number}|null>(null);
   const scroll=useRef<ScrollView>(null);
+  const zoneAnchor=useWalkthroughAnchor('location-zone');
   const overlay=preview??zone.zone;
   const mapPosition=watchFix;
   const updatePreview=useCallback((value:ZoneOverlay|null)=>{setPreview(value);if(!value)setSelecting(false);},[]);
@@ -66,7 +68,7 @@ export default function LastSyncLocationScreen() {
         <View style={styles.headerCopy}><Text style={[styles.title, { color: theme.text }]}>Live location tracking</Text><Text style={[styles.subtitle, { color: theme.subtitle }]}>{gpsLive ? 'Receiving location updates' : watchConnected?'Watch connected · waiting for location':'Waiting or showing the last known position'}</Text></View>
       </View>
 
-      <ScrollView ref={scroll} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {void load(true);void zone.refresh();}} colors={[palette.primary]} />} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
+      <WalkthroughScrollView ref={scroll} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {void load(true);void zone.refresh();}} colors={[palette.primary]} />} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
         <View style={[styles.notice, { backgroundColor: `${palette.primary}12` }]}>
           <Ionicons name="watch-outline" size={21} color={palette.primaryDark} />
           <Text style={[styles.noticeText, { color: theme.text }]}>{`${watchFix?trackingSourceLabel(watchFix.location_source):'Waiting for location'}. ${watchFix?.location_source==='watch_gps'?'This fix comes from the watch’s satellite GPS.':'Hybrid tracking uses GPS, fused and network estimates. A phone-assisted estimate may represent the paired phone if it stays behind.'} ${gpsLive?'The marker updates as new estimates arrive.':'A last known marker does not establish the current position.'}`}</Text>
@@ -86,16 +88,16 @@ export default function LastSyncLocationScreen() {
             <LiveLocationMap key={location?.id??'safe-zone-preview'} style={styles.map} position={mapPosition}
               points={track.points} live={gpsLive} safeZone={overlay} selecting={selecting} onCoordinateSelect={point=>{setPicked(point);setSelecting(false);}} />
             {!location?<View style={styles.details}><FeatureMessage message="The map is centered on your saved place. No patient position is available yet."/></View>:<View style={styles.details}>
-              <Text style={[styles.noticeText,{color:theme.subtitle}]}>The dot and line show received GPS, fused or network estimates. Source changes start a new trail segment. The safe-zone circle stays at your saved place. Drag the map to explore; tap Follow location to return.</Text>
+              <Text style={[styles.noticeText,{color:theme.subtitle}]}>The dot and trail filter small GPS drift; the uncertainty circle includes drift from the latest received fix. Movement needs repeated fixes beyond the reported uncertainty; the marker may take a few seconds to catch up. Source changes start a new trail segment. The safe-zone circle stays at your saved place. Drag the map to explore; tap Follow location to return.</Text>
               {location!.accuracy_m != null && location!.accuracy_m > 100 ? <Text style={[styles.noticeText,{color:palette.warning}]}>Approximate position. Small movements may be within the reported accuracy.</Text> : null}
               <View style={styles.detailRow}><Ionicons name="time-outline" size={18} color={palette.primaryDark} /><View><Text style={[styles.detailLabel, { color: theme.subtitle }]}>LAST RECORDED</Text><Text style={[styles.detailValue, { color: theme.text }]}>{relativeTime(location!.recorded_at)} • {new Date(location!.recorded_at).toLocaleString()}</Text></View></View>
-              <View style={styles.detailRow}><Ionicons name="locate-outline" size={18} color={palette.accentDark} /><View><Text style={[styles.detailLabel, { color: theme.subtitle }]}>REPORTED ACCURACY</Text><Text style={[styles.detailValue, { color: theme.text }]}>{location!.accuracy_m != null ? `Approximately ${Math.round(location!.accuracy_m)} meters` : 'Accuracy unavailable'}</Text></View></View>
+              <View style={styles.detailRow}><Ionicons name="locate-outline" size={18} color={palette.accentDark} /><View><Text style={[styles.detailLabel, { color: theme.subtitle }]}>LOCATION UNCERTAINTY</Text><Text style={[styles.detailValue, { color: theme.text }]}>{location!.accuracy_m != null ? `Approximately ${Math.round(location!.accuracy_m)} meters` : 'Accuracy unavailable'}</Text></View></View>
               <Pressable onPress={openExternalMap} style={styles.openButton}><Ionicons name="navigate-outline" size={18} color="#FFFFFF" /><Text style={styles.openButtonText}>Open in OpenStreetMap</Text></Pressable>
             </View>}
           </View>
         </> : null}
-        <View style={{marginTop:20}}><SafeZonePanel key={`${session.user.id}:${elderly?.elderly_id}`} care={zone} fix={watchFix} monitoring={galaxyWatch?.monitoring} picked={picked} onPreview={updatePreview} onPickRequest={()=>{setSelecting(true);scroll.current?.scrollTo({y:0,animated:true});}}/></View>
-      </ScrollView>
+        <View ref={zoneAnchor} collapsable={false} style={{marginTop:20}}><SafeZonePanel key={`${session.user.id}:${elderly?.elderly_id}`} care={zone} fix={watchFix} monitoring={galaxyWatch?.monitoring} picked={picked} onPreview={updatePreview} onPickRequest={()=>{setSelecting(true);scroll.current?.scrollTo({y:0,animated:true});}}/></View>
+      </WalkthroughScrollView>
     </View>
   );
 }

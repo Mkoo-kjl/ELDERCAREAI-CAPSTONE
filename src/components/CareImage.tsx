@@ -8,10 +8,10 @@ import {careFileUrl} from '@/src/lib/care-files';
 import {useAuth} from '@/src/providers/AuthProvider';
 import {palette} from '@/src/theme/colors';
 import type {LocalPhoto} from './ProfilePhotoPicker';
-export async function chooseCareImage(camera=false):Promise<LocalPhoto|null>{
+export async function chooseCareImage(camera=false,{crop=false,quality=0.95}:{crop?:boolean;quality?:number}={}):Promise<LocalPhoto|null>{
   const permission=camera?await ImagePicker.requestCameraPermissionsAsync():await ImagePicker.requestMediaLibraryPermissionsAsync();
   if(!permission.granted)throw Error(`Allow ${camera?'camera':'photo'} access in phone settings to continue.`);
-  const options={mediaTypes:['images'] as ImagePicker.MediaType[],allowsEditing:false,quality:0.95};
+  const options={mediaTypes:['images'] as ImagePicker.MediaType[],allowsEditing:crop,quality};
   const result=camera?await ImagePicker.launchCameraAsync(options):await ImagePicker.launchImageLibraryAsync(options);
   return result.canceled?null:{uri:result.assets[0].uri,mimeType:result.assets[0].mimeType};
 }

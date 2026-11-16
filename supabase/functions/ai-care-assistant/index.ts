@@ -313,7 +313,7 @@ Deno.serve(async (request) => {
     }
 
     let elderlyQuery = admin.from('elderly_profiles')
-      .select('elderly_id, full_name, age, gender, weight_kg, height_cm, blood_type, medical_conditions, medications, emergency_contact, emergency_contact_phone')
+      .select('elderly_id, full_name, age, gender, weight_kg, height_cm, blood_type, medical_conditions, medications, emergency_contact, emergency_contact_phone, vital_thresholds')
       .eq('caregiver_id', userId);
     if (chatSession?.elderly_id) elderlyQuery = elderlyQuery.eq('elderly_id', chatSession.elderly_id);
     const { data: elderly, error: elderlyError } = await elderlyQuery.order('created_at').limit(1).maybeSingle();
@@ -395,6 +395,7 @@ Deno.serve(async (request) => {
         blood_type: elderly.blood_type ?? null,
         medical_conditions: clip(elderly.medical_conditions, 500),
         medications_profile_text: clip(elderly.medications, 500),
+        configured_review_thresholds: elderly.vital_thresholds ?? {},
         emergency_contact: clip(elderly.emergency_contact, 160),
         emergency_contact_phone: clip(elderly.emergency_contact_phone, 80),
       } : null,
@@ -455,7 +456,7 @@ Use the database snapshot to answer factual questions such as the caregiver's na
 When discussing vitals, sleep, medications, alerts, symptoms, or health data, refer to "the patient" or the patient's name. Do not say "your vitals", "your sleep", "your heart rate", or similar phrasing unless the question is truly about the caregiver account.
 Do not invent missing data. If today's sleep or vitals are absent, say that today's reading is not available and mention the latest available reading if present.
 When mentioning a specific saved measurement, cite its matching source_reading_references reference in square brackets, for example [V1]. Only cite a reference supplied in this snapshot and ensure the metric, value and time match. These are source readings, not proof of a diagnosis. Do not invent record IDs, references, or citations for general advice. If a historical aggregate has no corresponding source reference, describe it as an aggregate check without inventing a citation.
-For historical peaks, threshold crossings, counts and ranges, use complete_recorded_vital_history. Its aggregates scan all saved matching rows, whereas recent_vitals and metric_insight contain only small recent samples. Do not claim an event never occurred from missing data; qualify answers as recorded measurements and note gaps. Sample counts are not independent episodes. Do not answer a narrower date or clock interval than the retrieved history scope; ask for an ISO date when an interval cannot be resolved. Stress scores are experimental, not medical grade.
+For historical peaks, threshold crossings, counts and ranges, use complete_recorded_vital_history. Its aggregates scan all saved matching rows, whereas recent_vitals and metric_insight contain only small recent samples. Do not claim an event never occurred from missing data; qualify answers as recorded measurements and note gaps. Sample counts are not independent episodes. Do not answer a narrower date or clock interval than the retrieved history scope; ask for an ISO date when an interval cannot be resolved. Stress scores are experimental, not medical grade. For current review targets, use patient.configured_review_thresholds when present; these are caregiver-configured review settings, not diagnoses or proof of clinician approval. Do not substitute global defaults for configured patient values.
 For urgent symptoms, severe distress, falls, chest pain, breathing trouble, very low oxygen, or immediate danger, tell the caregiver to call local emergency services now.
 Do not diagnose, prescribe, change doses, or tell the caregiver to stop/start medication. For medication questions, summarize schedules and advise following the prescriber's instructions.
 Keep responses concise, warm, and practical: usually 1 to 4 short sentences.`;

@@ -1,6 +1,7 @@
+import {patientReviewRules} from './vital-thresholds';
 import {metricRecords} from './monitoring-records';
 import type { VitalLog } from '@/src/providers/HealthDataProvider';
-import {vitalReviewWarnings,VITAL_REVIEW_RULES} from '@/src/lib/vital-review';
+import {vitalReviewWarnings} from '@/src/lib/vital-review';
 
 export type AnalysisSeverity = 'positive' | 'info' | 'warning' | 'critical';
 export type AnalysisMetric = 'heart' | 'oxygen' | 'sleep' | 'steps' | 'temperature' | 'hrv' | 'data';
@@ -117,16 +118,17 @@ export function buildHealthPredictions(history: VitalLog[]): AnalysisResult[] {
   return results.length ? results : [{ id: 'prediction-waiting', title: 'Building personal trends', body: 'At least four recorded readings per metric are required before a statistical trend can be calculated.', severity: 'info', metric: 'data', confidence: 'Low' }];
 }
 
-export function buildHealthAnomalies(history: VitalLog[]): AnalysisResult[] {
+export function buildHealthAnomalies(history: VitalLog[],thresholds?:unknown): AnalysisResult[] {
   const latest = history[0] ? { ...history[0] } : null;
   if (latest) for (const metric of ['heart_rate_bpm', 'spo2_percent', 'sleep_hours', 'steps_count', 'skin_temp_celsius', 'hrv_rmssd_ms'] as const)
     latest[metric] = history.find((row) => row[metric] != null)?.[metric] ?? null;
   if (!latest) return [{ id: 'anomaly-waiting', title: 'No readings to analyze', body: 'Start monitoring on Galaxy Watch before checking for anomalies.', severity: 'info', metric: 'data' }];
   const anomalies: AnalysisResult[] = [];
-  const review=vitalReviewWarnings(latest);
-  if (latest.spo2_percent !== null && review.some(warning=>warning.metric==='spo2_percent')) anomalies.push({ id: 'low-spo2', title: 'Low SpO₂ threshold crossed', body: `The latest SpO₂ is ${latest.spo2_percent.toFixed(1)}%, below the app’s ${VITAL_REVIEW_RULES.oxygenLow}% review threshold. Confirm the wearable reading and consider appropriate medical guidance.`, severity: latest.spo2_percent<=92?'critical':'warning', metric: 'oxygen' });
-  if (latest.heart_rate_bpm !== null && review.some(warning=>warning.metric==='heart_rate_bpm')) anomalies.push({ id: 'heart-threshold', title: 'Heart-rate threshold crossed', body: `The latest heart rate is ${latest.heart_rate_bpm.toFixed(0)} bpm, outside the app’s ${VITAL_REVIEW_RULES.heartRateLow}–${VITAL_REVIEW_RULES.heartRateHigh} bpm review range. Context such as activity and symptoms matters.`, severity: 'warning', metric: 'heart' });
-  if (latest.sleep_hours !== null && latest.sleep_hours < 5) anomalies.push({ id: 'short-sleep', title: 'Very short recorded sleep', body: `The latest synchronized sleep duration is ${latest.sleep_hours.toFixed(1)} hours.`, severity: 'warning', metric: 'sleep' });
+  const rules=patientReviewRules(thresholds);
+  const review=vitalReviewWarnings(latest,rules);
+  if (latest.spo2_percent !== null && review.some(warning=>warning.metric==='spo2_percent')) anomalies.push({ id: 'low-spo2', title: 'Low SpO₂ threshold crossed', body: `The latest SpO₂ is ${latest.spo2_percent.toFixed(1)}%, below the app’s ${rules.oxygenLow}% review threshold. Confirm the wearable reading and consider appropriate medical guidance.`, severity: latest.spo2_percent<=rules.oxygenCritical?'critical':'warning', metric: 'oxygen' });
+  if (latest.heart_rate_bpm !== null && review.some(warning=>warning.metric==='heart_rate_bpm')) anomalies.push({ id: 'heart-threshold', title: 'Heart-rate threshold crossed', body: `The latest heart rate is ${latest.heart_rate_bpm.toFixed(0)} bpm, outside the app’s ${rules.heartRateLow}–${rules.heartRateHigh} bpm review range. Context such as activity and symptoms matters.`, severity: 'warning', metric: 'heart' });
+  if (latest.sleep_hours !== null && latest.sleep_hours < rules.sleepHoursLow) anomalies.push({ id: 'short-sleep', title: 'Very short recorded sleep', body: `The latest synchronized sleep duration is ${latest.sleep_hours.toFixed(1)} hours.`, severity: 'warning', metric: 'sleep' });
 
 
   const personalized: { key: NumericVitalKey; id: string; metric: AnalysisMetric; label: string; unit: string; minimumDelta: number }[] = [

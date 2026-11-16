@@ -1,5 +1,44 @@
 # ElderCareAI
 
+## November 15 care fixes
+
+This update adds a selected main SOS contact and dedicated call buttons, patient-specific vital thresholds, a first-use/replayable walkthrough, one reviewed prescription group with multiple medications, uncertainty-aware safe-zone confirmation, and hospital/place search in the appointment map. Calls open the phone's calling interface; the operating system may require confirmation.
+
+Deployed November 15, 2026: both migrations below are applied to the linked project, and `prescription-draft`, `ai-care-assistant`, and `appointment-places` are active. Android OTA release `01a1dea4-ec76-72ba-9f74-a3ed1a78d298` (group `ee0b1e61-df6d-4785-915b-b2b4ae181567`) is published on `preview` for runtime/app version `1.4.1`. Its live manifest and actual bundle download were verified (HTTP 200, Firebase configured). This release includes the spotlight walkthrough, partial prescription drafts, calendar dates and scrolling reminder times described below. The release also preserves patient loading when optional preference columns are unavailable, offers profile retry from threshold settings, and provides an edit action for a genuinely empty patient name. Existing compatible installations may need two complete close/reopen cycles to download and apply the update.
+
+Apply both `20261115000000_patient_preferences_and_location_stability.sql` and `20261115010000_prescription_groups.sql` before shipping the updated phone bundle. Deploy the changed extraction/assistant handlers and the new place-search handler:
+
+```powershell
+npx supabase db push
+npx supabase functions deploy prescription-draft
+npx supabase functions deploy ai-care-assistant
+npx supabase functions deploy appointment-places
+```
+
+Prescriptions are extracted as drafts, with every readable medicine displayed together, including partially readable entries. Unambiguous spelling corrections preserve the original text and require review. Missing or unclear fields stay blank: treatment dates never default to today, and frequency never creates guessed reminder times. A written prescription issue date stays separate from the treatment start date. Dates use calendars and reminder times use scrolling hour, minute and AM/PM wheels; Cancel leaves missing fields blank and Done commits the selection. All confirmed medicines save atomically; retrying a lost response uses the same import ID and does not create duplicates. This changes extraction instructions and validation, not the underlying Gemini model's training.
+
+Prescription selection offers optional Android cropping/rotation and maximum-quality uploads. The transcription prompt explicitly checks ambiguous digits, decimals and mg/mL units, leaves low-confidence values blank, and requires field-specific warnings. Both `warnings` and `uncertainties` response arrays are preserved for the review screen. Automatic grayscale/threshold conversion is not applied.
+
+The prescription service uses a compact structured-output schema, retries JSON extraction when the provider rejects that schema, and falls back between supported image models when a configured model is unavailable. It distinguishes provider failures from unreadable images and logs only sanitized failure metadata. Authentication, active-caregiver checks and private image ownership remain enforced. The signed-in user confirmed that the deployed extraction fix opens medication drafts successfully.
+
+The first-use walkthrough dims the screen around the real highlighted button, tab or card and anchors an Elle tooltip beside it. Its 12 steps navigate across Home, Settings, Location, Care, Elle and Alerts, automatically reveal offscreen settings, and support Back, closing/skipping and replay from Settings. The guide now uses a compact tooltip (at most 260 points and 74% of screen width), short instructions and a small step counter. The Appointments step measures the actual + button directly, avoiding the horizontal tab’s missing highlight. Highlight taps advance the guide without activating the underlying control, including SOS.
+
+The navigation-alignment follow-up preserves the exact measured control center near screen edges, measures relative to the actual overlay, waits for two consistent layout samples, and follows subsequent layout changes. Only the active tab icon copy registers a tour target. The bottom tab bar reserves Android/iOS bottom insets, and Elle has an explicit icon container size. The mask uses four strips and small rounded corner rings instead of an oversized border. Tour tooltip/highlight entrances fade over 150 ms on the UI thread with system reduced-motion support; tab switches remain immediate and same-screen tour steps avoid redundant navigation.
+
+Navigation follow-up validation: 11 focused tests passed across five suites, including inset offsets, edge alignment, duplicate tab icon copies, delayed layout changes and stale-highlight removal. Type checking and lint passed. The fixture preview exercised every step, Back and Done with simulated system insets, with matching Home/Elle icon and highlight centers and no browser errors. Release-build animation feel on the physical phone still needs checking after installation.
+
+Health thresholds belong to the caregiver's patient record and are enforced for new server readings as well as displayed in the app. The existing review defaults remain; optional HRV, experimental stress, and upper monitored-activity thresholds start disabled. Threshold changes do not erase alert history. Signing in does not replay older foreground notices or requeue historical pushes.
+
+The map suppresses movements within location uncertainty and waits for repeated consistent fixes before moving the marker. Safe-zone exits require four usable same-source fixes over at least 30 seconds beyond an accuracy margin; network-only and poor-accuracy estimates do not trigger crossings. This reduces drift alerts and can delay recognition of real movement; confirm on the physical watch/phone, especially indoors and around a small zone.
+
+Place search runs only on submission and keeps manual address entry and map taps available. It uses the [Photon API](https://github.com/komoot/photon/blob/master/docs/api-v1.md), with bounded results, caching, and per-user throttling. The public demo has no availability guarantee and is intended for reasonable request volume ([provider terms](https://github.com/komoot/photon#demo-server)); set the server `PHOTON_SEARCH_URL` to a hosted/private Photon endpoint if needed. No patient identifiers or health records are sent to the search provider.
+
+Validation for this follow-up: 155 suites / 205 tests passed in the full suite; after the final fixes, all 22 targeted checks passed, including the additional frequency regression. Type checking, lint, edge-function type checking and provider failure/retry scenarios passed. Visual QA exercised all 12 tour targets, automatic settings scrolling, time selection and calendar confirmation using an isolated fixture preview. The signed-in user confirmed live extraction success; watch/phone location behavior still needs physical-device validation.
+
+Compact-tour follow-up validation: all 26 tests in 16 affected suites passed, together with app/edge type checks, lint and prescription-provider regression scenarios. The fixture preview exercised every tour target and completion at 360×740 and 320×640. Native crop selection was covered with picker mocks; the system crop editor still needs a physical-device check.
+
+Validation commands: `npm run typecheck`, `npm run lint`, `npm test`, `node test-support/galaxy-watch-migration.mjs`, and `node test-support/prescription-runtime.mjs`, and `node test-support/appointment-places-runtime.mjs`. Database checks run against isolated PGlite, never the connected project.
+
 ## Galaxy Watch6 vitals and location
 
 The standalone Wear OS project is in [`wearos`](wearos/README.md). Open that folder in Android Studio. Its guide covers backend deployment, pairing, permissions, installation and physical-device verification. This version streams heart rate and the watch's GPS only; it does not collect the other health metrics. The backend migration must be applied before running the updated phone app.

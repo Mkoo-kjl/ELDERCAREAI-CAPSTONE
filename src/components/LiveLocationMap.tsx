@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { AppText as Text } from '@/src/components/AppText';
-import { liveMapHtml, mapPayload, type MapPosition } from '@/src/lib/location-map';
+import { liveMapHtml, mapPayload, stabilizedWatchPosition, type MapPosition } from '@/src/lib/location-map';
 import type {ZoneOverlay} from '@/src/lib/safe-zone';
 
 export function LiveLocationMap({ position, points = [], live = false, compact = false, style,safeZone=null,selecting=false,onCoordinateSelect }: {
@@ -10,10 +10,13 @@ export function LiveLocationMap({ position, points = [], live = false, compact =
   safeZone?:ZoneOverlay|null;selecting?:boolean;onCoordinateSelect?:(point:{latitude:number;longitude:number})=>void;
 }) {
   const web = useRef<WebView>(null);
-  const source = useRef({ html: liveMapHtml(position, compact) });
+  const observed=useRef<MapPosition[]>([]);
+  if(!observed.current.some(point=>point.measured_at===position.measured_at))observed.current=[...observed.current,position].slice(-500);
+  const displayed=stabilizedWatchPosition(position,[...points,...observed.current])??position;
+  const source = useRef({ html: liveMapHtml(displayed, compact) });
   const ready = useRef(false);
-  const latest = useRef(mapPayload(position, points, live,safeZone,selecting));
-  latest.current = mapPayload(position, points, live,safeZone,selecting);
+  const latest = useRef(mapPayload(displayed, points, live,safeZone,selecting));
+  latest.current = mapPayload(displayed, points, live,safeZone,selecting);
   const [error, setError] = useState(false);
   const [following, setFollowing] = useState(true);
   const [attempt, setAttempt] = useState(0);

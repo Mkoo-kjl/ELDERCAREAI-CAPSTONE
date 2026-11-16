@@ -1,7 +1,6 @@
-import {readFileSync} from 'node:fs';
-import {join} from 'node:path';
-const ui=readFileSync(join(__dirname,'..','src/components/EmergencyContacts.tsx'),'utf8');
-test('visible UI contract',()=>{
-expect(ui).toContain('Caregiver');
-expect(ui).toContain('Doctor');
+import {emergencyRoles,emergencyDialUrl} from '@/src/lib/emergency-contact';
+test('dedicated contacts expose caregiver, family and doctor roles and valid direct-call links',()=>{
+  expect(emergencyRoles.map(([,label])=>label)).toEqual(['Caregiver','Family member','Doctor']);
+  expect(emergencyDialUrl('+63 (917) 000-0001')).toBe('tel:+639170000001');
+  expect(emergencyDialUrl('')).toBeNull();expect(emergencyDialUrl('0917#123*4567')).toBeNull();
 });

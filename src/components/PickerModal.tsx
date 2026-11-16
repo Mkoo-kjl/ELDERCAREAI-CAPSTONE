@@ -16,6 +16,7 @@ type Props = {
   value: Date;
   onChange: (value: Date) => void;
   onClose: () => void;
+  onConfirm?: (value: Date) => void;
   mode?: Mode;
   title?: string;
   minDate?: Date;
@@ -35,8 +36,8 @@ function sameDay(left: Date, right: Date) {
   return left.getFullYear() === right.getFullYear() && left.getMonth() === right.getMonth() && left.getDate() === right.getDate();
 }
 
-export function PickerModal({ visible, value, onChange, onClose, mode = 'datetime', title, minDate, maxDate }: Props) {
-  const theme = getTheme(useColorScheme() === 'dark');
+export function PickerModal({ visible, value, onChange, onClose, onConfirm, mode = 'datetime', title, minDate, maxDate }: Props) {
+  const dark = useColorScheme() === 'dark', theme = getTheme(dark);
   const insets = useSafeAreaInsets();
   // A malformed imported date must never poison the calendar's month/year state.
   const selectedDate = validDate(value) ? value : new Date();
@@ -49,6 +50,7 @@ export function PickerModal({ visible, value, onChange, onClose, mode = 'datetim
   const hourWheel = useRef<TimeWheelHandle>(null), minuteWheel = useRef<TimeWheelHandle>(null), periodWheel = useRef<TimeWheelHandle>(null);
   const finish = () => {
     hourWheel.current?.flush(); minuteWheel.current?.flush(); periodWheel.current?.flush();
+    onConfirm?.(latestDate.current);
     onClose();
   };
 
@@ -88,12 +90,13 @@ export function PickerModal({ visible, value, onChange, onClose, mode = 'datetim
     onChange(next);
   };
 
-  return <Modal visible={visible} transparent animationType="slide" onRequestClose={finish}>
+  return <Modal visible={visible} transparent animationType="slide" onRequestClose={onConfirm?onClose:finish}>
     <View style={styles.overlay}>
       <View style={[styles.sheet, { backgroundColor: theme.cardElevated, paddingBottom: Math.max(insets.bottom, 18) }]}>
         <View style={styles.top}>
           <Text style={[styles.title, { color: theme.text }]}>{title ?? (mode === 'time' ? 'Choose time' : mode === 'date' ? 'Choose date' : 'Choose date & time')}</Text>
-          <Pressable accessibilityRole="button" accessibilityLabel="Done choosing date and time" onPress={finish} style={styles.doneButton}><Text style={styles.done}>Done</Text></Pressable>
+          {onConfirm?<Pressable accessibilityRole="button" accessibilityLabel="Cancel choosing date and time" onPress={onClose} style={styles.doneButton}><Text style={{color:theme.subtitle}}>Cancel</Text></Pressable>:null}
+          <Pressable accessibilityRole="button" accessibilityLabel="Done choosing date and time" onPress={finish} style={styles.doneButton}><Text style={[styles.done,{color:dark?palette.primary:palette.primaryDark}]}>Done</Text></Pressable>
         </View>
         {mode === 'datetime' ? <View style={[styles.segment, { backgroundColor: theme.card }]}>
           {(['calendar', 'time'] as const).map((item) => <Pressable key={item} accessibilityRole="button" onPress={() => setPage(item)} style={[styles.segmentButton, page === item && { backgroundColor: palette.aquaSurface }]}><Text style={[styles.segmentText, { color: page === item ? palette.primaryDark : theme.subtitle }]}>{item === 'calendar' ? 'Date' : 'Time'}</Text></Pressable>)}
@@ -149,7 +152,7 @@ const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: '#00000066', justifyContent: 'flex-end' },
   sheet: { maxHeight: '86%', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 18 },
   top: { paddingHorizontal: 20, marginBottom: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { ...typeScale.sectionTitle, flexShrink: 1 }, doneButton: { minHeight: 36, justifyContent: 'center', paddingLeft: 15 }, done: { color: palette.primaryDark, fontFamily: fontFamily.semiBold },
+  title: { ...typeScale.sectionTitle, flexShrink: 1 }, doneButton: { minHeight: 44, justifyContent: 'center', paddingLeft: 15 }, done: { color: palette.primaryDark, fontFamily: fontFamily.semiBold },
   segment: { marginHorizontal: 20, marginBottom: 8, padding: 4, borderRadius: 12, flexDirection: 'row' }, segmentButton: { flex: 1, minHeight: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 9 }, segmentText: { fontFamily: fontFamily.semiBold, fontSize: 13 },
   body: { paddingHorizontal: 20, paddingBottom: 14 }, monthHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 17 }, monthHeading: { flexDirection: 'row', alignItems: 'center', gap: 8 }, monthTitle: { fontFamily: fontFamily.bold, fontSize: 17 }, arrow: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
   calendarGrid: { flexDirection: 'row', flexWrap: 'wrap' }, weekday: { width: '14.2857%', textAlign: 'center', fontFamily: fontFamily.medium, fontSize: 11, marginBottom: 10 }, dayCell: { width: '14.2857%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 12 }, selectedDay: { backgroundColor: palette.primaryDark }, dayText: { fontFamily: fontFamily.semiBold, fontSize: 13 },

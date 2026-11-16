@@ -1,0 +1,27 @@
+jest.mock('react-native-safe-area-context',()=>({useSafeAreaInsets:()=>({top:0,bottom:0,left:0,right:0})}));
+import {fireEvent,render,screen,waitFor} from '@testing-library/react-native';
+import {Alert,Linking} from 'react-native';
+import AlertsScreen from '@/app/(tabs)/alerts';
+const mockInsert=jest.fn();
+jest.mock('@/src/components/AutomaticVitalAlerts',()=>({AutomaticVitalAlerts:()=>null}));
+jest.mock('@/src/components/RelatedMedications',()=>({RelatedMedications:()=>null}));
+jest.mock('@/src/providers/AuthProvider',()=>({useAuth:()=>({session:{user:{id:'owner'}}})}));
+jest.mock('@/src/providers/HealthDataProvider',()=>({useHealthData:()=>({elderly:{elderly_id:'patient',full_name:'Fixture patient',primary_emergency_role:'doctor',emergency_contacts:[{role:'doctor',name:'Doctor',phone:'+639170000003'},{role:'caregiver',name:'Caregiver',phone:'+639170000001'},{role:'family',name:'Family',phone:'+639170000002'}]},vital:null})}));
+jest.mock('@/src/hooks/useCareRefresh',()=>({useCareRefresh:()=>{}}));
+jest.mock('expo-router',()=>({router:{push:jest.fn()},useLocalSearchParams:()=>({}),useFocusEffect:()=>{}}));
+const mockPlayer={seekTo:jest.fn().mockResolvedValue(undefined),play:jest.fn()};
+jest.mock('expo-audio',()=>({useAudioPlayer:()=>mockPlayer}));
+jest.mock('@/src/lib/watch-push',()=>({registerCarePush:jest.fn()}));
+jest.mock('@/src/lib/supabase',()=>({supabase:{from:()=>({insert:(payload:unknown)=>{mockInsert(payload);return {select:()=>({single:async()=>({error:new Error('offline')})})};}})}}));
+test('main SOS opens its configured number without a chooser and dedicated buttons call each contact even offline',async()=>{
+  const dial=jest.spyOn(Linking,'openURL').mockResolvedValue(true),alert=jest.spyOn(Alert,'alert').mockImplementation(()=>{});
+  await render(<AlertsScreen/>);
+  await fireEvent.press(screen.getByLabelText('SOS · call main emergency contact'));
+  await waitFor(()=>expect(dial).toHaveBeenCalledWith('tel:+639170000003'));
+  expect(mockInsert).toHaveBeenCalled();
+  expect(alert).not.toHaveBeenCalledWith('Activate SOS?',expect.anything(),expect.anything());
+  expect(screen.queryByText('Emergency contacts · call for help')).toBeNull();
+  await fireEvent.press(screen.getByText('SOS · Call Caregiver'));expect(dial).toHaveBeenLastCalledWith('tel:+639170000001');
+  await fireEvent.press(screen.getByText('SOS · Call Family member'));expect(dial).toHaveBeenLastCalledWith('tel:+639170000002');
+  dial.mockRestore();alert.mockRestore();
+});

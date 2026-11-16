@@ -1,3 +1,5 @@
+import {WalkthroughProvider} from '@/src/providers/WalkthroughProvider';
+import {AppWalkthrough} from '@/src/components/AppWalkthrough';
 import {CareScheduleObserver} from '@/src/components/CareScheduleObserver';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -17,7 +19,7 @@ function AppNavigator({ isDark }: { isDark: boolean }) {
   const { session } = useAuth();
   return (
     <HealthDataProvider key={session?.user.id ?? 'signed-out'}>
-      <SamsungHealthProvider>
+      <SamsungHealthProvider><WalkthroughProvider>
       <CareNotificationObserver /><CareScheduleObserver />
       <WatchCareObserver />
       <StatusBar style={isDark ? 'light' : 'dark'} />
@@ -37,7 +39,8 @@ function AppNavigator({ isDark }: { isDark: boolean }) {
         <Stack.Screen name="health-records" />
         <Stack.Screen name="(tabs)" />
       </Stack>
-      </SamsungHealthProvider>
+      <AppWalkthrough/>
+      </WalkthroughProvider></SamsungHealthProvider>
     </HealthDataProvider>
   );
 }

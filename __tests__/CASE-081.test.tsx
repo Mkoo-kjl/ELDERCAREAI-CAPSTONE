@@ -26,14 +26,16 @@ jest.mock('@/src/providers/HealthDataProvider',()=>({useHealthData:()=>({elderly
 
 jest.mock('@/src/lib/supabase',()=>({supabase:{
   from:()=>{let related=false;const query:any={select:()=>query,eq:()=>query,gte:()=>query,order:()=>query,contains:()=>{related=true;return query;},limit:()=>Promise.resolve({data:related&&mockLinked?[{id:'linked-med'}]:[],error:null})};return query;},
+  rpc:(...args:unknown[])=>mockClaim(...args),
   channel:()=>{const channel={on:(_event:any,_filter:any,callback:any)=>{mockEvent=callback;return channel;},subscribe:()=>channel};return channel;},removeChannel:jest.fn().mockResolvedValue(undefined),
 }}));
 
 let mockLinked=false;
+const mockClaim=jest.fn().mockResolvedValue({data:true,error:null});
 
 const notice={id:'notification-1',title:'Watch SOS',body:'Assistance requested',data:{watch_sos_id:'event-1'},sent_at:new Date().toISOString()};
 
-beforeEach(()=>{Object.defineProperty(AppState,'currentState',{value:'active',writable:true,configurable:true});jest.spyOn(Alert,'alert').mockImplementation(()=>{});jest.spyOn(Vibration,'vibrate').mockImplementation(()=>{});});
+beforeEach(()=>{notice.sent_at=new Date().toISOString();Object.defineProperty(AppState,'currentState',{value:'active',writable:true,configurable:true});jest.spyOn(Alert,'alert').mockImplementation(()=>{});jest.spyOn(Vibration,'vibrate').mockImplementation(()=>{});});
 
 afterEach(()=>jest.restoreAllMocks());
 
@@ -41,9 +43,9 @@ const local=(kind:'medication'|'appointment',id:string,date=Date.now())=>({date,
 
 test('new watch SOS alerts once and duplicate delivery is ignored',async()=>{
   await render(<WatchCareObserver/>);
-  await act(async()=>{mockEvent({new:notice});await Promise.resolve();});
+  await act(async()=>{mockEvent({new:{...notice,sent_at:new Date().toISOString()}});await Promise.resolve();});
   expect(Alert.alert).toHaveBeenCalledTimes(1);expect(Vibration.vibrate).toHaveBeenCalled();expect(mockAudio.play).toHaveBeenCalled();
-  await act(async()=>{mockEvent({new:notice});await Promise.resolve();});
+  await act(async()=>{mockEvent({new:{...notice,sent_at:new Date().toISOString()}});await Promise.resolve();});
   expect(Alert.alert).toHaveBeenCalledTimes(1);
 });
 
@@ -55,7 +57,7 @@ test('unrelated notices and events delivered after cleanup cannot display an SOS
 
 test('a newly saved vital warning sounds once without Firebase registration',async()=>{
   await render(<WatchCareObserver/>);
-  const vital={...notice,id:'vital-notice',title:'Heart rate above review threshold',data:{care_kind:'vital'}};
+  const vital={...notice,id:'vital-notice',sent_at:new Date().toISOString(),title:'Heart rate above review threshold',data:{care_kind:'vital'}};
   await act(async()=>{mockEvent({new:vital});await Promise.resolve();});
   expect(Alert.alert).toHaveBeenCalledTimes(1);expect(mockAudio.play).toHaveBeenCalledTimes(1);
   expect(Alert.alert).toHaveBeenCalledWith(vital.title,vital.body,expect.any(Array),expect.objectContaining({cancelable:true}));
@@ -73,8 +75,17 @@ test('stale vital notices and background Realtime events do not play foreground 
 
 test('threshold popup offers linked prescriptions only when that patient has an explicit medication link',async()=>{
   mockLinked=true;await render(<WatchCareObserver/>);
-  await act(async()=>{mockEvent({new:{...notice,id:'linked-warning',data:{care_kind:'vital',rule:'heart_high'}}});});
+  await act(async()=>{mockEvent({new:{...notice,id:'linked-warning',sent_at:new Date().toISOString(),data:{care_kind:'vital',rule:'heart_high'}}});});
   const buttons=(Alert.alert as jest.Mock).mock.calls[0][2];
   expect(buttons.some((button:{text:string})=>button.text==='View linked medications')).toBe(true);
   mockLinked=false;
+});
+
+test('relogin does not replay an old unread SOS and a server-claimed event stays suppressed',async()=>{
+  await render(<WatchCareObserver/>);
+  await act(async()=>{mockEvent({new:{...notice,id:'old-login-sos',sent_at:new Date(Date.now()-60000).toISOString()}});});
+  expect(Alert.alert).not.toHaveBeenCalled();
+  mockClaim.mockResolvedValueOnce({data:false,error:null});
+  await act(async()=>{mockEvent({new:{...notice,id:'already-presented',sent_at:new Date().toISOString()}});});
+  expect(Alert.alert).not.toHaveBeenCalled();
 });

@@ -18,6 +18,13 @@ test('emergency action displays contact details and dials the selected caregiver
   const dial=jest.spyOn(Linking,'openURL').mockResolvedValue(true);await render(<EmergencyContacts/>);
   await fireEvent.press(screen.getByText('Emergency contacts · call for help'));
   await waitFor(()=>expect(screen.getByText('Caregiver A')).toBeTruthy());expect(dial).not.toHaveBeenCalled();
-  expect(screen.getByText('1. Caregiver')).toBeTruthy();expect(screen.getByText('2. Family member')).toBeTruthy();expect(screen.getByText('3. Doctor')).toBeTruthy();
+  expect(screen.getByText('Caregiver · Main SOS')).toBeTruthy();expect(screen.getByText('Family member')).toBeTruthy();expect(screen.getByText('Doctor')).toBeTruthy();
   await fireEvent.press(screen.getByText('Call caregiver'));expect(dial).toHaveBeenCalledWith('tel:09170000001');dial.mockRestore();
+});
+
+test('settings save the selected main SOS role with that patient’s dedicated contact numbers',async()=>{
+  await render(<EmergencyContacts editable/>);await fireEvent.press(screen.getByText('Emergency contacts · main SOS number'));
+  await waitFor(()=>expect(screen.getByDisplayValue('Dr C')).toBeTruthy());await fireEvent.press(screen.getByLabelText('Main SOS contact: Doctor'));
+  await fireEvent.press(screen.getByText('Save emergency contacts'));
+  await waitFor(()=>expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({primary_emergency_role:'doctor',emergency_contacts:expect.arrayContaining([expect.objectContaining({role:'doctor',phone:'09170000003'})])})));
 });

@@ -1,4 +1,5 @@
 import {testDailySteps} from './daily-steps-cases.mjs';
+import {testPatientFixes} from './patient-fixes-cases.mjs';
 import {testAllLocationSafeZones} from './safe-zone-all-sources.mjs';
 import {testCareUsability} from './care-usability-cases.mjs';
 // Isolated PostgreSQL check, never connects to the user's Supabase database.
@@ -353,4 +354,5 @@ try {
   await testAllLocationSafeZones(db,{caregiver,patient});
   await testCareUsability(db,{caregiver,other,patient,otherPatient});
   await testDailySteps(db,{caregiver,other});
+  await testPatientFixes(db,{caregiver,other,patient,otherPatient});
 } catch(error) { console.error('FAIL',error.stack??error.message,error.where??'',error.position??'',error.internalPosition??'',error.internalQuery??''); process.exitCode=1; } finally { await db.close(); }

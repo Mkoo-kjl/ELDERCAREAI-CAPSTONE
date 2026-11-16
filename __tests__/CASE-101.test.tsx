@@ -1,3 +1,4 @@
+jest.mock('@/src/providers/HealthDataProvider',()=>({useHealthData:()=>({elderly:{vital_thresholds:{}}})}));
 import {fireEvent,render,screen,waitFor} from '@testing-library/react-native';
 import {VitalDetailModal} from '@/src/components/VitalDetailModal';
 import {supabase} from '@/src/lib/supabase';

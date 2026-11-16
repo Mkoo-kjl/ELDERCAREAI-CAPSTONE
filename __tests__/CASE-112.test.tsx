@@ -1,0 +1,35 @@
+import {fireEvent,render,screen,waitFor} from '@testing-library/react-native';
+import {VitalThresholdSettings} from '@/src/components/VitalThresholdSettings';
+import type {ElderlyProfile} from '@/src/providers/HealthDataProvider';
+const mockRefresh=jest.fn().mockResolvedValue(undefined),mockUpdate=jest.fn(),mockSingle=jest.fn();
+let mockPatient:ElderlyProfile|null=null;
+jest.mock('expo-router',()=>({router:{push:jest.fn()}}));
+jest.mock('@/src/providers/AuthProvider',()=>({useAuth:()=>({session:{user:{id:'caregiver'}}})}));
+jest.mock('@/src/providers/HealthDataProvider',()=>({useHealthData:()=>({elderly:mockPatient,refresh:mockRefresh,loading:false,error:mockPatient?null:'The patient profile could not load. Check your connection and retry.'})}));
+jest.mock('@/src/lib/supabase',()=>({supabase:{from:()=>{const query={update:(payload:unknown)=>{mockUpdate(payload);return query;},eq:()=>query,select:()=>query,single:()=>mockSingle()};return query;}}}));
+beforeEach(()=>{mockPatient=null;mockSingle.mockReset();});
+test('threshold settings open with an actionable retry after a failed profile load and hydrate saved settings on recovery',async()=>{
+  const view=await render(<VitalThresholdSettings/>);
+  await fireEvent.press(screen.getByText('Health alert thresholds'));
+  expect(screen.getByText('The patient profile could not load. Check your connection and retry.')).toBeTruthy();
+  expect(screen.queryByText('Save patient thresholds')).toBeNull();
+  await fireEvent.press(screen.getByText('Retry patient profile'));expect(mockRefresh).toHaveBeenCalledWith(false);
+  mockPatient={elderly_id:'patient',full_name:'Maria',vital_thresholds:{heartRateHigh:130}} as ElderlyProfile;
+  await view.rerender(<VitalThresholdSettings/>);
+  expect(screen.getByLabelText('Heart rate above (BPM)').props.value).toBe('130');
+  expect(screen.getByText('Save patient thresholds')).toBeTruthy();
+});
+test('a blank saved name does not block threshold editing; failed saves retain edits and retry under the same patient',async()=>{
+  mockPatient={elderly_id:'patient',full_name:'   ',vital_thresholds:{}} as ElderlyProfile;
+  mockSingle.mockResolvedValueOnce({error:{message:'offline'}}).mockResolvedValueOnce({data:{elderly_id:'patient'},error:null});
+  await render(<VitalThresholdSettings/>);
+  expect(screen.getByText('Personal settings for your patient')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Health alert thresholds'));
+  await fireEvent.changeText(screen.getByLabelText('Heart rate above (BPM)'),'125');
+  await fireEvent.press(screen.getByText('Save patient thresholds'));
+  await screen.findByText(/Thresholds could not save/);
+  expect(screen.getByLabelText('Heart rate above (BPM)').props.value).toBe('125');
+  await fireEvent.press(screen.getByText('Save patient thresholds'));
+  await waitFor(()=>expect(mockSingle).toHaveBeenCalledTimes(2));
+  expect(mockUpdate).toHaveBeenLastCalledWith(expect.objectContaining({vital_thresholds:expect.objectContaining({heartRateHigh:125})}));
+});

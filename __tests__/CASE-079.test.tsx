@@ -1,3 +1,4 @@
+jest.mock('@/src/providers/HealthDataProvider',()=>({useHealthData:()=>({elderly:{vital_thresholds:{}}})}));
 import {fireEvent,render,screen} from '@testing-library/react-native';
 
 import {AutomaticVitalAlerts} from '@/src/components/AutomaticVitalAlerts';

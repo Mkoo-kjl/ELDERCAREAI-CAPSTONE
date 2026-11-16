@@ -1,5 +1,7 @@
+import {WalkthroughTarget} from '@/src/providers/WalkthroughProvider';
 import { Redirect, Tabs } from 'expo-router';
 import { Image, StyleSheet, useColorScheme, View } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import { getPostAuthRoute } from '@/src/lib/onboarding-route';
 import { useAuth } from '@/src/providers/AuthProvider';
@@ -15,6 +17,7 @@ const tabIcons = {
 } as const;
 
 export default function TabLayout() {
+  const insets=useSafeAreaInsets();
   const theme = getTheme(useColorScheme() === 'dark');
   const { session, onboarding, isLoading, isOnboardingLoading } = useAuth();
   if (!isLoading && !session) return <Redirect href="/login" />;
@@ -23,14 +26,17 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={({ route }) => ({
         headerShown: false,
+        animation: 'none',
         tabBarActiveTintColor: palette.primaryDark,
         tabBarInactiveTintColor: theme.subtitle,
-        tabBarStyle: { backgroundColor: theme.cardElevated, borderTopColor: theme.border, height: 72, paddingTop: 4, paddingBottom: 7 },
+        tabBarStyle: { backgroundColor: theme.cardElevated, borderTopColor: theme.border, height: 72+insets.bottom, paddingTop: 4, paddingBottom: Math.max(insets.bottom,7) },
         tabBarHideOnKeyboard: true,
         tabBarLabelStyle: { fontFamily: fontFamily.medium, fontSize: 10 },
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color, size, focused }) => {
           const icon = tabIcons[route.name as keyof typeof tabIcons];
-          return icon ? <Image source={icon} style={{ width: size, height: size, tintColor: color }} resizeMode="contain" /> : null;
+          if(!icon)return null;
+          const image=<Image source={icon} style={{ width: size, height: size, tintColor: color }} resizeMode="contain"/>;
+          return focused?<WalkthroughTarget id={`tab-${route.name}`}>{image}</WalkthroughTarget>:<View>{image}</View>;
         },
       })}>
         <Tabs.Screen name="dashboard" options={{ title: 'Home' }} />
@@ -41,15 +47,10 @@ export default function TabLayout() {
           tabBarAccessibilityLabel: 'Elle AI Chat',
           tabBarActiveTintColor: palette.primaryDark,
           tabBarLabelStyle: { fontFamily: fontFamily.bold, fontSize: 11 },
-          tabBarIcon: ({ focused }) => (
-            <View style={[styles.elleIcon, focused && styles.elleIconFocused]}>
-              <Image
-                source={require('@/assets/images/elle-happy.png')}
-                style={styles.elleImage}
-                resizeMode="cover"
-              />
-            </View>
-          ),
+          tabBarIconStyle: {width:40,height:40},
+          tabBarIcon: ({ focused }) => focused?
+            <WalkthroughTarget id="tab-chatbot" style={[styles.elleIcon,styles.elleIconFocused]}><Image source={require('@/assets/images/elle-happy.png')} style={styles.elleImage} resizeMode="cover"/></WalkthroughTarget>:
+            <View style={styles.elleIcon}><Image source={require('@/assets/images/elle-happy.png')} style={styles.elleImage} resizeMode="cover"/></View>,
         }} />
         <Tabs.Screen name="care" options={{ title: 'Care' }} />
         <Tabs.Screen name="profile" options={{ title: 'Settings' }} />

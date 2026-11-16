@@ -17,6 +17,8 @@ export type ElderlyProfile = {
   medical_conditions: string | null;
   medications: string | null;
   emergency_contacts?: unknown;
+  primary_emergency_role?: 'caregiver'|'family'|'doctor';
+  vital_thresholds?: unknown;
   emergency_contact: string | null;
   emergency_contact_phone: string | null;
   photo_url: string | null;
@@ -87,10 +89,11 @@ export function HealthDataProvider({ children }: PropsWithChildren) {
     if (!userId) return;
     const atStart = revision.current;
     const { data: profile, error: profileError } = await supabase.from('elderly_profiles')
-      .select('elderly_id, full_name, age, gender, weight_kg, height_cm, blood_type, medical_conditions, medications, emergency_contact, emergency_contact_phone, emergency_contacts, photo_url')
+      // Optional preferences must not make the entire profile disappear during a rollout.
+      .select('*')
       .eq('caregiver_id', userId).order('created_at').limit(1).maybeSingle();
     if (activeUser.current !== userId) return;
-    if (profileError) throw profileError;
+    if (profileError) throw new Error('The patient profile could not load. Check your connection and retry.');
     setElderly(profile as ElderlyProfile | null);
     if (!profile) { setHistory([]); return; }
     // Each metric has its own history budget: frequent BPM events cannot evict a spot SpO2 result.

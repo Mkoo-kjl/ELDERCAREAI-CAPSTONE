@@ -12,13 +12,13 @@ export const VITAL_REVIEW_RULES={
   activeRuleReminderMinutes:60,
 } as const;
 export type VitalReviewInput={heart_rate_bpm?:number|null;spo2_percent?:number|null};
-export function vitalReviewWarnings(vital:VitalReviewInput){
+export function vitalReviewWarnings(vital:VitalReviewInput,rules:{heartRateLow:number;heartRateHigh:number;oxygenLow:number}=VITAL_REVIEW_RULES){
   const warnings:{metric:'heart_rate_bpm'|'spo2_percent';message:string}[]=[];
   const heart=vital.heart_rate_bpm,oxygen=vital.spo2_percent;
   if(typeof heart==='number'&&Number.isFinite(heart)&&heart>=1&&heart<=350&&
-    (heart<VITAL_REVIEW_RULES.heartRateLow||heart>VITAL_REVIEW_RULES.heartRateHigh))
+    (heart<rules.heartRateLow||heart>rules.heartRateHigh))
     warnings.push({metric:'heart_rate_bpm',message:`heart rate ${heart} bpm`});
-  if(typeof oxygen==='number'&&Number.isFinite(oxygen)&&oxygen>=1&&oxygen<=100&&oxygen<VITAL_REVIEW_RULES.oxygenLow)
+  if(typeof oxygen==='number'&&Number.isFinite(oxygen)&&oxygen>=1&&oxygen<=100&&oxygen<rules.oxygenLow)
     warnings.push({metric:'spo2_percent',message:`SpO₂ ${oxygen.toFixed(1)}%`});
   return warnings;
 }

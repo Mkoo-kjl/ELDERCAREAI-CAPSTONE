@@ -1,3 +1,4 @@
+import {shouldPresentNotice} from '@/src/lib/foreground-notice';
 import {NoticeQueue} from '@/src/lib/notice-queue';
 import {localCareNotice} from '@/src/lib/local-care-notice';
 import {vitalForRule} from '@/src/lib/medication';
@@ -21,6 +22,8 @@ export function WatchCareObserver(){
   const medicationPlayer=useAudioPlayer(require('@/assets/sounds/medication_reminder.wav'));
   const appointmentPlayer=useAudioPlayer(require('@/assets/sounds/appointment_reminder.wav'));
   const vitalPlayer=useAudioPlayer(require('@/assets/sounds/health_warning.wav'));
+  const sessionWindow=useRef({userId,startedAt:Date.now()});
+  if(sessionWindow.current.userId!==userId)sessionWindow.current={userId,startedAt:Date.now()};
   const activeUser=useRef(userId);activeUser.current=userId;
   useEffect(()=>{void setAudioModeAsync({interruptionMode:'duckOthers',shouldRouteThroughEarpiece:false,shouldPlayInBackground:false}).catch(()=>undefined);},[]);
   const queue=useRef<NoticeQueue<{id:string;notice:CareNotice;isSos:boolean;linked:boolean}>|null>(null);
@@ -38,7 +41,15 @@ export function WatchCareObserver(){
     let active=true;
     const next=new NoticeQueue<{id:string;notice:CareNotice;isSos:boolean;linked:boolean}>((item,done)=>{
       const key=`${item.isSos?'watch-sos':'care-vital'}-shown:${userId}:${item.id}`;
-      void AsyncStorage.setItem(key,'1').catch(()=>undefined).then(()=>{if(active&&activeUser.current===userId)display(item.notice,item.isSos,item.linked,done);else done();});
+      void (async()=>{
+        if(!active||activeUser.current!==userId){done();return;}
+        if(!item.id.startsWith('local:')){
+          try{const result=await supabase.rpc('claim_foreground_notice',{p_notice:item.id});if(!result.error&&result.data===false){done();return;}}catch{ /* Local receipt still prevents repeats when offline. */ }
+        }
+        if(!active||activeUser.current!==userId){done();return;}
+        await AsyncStorage.setItem(key,'1').catch(()=>undefined);
+        if(active&&activeUser.current===userId)display(item.notice,item.isSos,item.linked,done);else done();
+      })();
     });
     queue.current=next;return()=>{active=false;next.stop();queue.current=null;};
   },[display,userId,patient]);
@@ -50,6 +61,7 @@ export function WatchCareObserver(){
       const isSos=Boolean(notice.data?.watch_sos_id)||notice.data?.care_kind==='sos',isVital=notice.data?.care_kind==='vital',isReminder=['medication','appointment'].includes(notice.data?.care_kind??'');
       if(!active||activeUser.current!==userId||(!isSos&&!isVital&&!isReminder)||!notice.id||seen.has(notice.id))return;
       if(notice.elderly_id&&notice.elderly_id!==patient)return;
+      if(!shouldPresentNotice(notice.sent_at,sessionWindow.current.startedAt))return;
       if(isVital&&(!Number.isFinite(Date.parse(notice.sent_at))||Date.now()-Date.parse(notice.sent_at)>120000))return;
       if(isReminder&&(!Number.isFinite(Date.parse(notice.sent_at))||Date.now()-Date.parse(notice.sent_at)>900000))return;
       if(isReminder&&!local&&!await isCarePushRegistered())return;
@@ -69,7 +81,7 @@ export function WatchCareObserver(){
       try{
         const query=(kind:string,age:number,limit:number)=>supabase.from('caregiver_notifications')
           .select('id,title,body,data,elderly_id,sent_at').eq('caregiver_id',userId).eq('elderly_id',patient)
-          .eq('notification_type',kind).eq('is_read',false).gte('sent_at',new Date(Date.now()-age).toISOString())
+          .eq('notification_type',kind).eq('is_read',false).gte('sent_at',new Date(Math.max(Date.now()-age,sessionWindow.current.startedAt-1000)).toISOString())
           .order('sent_at',{ascending:false}).limit(limit);
         const results=await Promise.all([query('emergency',86400000,5),query('health_alert',120000,10),query('medication',900000,30),query('appointment',900000,30)]);
         if(active)for(const result of results)if(!result.error)for(const row of result.data??[])await show(row as CareNotice);

@@ -55,7 +55,7 @@ const metricDefinitions = [
 function Vitals({ vital, onSelect }: { vital: VitalLog | null; onSelect: (metric: VitalMetricKey) => void }) {
   const isDark = useColorScheme() === 'dark';
   const theme = getTheme(isDark);
-  const { galaxyWatch,history } = useHealthData();
+  const { galaxyWatch,history,elderly } = useHealthData();
   const surfaces = [palette.lemonSurface, palette.aquaSurface, palette.peachSurface, palette.lavenderSurface, palette.lavenderSurface, palette.mintSurface];
   return <View style={styles.list}>{metricDefinitions.map(([icon, label, key, unit, color], index) => {
     const raw = vital?.[key];
@@ -63,7 +63,7 @@ function Vitals({ vital, onSelect }: { vital: VitalLog | null; onSelect: (metric
     const sleepContext = key === 'sleep_hours' ? sleepDurationContext(vital?.sleep_hours) : null;
     return <Pressable key={label} accessibilityRole="button" accessibilityLabel={`${label} details`} onPress={() => onSelect(key)} style={[styles.metricRow, { backgroundColor: isDark ? theme.cardElevated : surfaces[index] }]}>
       <View style={[styles.metricIcon, { backgroundColor: theme.cardElevated }]}><Ionicons name={icon} size={19} color={color} /></View>
-      <View style={styles.metricCopy}><Text style={[styles.metricLabel, { color: theme.text }]}>{label}</Text><Text style={[styles.metricTime, { color: theme.subtitle }]}>{key === 'hrv_rmssd_ms' ? stressIndexCaption(vital) : raw == null ? watchMetricStatus(galaxyWatch, key) : vitalTimeLabel(vital, key)}</Text><VitalStatusBadge status={vitalStatus(key,vital,history)}/>{sleepContext ? <Text style={[styles.scoreCaption, { color }]}>{sleepContext.label}</Text> : null}</View>
+      <View style={styles.metricCopy}><Text style={[styles.metricLabel, { color: theme.text }]}>{label}</Text><Text style={[styles.metricTime, { color: theme.subtitle }]}>{key === 'hrv_rmssd_ms' ? stressIndexCaption(vital) : raw == null ? watchMetricStatus(galaxyWatch, key) : vitalTimeLabel(vital, key)}</Text><VitalStatusBadge status={vitalStatus(key,vital,history,elderly?.vital_thresholds)}/>{sleepContext ? <Text style={[styles.scoreCaption, { color }]}>{sleepContext.label}</Text> : null}</View>
       <Text style={[styles.metricValue, { color: theme.text }]}>{key === 'hrv_rmssd_ms' ? stressIndexValue(vital) : value} <Text style={[styles.metricUnit, { color: theme.subtitle }]}>{key==='hrv_rmssd_ms'?'/100':unit}</Text></Text>
     </Pressable>;
   })}</View>;
@@ -77,7 +77,8 @@ function Predictions({ history }: { history: VitalLog[] }) {
 
 function Anomalies({ history }: { history: VitalLog[] }) {
   const theme = getTheme(useColorScheme() === 'dark');
-  const anomalies = buildHealthAnomalies(history);
+  const {elderly}=useHealthData();
+  const anomalies = buildHealthAnomalies(history,elderly?.vital_thresholds);
   return <><View style={[styles.disclaimer, { backgroundColor: `${palette.warning}12` }]}><Ionicons name="shield-checkmark-outline" size={20} color={palette.warning} /><Text style={[styles.disclaimerText, { color: theme.text }]}>Anomalies combine review thresholds with personal-baseline deviation when enough history exists. Wearable readings should be confirmed when symptoms or concerns are present.</Text></View>{anomalies.map((item) => <AnalysisCard key={item.id} item={item} />)}</>;
 }
 
