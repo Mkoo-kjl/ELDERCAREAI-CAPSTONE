@@ -7,11 +7,11 @@ export function safeZoneAccuracyLimit(radius:number){return Math.min(50,Math.max
 export function safeZoneGpsHint(zone:SafeZone|null,fix:{location_source:string;accuracy_m:number|null;measured_at:string}|null,monitoring?:boolean,now=Date.now()){
   if(!zone?.enabled)return null;
   if(monitoring===false)return 'Start monitoring on the watch to check the safe zone.';
-  if(fix?.location_source==='network')return 'Network estimates are shown on the map but do not trigger safe-zone crossings. Waiting for precise GPS or fused location.';
   if(!fix)return 'Waiting for GPS, fused or network location uploaded by the watch. Enable Location, monitoring and internet.';
-  const age=now-Date.parse(fix.measured_at),limit=safeZoneAccuracyLimit(zone.radius_m);
+  const age=now-Date.parse(fix.measured_at);
   if(!Number.isFinite(age)||age>90_000||age< -10_000)return 'The last location is too old or has an incorrect time. Check watch Location, automatic time and internet.';
-  if(fix.accuracy_m==null||!Number.isFinite(fix.accuracy_m)||fix.accuracy_m<0||fix.accuracy_m>limit)return `This ${zone.radius_m} m zone needs location accuracy of ${limit} m or better.${fix.accuracy_m!=null?` The latest fix reports ±${Math.round(fix.accuracy_m)} m.`:''} Move to an open area and wait for a clearer fix.`;
+  if(fix.accuracy_m==null||!Number.isFinite(fix.accuracy_m)||fix.accuracy_m<0||fix.accuracy_m>2000)return 'Waiting for a location estimate with valid reported accuracy.';
+  if(fix.accuracy_m>zone.radius_m||fix.location_source==='network'||fix.location_source==='fused')return `Fast alerts use the displayed location estimate (±${Math.round(fix.accuracy_m)} m). Uncertainty can exceed this ${zone.radius_m} m zone; check the person’s location. Fused location may use the paired phone.`;
   return null;
 }
 export function zoneInputError(name:string,latitude:number,longitude:number,radius:number){
