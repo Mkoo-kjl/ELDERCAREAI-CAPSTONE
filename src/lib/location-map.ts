@@ -7,7 +7,9 @@ export function validMapPosition(point: MapPosition) {
   return Number.isFinite(point.latitude) && Math.abs(point.latitude) <= 90 && Number.isFinite(point.longitude) && Math.abs(point.longitude) <= 180
     && Number.isFinite(Date.parse(point.measured_at)) && (point.accuracy_m == null || Number.isFinite(point.accuracy_m) && point.accuracy_m >= 0);
 }
-/** The route stream can be newer than the separately synchronized live snapshot. */
+/** Keep live coordinates, accuracy and time from the same newest raw fix.
+ * The route stream can be newer than the separately synchronized live snapshot.
+ */
 export function newestWatchPosition(snapshot:MapPosition|null,points:MapPosition[],now=Date.now()){
   let latest=snapshot&&validMapPosition(snapshot)&&Date.parse(snapshot.measured_at)<=now+10_000?snapshot:null;
   for(const point of points){
@@ -47,6 +49,7 @@ export function stabilizedWatchTrack(points:MapPosition[]){
   }
   return output;
 }
+/** Filtered trail endpoint. Live markers use newestWatchPosition. */
 export function stabilizedWatchPosition(snapshot:MapPosition|null,points:MapPosition[],now=Date.now()){
   return stabilizedWatchTrack([...points,...(snapshot?[snapshot]:[])].filter(point=>Date.parse(point.measured_at)<=now+10000)).at(-1)??null;
 }
@@ -103,13 +106,14 @@ window.updatePosition=function(payload){
  const point=payload.position;if(Date.parse(point.measured_at)<Date.parse(latest.measured_at))return;
  const old=marker.getLatLng();const target=[point.latitude,point.longitude];
  const smooth=map.distance(old,target)<150&&point.location_source===latest.location_source;
- latest=point;cancelAnimationFrame(animation);
+ const moved=point.latitude!==latest.latitude||point.longitude!==latest.longitude;
+ latest=point;if(moved)cancelAnimationFrame(animation);
  circle.setRadius(Math.max(point.accuracy_m||1,1));
  const label=document.createElement('div');label.textContent=(point.location_source==='watch_gps'?'Watch satellite GPS':point.location_source==='fused'?'Fused location (may use paired phone)':'Network location')+' · '+new Date(point.measured_at).toLocaleString()+' · ±'+Math.round(point.accuracy_m||0)+'m';if(!selecting)marker.bindPopup(label);
  const element=marker.getElement();if(element){const pin=element.querySelector('.pin');if(pin)pin.classList.toggle('stale',!payload.live);}
- if(smooth){let start=null;let delta=((point.longitude-old.lng+540)%360)-180;
+ if(moved&&smooth){let start=null;let delta=((point.longitude-old.lng+540)%360)-180;
   const frame=function(time){if(start===null)start=time;const fraction=Math.min(1,(time-start)/650);const eased=fraction*(2-fraction);const position=[old.lat+(point.latitude-old.lat)*eased,old.lng+delta*eased];marker.setLatLng(position);circle.setLatLng(position);if(fraction<1)animation=requestAnimationFrame(frame);};animation=requestAnimationFrame(frame);
- }else{marker.setLatLng(target);circle.setLatLng(target);}
+ }else if(moved){marker.setLatLng(target);circle.setLatLng(target);}
  trail.clearLayers();(payload.segments||[]).forEach(function(segment){L.polyline(segment,{interactive:false,color:'#397F88',weight:3,opacity:.7}).addTo(trail);});
  if(following)map.panTo(target,{animate:true,duration:.65});
 };

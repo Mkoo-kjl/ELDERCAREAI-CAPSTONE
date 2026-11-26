@@ -35,6 +35,9 @@ const html=liveMapHtml(base,false);
 for(const match of html.matchAll(/<script(?: [^>]*)?>([\s\S]*?)<\/script>/g))if(match[1].trim())vm.runInContext(match[1],context);
 assert.equal(messages[0].type,'ready');
 context.window.updatePosition(mapPayload(moved,[base,moved],true));
+const runningFrame=frames[0];
+context.window.updatePosition(mapPayload(moved,[base,moved],true));
+assert.equal(frames[0],runningFrame,'Repeated renders of the same fix must not restart movement animation');
 let time=0;while(frames.length){const frame=frames.shift();frame(time);time+=100;}
 assert.equal(point[0],moved.latitude);assert.equal(point[1],moved.longitude);
 assert.ok(popup.includes('Watch satellite GPS'));assert.equal(tiles,1);assert.equal(markers,1);

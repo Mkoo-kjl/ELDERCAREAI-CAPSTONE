@@ -6,7 +6,7 @@ import {prescriptionDrafts,preparePrescriptionDraft,normalizedPrescriptionFreque
 import {shouldPresentNotice} from '@/src/lib/foreground-notice';
 const at=Date.parse('2026-11-15T10:00:00Z');
 const fix=(seconds:number,meters:number,accuracy=8):MapPosition=>({latitude:10+meters/111195,longitude:123,accuracy_m:accuracy,measured_at:new Date(at+seconds*1000).toISOString(),location_source:'fused'});
-test('stationary indoor jitter does not draw a scribble or move the marker; coherent motion eventually moves it',()=>{
+test('stationary jitter keeps the trail clean; coherent motion advances its filtered endpoint',()=>{
   const jitter=[fix(0,0),fix(4,5),fix(8,-7),fix(12,9),fix(16,-4)];
   expect(new Set(stabilizedWatchTrack(jitter).map(point=>point.latitude)).size).toBe(1);
   expect(routeSegments(jitter)).toEqual([]);

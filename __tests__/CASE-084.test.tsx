@@ -1,5 +1,6 @@
 import {act,render,screen} from '@testing-library/react-native';
 import {LiveLocationMap} from '@/src/components/LiveLocationMap';
+import {LocationMapPreview} from '@/src/components/LocationMapPreview';
 const mockInject=jest.fn();let mockProps:any;
 jest.mock('react-native-webview',()=>{
   const React=require('react');const {View}=require('react-native');
@@ -7,17 +8,25 @@ jest.mock('react-native-webview',()=>{
 });
 const point={latitude:10,longitude:123,accuracy_m:5,measured_at:'2026-11-02T10:00:00Z',location_source:'watch_gps' as const};
 beforeEach(()=>mockInject.mockClear());
-test('retains its document, filters a single jump and sends confirmed movement after initialization',async()=>{
+test('retains its document and sends the newest coordinates after initialization',async()=>{
   const result=await render(<LiveLocationMap position={point} live/>);const source=mockProps.source;
   const next={...point,latitude:10.001,measured_at:'2026-11-02T10:00:02Z'};
   await result.rerender(<LiveLocationMap position={next} live/>);
   expect(mockProps.source).toBe(source);expect(mockInject).not.toHaveBeenCalled();
   await act(async()=>mockProps.onMessage({nativeEvent:{data:JSON.stringify({type:'ready'})}}));
-  expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('\"latitude\":10,'));
+  expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('\"latitude\":10.001,'));
   expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('2026-11-02T10:00:02Z'));
   await result.rerender(<LiveLocationMap position={{...next,latitude:10.00101,measured_at:'2026-11-02T10:00:06Z'}} live/>);
   await result.rerender(<LiveLocationMap position={{...next,latitude:10.00102,measured_at:'2026-11-02T10:00:10Z'}} live/>);
   expect(mockProps.source).toBe(source);expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('10.00102'));
+});
+
+test('the compact Home preview updates small movements without needing a trail',async()=>{
+  const result=await render(<LocationMapPreview latitude={10} longitude={123} recordedAt={point.measured_at} accuracy={120} source="network"/>);
+  await act(async()=>mockProps.onMessage({nativeEvent:{data:JSON.stringify({type:'ready'})}}));
+  await result.rerender(<LocationMapPreview latitude={10.00002} longitude={123} recordedAt="2026-11-02T10:00:02Z" accuracy={120} source="network"/>);
+  expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('\"latitude\":10.00002,'));
+  expect(mockInject).toHaveBeenLastCalledWith(expect.stringContaining('\"accuracy_m\":120,'));
 });
 test('offers a follow control after the user drags the map',async()=>{
   await render(<LiveLocationMap position={point}/>);
