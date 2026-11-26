@@ -1,0 +1,1179 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2540" height="3500" viewBox="0 0 2540 3500">
+<title>ElderCareAI Database Diagram</title>
+<desc>Portrait database design with 18 tables, 245 fields, and 34 declared relationships. No logo.</desc>
+<rect width="2540" height="3500" fill="white"/>
+<style>text{font-family:"Times New Roman",serif;fill:#111}.rel{fill:none;stroke:#2F7E28;stroke-width:2;stroke-linejoin:miter;stroke-linecap:butt}</style>
+<path class="rel" d="M740.00,109.00 L770.00,109.00 L770.00,140.00 L910.00,140.00 L910.00,139.00 L940.00,139.00"/>
+<path class="rel" d="M753,101.0V117.0"/>
+<path class="rel" d="M940,130.0L921,139.0L940,148.0"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,783.00 L1600.00,783.00"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1600,774.0L1619,783.0L1600,792.0"/>
+<path class="rel" d="M1600.00,723.00 L1630.00,723.00 L1630.00,1187.00 L1600.00,1187.00"/>
+<path class="rel" d="M1613,715.0V731.0"/>
+<path class="rel" d="M1600,1178.0L1619,1187.0L1600,1196.0"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,110.00 L1620.00,110.00 L1620.00,1160.00 L1630.00,1160.00 L1630.00,1157.00 L1600.00,1157.00"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1613,1149.0V1165.0"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,110.00 L1640.00,110.00 L1640.00,2160.00 L1630.00,2160.00 L1630.00,2161.00 L1600.00,2161.00"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1600,2152.0L1619,2161.0L1600,2170.0"/>
+<path class="rel" d="M1600.00,723.00 L1630.00,723.00 L1630.00,720.00 L1610.00,720.00 L1610.00,2640.00 L1630.00,2640.00 L1630.00,2641.00 L1600.00,2641.00"/>
+<path class="rel" d="M1613,715.0V731.0"/>
+<path class="rel" d="M1600,2632.0L1619,2641.0L1600,2650.0"/>
+<path class="rel" d="M1600.00,723.00 L1630.00,723.00 L1630.00,720.00 L1650.00,720.00 L1650.00,3220.00 L1630.00,3220.00 L1630.00,3225.00 L1600.00,3225.00"/>
+<path class="rel" d="M1613,715.0V731.0"/>
+<path class="rel" d="M1600,3216.0L1619,3225.0L1600,3234.0"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,110.00 L1660.00,110.00 L1660.00,3200.00 L1630.00,3200.00 L1630.00,3195.00 L1600.00,3195.00"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1600,3186.0L1619,3195.0L1600,3204.0"/>
+<path class="rel" d="M80.00,109.00 L50.00,109.00 L50.00,603.33 L80.00,603.33"/>
+<path class="rel" d="M67,101.0V117.0"/>
+<path class="rel" d="M80,594.3299999999999L61,603.3299999999999L80,612.3299999999999"/>
+<path class="rel" d="M940.00,109.00 L910.00,109.00 L910.00,570.00 L770.00,570.00 L770.00,573.33 L740.00,573.33"/>
+<path class="rel" d="M927,101.0V117.0"/>
+<path class="rel" d="M740,564.3299999999999L759,573.3299999999999L740,582.3299999999999"/>
+<path class="rel" d="M940.00,109.00 L910.00,109.00 L910.00,110.00 L770.00,110.00 L770.00,1307.67 L740.00,1307.67"/>
+<path class="rel" d="M927,101.0V117.0"/>
+<path class="rel" d="M740,1298.67L759,1307.67L740,1316.67"/>
+<path class="rel" d="M80.00,109.00 L50.00,109.00 L50.00,110.00 L40.00,110.00 L40.00,1460.00 L50.00,1460.00 L50.00,1457.67 L80.00,1457.67"/>
+<path class="rel" d="M67,101.0V117.0"/>
+<path class="rel" d="M80,1448.67L61,1457.67L80,1466.67"/>
+<path class="rel" d="M80.00,543.33 L50.00,543.33 L50.00,1277.67 L80.00,1277.67"/>
+<path class="rel" d="M67,535.3299999999999V551.3299999999999"/>
+<path class="rel" d="M80,1268.67L61,1277.67L80,1286.67"/>
+<path class="rel" d="M940.00,723.00 L910.00,723.00 L910.00,1550.00 L770.00,1550.00 L770.00,1547.67 L740.00,1547.67"/>
+<path class="rel" d="M927,715.0V731.0"/>
+<path class="rel" d="M740,1538.67L759,1547.67L740,1556.67"/>
+<path class="rel" d="M80.00,109.00 L50.00,109.00 L50.00,110.00 L60.00,110.00 L60.00,1800.00 L50.00,1800.00 L50.00,1802.00 L80.00,1802.00"/>
+<path class="rel" d="M67,101.0V117.0"/>
+<path class="rel" d="M80,1793.0L61,1802.0L80,1811.0"/>
+<path class="rel" d="M940.00,109.00 L910.00,109.00 L910.00,110.00 L900.00,110.00 L900.00,1770.00 L770.00,1770.00 L770.00,1772.00 L740.00,1772.00"/>
+<path class="rel" d="M927,101.0V117.0"/>
+<path class="rel" d="M740,1763.0L759,1772.0L740,1781.0"/>
+<path class="rel" d="M80.00,109.00 L50.00,109.00 L50.00,110.00 L30.00,110.00 L30.00,2360.00 L50.00,2360.00 L50.00,2356.33 L80.00,2356.33"/>
+<path class="rel" d="M67,101.0V117.0"/>
+<path class="rel" d="M80,2347.33L61,2356.33L80,2365.33"/>
+<path class="rel" d="M940.00,109.00 L910.00,109.00 L910.00,110.00 L920.00,110.00 L920.00,2330.00 L770.00,2330.00 L770.00,2326.33 L740.00,2326.33"/>
+<path class="rel" d="M927,101.0V117.0"/>
+<path class="rel" d="M740,2317.33L759,2326.33L740,2335.33"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,110.00 L1770.00,110.00 L1770.00,750.20 L1800.00,750.20"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1800,741.2L1781,750.2L1800,759.2"/>
+<path class="rel" d="M2460.00,109.00 L2490.00,109.00 L2490.00,1230.20 L2460.00,1230.20"/>
+<path class="rel" d="M2473,101.0V117.0"/>
+<path class="rel" d="M2460,1221.2L2479,1230.2L2460,1239.2"/>
+<path class="rel" d="M740.00,109.00 L770.00,109.00 L770.00,110.00 L780.00,110.00 L780.00,1080.00 L1770.00,1080.00 L1770.00,1080.20 L1800.00,1080.20"/>
+<path class="rel" d="M753,101.0V117.0"/>
+<path class="rel" d="M1800,1071.2L1781,1080.2L1800,1089.2"/>
+<path class="rel" d="M2460.00,720.20 L2490.00,720.20 L2490.00,720.00 L2480.00,720.00 L2480.00,1540.00 L2490.00,1540.00 L2490.00,1541.40 L2460.00,1541.40"/>
+<path class="rel" d="M2473,712.2V728.2"/>
+<path class="rel" d="M2460,1532.4L2479,1541.4L2460,1550.4"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,110.00 L1670.00,110.00 L1670.00,1570.00 L1770.00,1570.00 L1770.00,1571.40 L1800.00,1571.40"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1800,1562.4L1781,1571.4L1800,1580.4"/>
+<path class="rel" d="M2460.00,720.20 L2490.00,720.20 L2490.00,720.00 L2500.00,720.00 L2500.00,2030.00 L2490.00,2030.00 L2490.00,2032.60 L2460.00,2032.60"/>
+<path class="rel" d="M2473,712.2V728.2"/>
+<path class="rel" d="M2460,2023.6L2479,2032.6L2460,2041.6"/>
+<path class="rel" d="M740.00,109.00 L770.00,109.00 L770.00,110.00 L790.00,110.00 L790.00,1070.00 L1770.00,1070.00 L1770.00,1972.60 L1800.00,1972.60"/>
+<path class="rel" d="M753,101.0V117.0"/>
+<path class="rel" d="M1800,1963.6L1781,1972.6L1800,1981.6"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,110.00 L1680.00,110.00 L1680.00,2000.00 L1770.00,2000.00 L1770.00,2002.60 L1800.00,2002.60"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1800,1993.6L1781,2002.6L1800,2011.6"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,140.00 L1770.00,140.00 L1770.00,139.00 L1800.00,139.00"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1800,130.0L1781,139.0L1800,148.0"/>
+<path class="rel" d="M740.00,109.00 L770.00,109.00 L770.00,40.00 L1760.00,40.00 L1760.00,350.00 L1770.00,350.00 L1770.00,349.00 L1800.00,349.00"/>
+<path class="rel" d="M753,101.0V117.0"/>
+<path class="rel" d="M1800,340.0L1781,349.0L1800,358.0"/>
+<path class="rel" d="M80.00,109.00 L50.00,109.00 L50.00,110.00 L70.00,110.00 L70.00,2760.00 L50.00,2760.00 L50.00,2760.67 L80.00,2760.67"/>
+<path class="rel" d="M67,101.0V117.0"/>
+<path class="rel" d="M80,2751.67L61,2760.67L80,2769.67"/>
+<path class="rel" d="M940.00,109.00 L910.00,109.00 L910.00,110.00 L890.00,110.00 L890.00,2730.00 L770.00,2730.00 L770.00,2730.67 L740.00,2730.67"/>
+<path class="rel" d="M927,101.0V117.0"/>
+<path class="rel" d="M740,2721.67L759,2730.67L740,2739.67"/>
+<path class="rel" d="M80.00,2700.67 L50.00,2700.67 L50.00,3165.00 L80.00,3165.00"/>
+<path class="rel" d="M67,2692.67V2708.67"/>
+<path class="rel" d="M80,3156.0L61,3165.0L80,3174.0"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,110.00 L1690.00,110.00 L1690.00,2640.00 L1770.00,2640.00 L1770.00,2643.80 L1800.00,2643.80"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1787,2635.8V2651.8"/>
+<path class="rel" d="M2460.00,720.20 L2490.00,720.20 L2490.00,720.00 L2470.00,720.00 L2470.00,3400.00 L2490.00,3400.00 L2490.00,3405.00 L2460.00,3405.00"/>
+<path class="rel" d="M2473,712.2V728.2"/>
+<path class="rel" d="M2460,3396.0L2479,3405.0L2460,3414.0"/>
+<path class="rel" d="M1600.00,109.00 L1630.00,109.00 L1630.00,100.00 L1780.00,100.00 L1780.00,3160.00 L1770.00,3160.00 L1770.00,3165.00 L1800.00,3165.00"/>
+<path class="rel" d="M1613,101.0V117.0"/>
+<path class="rel" d="M1800,3156.0L1781,3165.0L1800,3174.0"/>
+<g id="table-caregivers"><rect x="80" y="50" width="660" height="314" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="80" y="50" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="410.00" y="80.00" font-size="24" text-anchor="middle" font-weight="bold">CAREGIVERS</text>
+<path d="M236,94V364" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M650,94V364" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="116.00" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="116.00" font-size="22" text-anchor="start">id</text>
+<text x="695.00" y="116.00" font-size="21" text-anchor="middle">PK/FK*</text>
+<path d="M80,124H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="146.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="146.00" font-size="22" text-anchor="start">full_name</text>
+<text x="695.00" y="146.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,154H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="176.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="176.00" font-size="22" text-anchor="start">phone</text>
+<text x="695.00" y="176.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,184H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="206.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="206.00" font-size="22" text-anchor="start">created_at</text>
+<text x="695.00" y="206.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,214H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="236.00" font-size="22" text-anchor="start">int</text>
+<text x="244.00" y="236.00" font-size="22" text-anchor="start">age</text>
+<text x="695.00" y="236.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,244H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="266.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="266.00" font-size="22" text-anchor="start">sex</text>
+<text x="695.00" y="266.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,274H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="296.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="296.00" font-size="22" text-anchor="start">photo_url</text>
+<text x="695.00" y="296.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,304H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="326.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="326.00" font-size="22" text-anchor="start">email</text>
+<text x="695.00" y="326.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,334H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="356.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="356.00" font-size="22" text-anchor="start">updated_at</text>
+<text x="695.00" y="356.00" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-medication_schedules"><rect x="80" y="484.33" width="660" height="584" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="80" y="484.33" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="410.00" y="514.33" font-size="24" text-anchor="middle" font-weight="bold">MEDICATION_SCHEDULES</text>
+<path d="M236,528.3299999999999V1068.33" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M650,528.3299999999999V1068.33" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="550.33" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="550.33" font-size="22" text-anchor="start">id</text>
+<text x="695.00" y="550.33" font-size="21" text-anchor="middle">PK</text>
+<path d="M80,558.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="580.33" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="580.33" font-size="22" text-anchor="start">elderly_id</text>
+<text x="695.00" y="580.33" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,588.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="610.33" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="610.33" font-size="22" text-anchor="start">caregiver_id</text>
+<text x="695.00" y="610.33" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,618.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="640.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="640.33" font-size="22" text-anchor="start">medication_name</text>
+<text x="695.00" y="640.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,648.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="670.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="670.33" font-size="22" text-anchor="start">dosage</text>
+<text x="695.00" y="670.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,678.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="700.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="700.33" font-size="22" text-anchor="start">form</text>
+<text x="695.00" y="700.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,708.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="730.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="730.33" font-size="22" text-anchor="start">frequency</text>
+<text x="695.00" y="730.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,738.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="760.33" font-size="22" text-anchor="start">text[]</text>
+<text x="244.00" y="760.33" font-size="22" text-anchor="start">times_of_day</text>
+<text x="695.00" y="760.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,768.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="790.33" font-size="22" text-anchor="start">date</text>
+<text x="244.00" y="790.33" font-size="22" text-anchor="start">start_date</text>
+<text x="695.00" y="790.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,798.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="820.33" font-size="22" text-anchor="start">date</text>
+<text x="244.00" y="820.33" font-size="22" text-anchor="start">end_date</text>
+<text x="695.00" y="820.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,828.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="850.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="850.33" font-size="22" text-anchor="start">instructions</text>
+<text x="695.00" y="850.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,858.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="880.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="880.33" font-size="22" text-anchor="start">prescribed_by</text>
+<text x="695.00" y="880.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,888.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="910.33" font-size="22" text-anchor="start">bool</text>
+<text x="244.00" y="910.33" font-size="22" text-anchor="start">is_active</text>
+<text x="695.00" y="910.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,918.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="940.33" font-size="22" text-anchor="start">bool</text>
+<text x="244.00" y="940.33" font-size="22" text-anchor="start">reminder_enabled</text>
+<text x="695.00" y="940.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,948.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="970.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="970.33" font-size="22" text-anchor="start">color_tag</text>
+<text x="695.00" y="970.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,978.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1000.33" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="1000.33" font-size="22" text-anchor="start">created_at</text>
+<text x="695.00" y="1000.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,1008.3299999999999H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1030.33" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="1030.33" font-size="22" text-anchor="start">updated_at</text>
+<text x="695.00" y="1030.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,1038.33H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1060.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="1060.33" font-size="22" text-anchor="start">timezone</text>
+<text x="695.00" y="1060.33" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-medication_logs"><rect x="80" y="1188.67" width="660" height="374" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="80" y="1188.67" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="410.00" y="1218.67" font-size="24" text-anchor="middle" font-weight="bold">MEDICATION_LOGS</text>
+<path d="M236,1232.67V1562.67" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M650,1232.67V1562.67" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1254.67" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="1254.67" font-size="22" text-anchor="start">id</text>
+<text x="695.00" y="1254.67" font-size="21" text-anchor="middle">PK</text>
+<path d="M80,1262.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1284.67" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="1284.67" font-size="22" text-anchor="start">schedule_id</text>
+<text x="695.00" y="1284.67" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,1292.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1314.67" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="1314.67" font-size="22" text-anchor="start">elderly_id</text>
+<text x="695.00" y="1314.67" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,1322.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1344.67" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="1344.67" font-size="22" text-anchor="start">scheduled_time</text>
+<text x="695.00" y="1344.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,1352.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1374.67" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="1374.67" font-size="22" text-anchor="start">taken_at</text>
+<text x="695.00" y="1374.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,1382.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1404.67" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="1404.67" font-size="22" text-anchor="start">status</text>
+<text x="695.00" y="1404.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,1412.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1434.67" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="1434.67" font-size="22" text-anchor="start">notes</text>
+<text x="695.00" y="1434.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,1442.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1464.67" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="1464.67" font-size="22" text-anchor="start">recorded_by</text>
+<text x="695.00" y="1464.67" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,1472.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1494.67" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="1494.67" font-size="22" text-anchor="start">created_at</text>
+<text x="695.00" y="1494.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,1502.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1524.67" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="1524.67" font-size="22" text-anchor="start">dose_key</text>
+<text x="695.00" y="1524.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,1532.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1554.67" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="1554.67" font-size="22" text-anchor="start">watch_device_id</text>
+<text x="695.00" y="1554.67" font-size="21" text-anchor="middle">FK</text>
+</g>
+<g id="table-appointments"><rect x="80" y="1683.0" width="660" height="434" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="80" y="1683.0" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="410.00" y="1713.00" font-size="24" text-anchor="middle" font-weight="bold">APPOINTMENTS</text>
+<path d="M236,1727.0V2117.0" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M650,1727.0V2117.0" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1749.00" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="1749.00" font-size="22" text-anchor="start">id</text>
+<text x="695.00" y="1749.00" font-size="21" text-anchor="middle">PK</text>
+<path d="M80,1757.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1779.00" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="1779.00" font-size="22" text-anchor="start">elderly_id</text>
+<text x="695.00" y="1779.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,1787.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1809.00" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="1809.00" font-size="22" text-anchor="start">caregiver_id</text>
+<text x="695.00" y="1809.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,1817.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1839.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="1839.00" font-size="22" text-anchor="start">title</text>
+<text x="695.00" y="1839.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,1847.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1869.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="1869.00" font-size="22" text-anchor="start">doctor_name</text>
+<text x="695.00" y="1869.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,1877.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1899.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="1899.00" font-size="22" text-anchor="start">location</text>
+<text x="695.00" y="1899.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,1907.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1929.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="1929.00" font-size="22" text-anchor="start">appointment_at</text>
+<text x="695.00" y="1929.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,1937.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1959.00" font-size="22" text-anchor="start">int</text>
+<text x="244.00" y="1959.00" font-size="22" text-anchor="start">duration_min</text>
+<text x="695.00" y="1959.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,1967.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="1989.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="1989.00" font-size="22" text-anchor="start">notes</text>
+<text x="695.00" y="1989.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,1997.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2019.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="2019.00" font-size="22" text-anchor="start">status</text>
+<text x="695.00" y="2019.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,2027.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2049.00" font-size="22" text-anchor="start">bool</text>
+<text x="244.00" y="2049.00" font-size="22" text-anchor="start">reminder_sent</text>
+<text x="695.00" y="2049.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,2057.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2079.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="2079.00" font-size="22" text-anchor="start">created_at</text>
+<text x="695.00" y="2079.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,2087.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2109.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="2109.00" font-size="22" text-anchor="start">updated_at</text>
+<text x="695.00" y="2109.00" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-caregiver_notes"><rect x="80" y="2237.33" width="660" height="284" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="80" y="2237.33" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="410.00" y="2267.33" font-size="24" text-anchor="middle" font-weight="bold">CAREGIVER_NOTES</text>
+<path d="M236,2281.33V2521.33" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M650,2281.33V2521.33" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2303.33" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="2303.33" font-size="22" text-anchor="start">id</text>
+<text x="695.00" y="2303.33" font-size="21" text-anchor="middle">PK</text>
+<path d="M80,2311.33H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2333.33" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="2333.33" font-size="22" text-anchor="start">elderly_id</text>
+<text x="695.00" y="2333.33" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,2341.33H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2363.33" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="2363.33" font-size="22" text-anchor="start">caregiver_id</text>
+<text x="695.00" y="2363.33" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,2371.33H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2393.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="2393.33" font-size="22" text-anchor="start">title</text>
+<text x="695.00" y="2393.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,2401.33H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2423.33" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="2423.33" font-size="22" text-anchor="start">content</text>
+<text x="695.00" y="2423.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,2431.33H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2453.33" font-size="22" text-anchor="start">bool</text>
+<text x="244.00" y="2453.33" font-size="22" text-anchor="start">is_pinned</text>
+<text x="695.00" y="2453.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,2461.33H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2483.33" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="2483.33" font-size="22" text-anchor="start">created_at</text>
+<text x="695.00" y="2483.33" font-size="21" text-anchor="middle"></text>
+<path d="M80,2491.33H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2513.33" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="2513.33" font-size="22" text-anchor="start">updated_at</text>
+<text x="695.00" y="2513.33" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-ai_chatbot_sessions"><rect x="80" y="2641.67" width="660" height="314" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="80" y="2641.67" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="410.00" y="2671.67" font-size="24" text-anchor="middle" font-weight="bold">AI_CHATBOT_SESSIONS</text>
+<path d="M236,2685.67V2955.67" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M650,2685.67V2955.67" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2707.67" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="2707.67" font-size="22" text-anchor="start">id</text>
+<text x="695.00" y="2707.67" font-size="21" text-anchor="middle">PK</text>
+<path d="M80,2715.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2737.67" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="2737.67" font-size="22" text-anchor="start">elderly_id</text>
+<text x="695.00" y="2737.67" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,2745.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2767.67" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="2767.67" font-size="22" text-anchor="start">caregiver_id</text>
+<text x="695.00" y="2767.67" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,2775.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2797.67" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="2797.67" font-size="22" text-anchor="start">session_title</text>
+<text x="695.00" y="2797.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,2805.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2827.67" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="2827.67" font-size="22" text-anchor="start">context_type</text>
+<text x="695.00" y="2827.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,2835.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2857.67" font-size="22" text-anchor="start">int</text>
+<text x="244.00" y="2857.67" font-size="22" text-anchor="start">total_messages</text>
+<text x="695.00" y="2857.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,2865.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2887.67" font-size="22" text-anchor="start">bool</text>
+<text x="244.00" y="2887.67" font-size="22" text-anchor="start">is_active</text>
+<text x="695.00" y="2887.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,2895.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2917.67" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="2917.67" font-size="22" text-anchor="start">started_at</text>
+<text x="695.00" y="2917.67" font-size="21" text-anchor="middle"></text>
+<path d="M80,2925.67H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="2947.67" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="2947.67" font-size="22" text-anchor="start">ended_at</text>
+<text x="695.00" y="2947.67" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-ai_chatbot_messages"><rect x="80" y="3076.0" width="660" height="344" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="80" y="3076.0" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="410.00" y="3106.00" font-size="24" text-anchor="middle" font-weight="bold">AI_CHATBOT_MESSAGES</text>
+<path d="M236,3120.0V3420.0" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M650,3120.0V3420.0" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3142.00" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="3142.00" font-size="22" text-anchor="start">id</text>
+<text x="695.00" y="3142.00" font-size="21" text-anchor="middle">PK</text>
+<path d="M80,3150.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3172.00" font-size="22" text-anchor="start">uuid</text>
+<text x="244.00" y="3172.00" font-size="22" text-anchor="start">session_id</text>
+<text x="695.00" y="3172.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M80,3180.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3202.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="3202.00" font-size="22" text-anchor="start">role</text>
+<text x="695.00" y="3202.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,3210.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3232.00" font-size="22" text-anchor="start">text</text>
+<text x="244.00" y="3232.00" font-size="22" text-anchor="start">content</text>
+<text x="695.00" y="3232.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,3240.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3262.00" font-size="22" text-anchor="start">int</text>
+<text x="244.00" y="3262.00" font-size="22" text-anchor="start">tokens_used</text>
+<text x="695.00" y="3262.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,3270.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3292.00" font-size="22" text-anchor="start">bool</text>
+<text x="244.00" y="3292.00" font-size="22" text-anchor="start">has_health_data</text>
+<text x="695.00" y="3292.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,3300.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3322.00" font-size="22" text-anchor="start">bool</text>
+<text x="244.00" y="3322.00" font-size="22" text-anchor="start">is_flagged</text>
+<text x="695.00" y="3322.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,3330.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3352.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="244.00" y="3352.00" font-size="22" text-anchor="start">created_at</text>
+<text x="695.00" y="3352.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,3360.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3382.00" font-size="22" text-anchor="start">jsonb</text>
+<text x="244.00" y="3382.00" font-size="22" text-anchor="start">evidence</text>
+<text x="695.00" y="3382.00" font-size="21" text-anchor="middle"></text>
+<path d="M80,3390.0H740" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="87.00" y="3412.00" font-size="22" text-anchor="start">jsonb</text>
+<text x="244.00" y="3412.00" font-size="22" text-anchor="start">evidence_summary</text>
+<text x="695.00" y="3412.00" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-elderly_profiles"><rect x="940" y="50" width="660" height="524" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="940" y="50" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="1270.00" y="80.00" font-size="24" text-anchor="middle" font-weight="bold">ELDERLY_PROFILES</text>
+<path d="M1096,94V574" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M1510,94V574" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="116.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="116.00" font-size="22" text-anchor="start">elderly_id</text>
+<text x="1555.00" y="116.00" font-size="21" text-anchor="middle">PK</text>
+<path d="M940,124H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="146.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="146.00" font-size="22" text-anchor="start">caregiver_id</text>
+<text x="1555.00" y="146.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M940,154H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="176.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="176.00" font-size="22" text-anchor="start">full_name</text>
+<text x="1555.00" y="176.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,184H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="206.00" font-size="22" text-anchor="start">int</text>
+<text x="1104.00" y="206.00" font-size="22" text-anchor="start">age</text>
+<text x="1555.00" y="206.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,214H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="236.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="236.00" font-size="22" text-anchor="start">gender</text>
+<text x="1555.00" y="236.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,244H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="266.00" font-size="22" text-anchor="start">numeric(5,2)</text>
+<text x="1104.00" y="266.00" font-size="22" text-anchor="start">weight_kg</text>
+<text x="1555.00" y="266.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,274H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="296.00" font-size="22" text-anchor="start">numeric(5,2)</text>
+<text x="1104.00" y="296.00" font-size="22" text-anchor="start">height_cm</text>
+<text x="1555.00" y="296.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,304H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="326.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="326.00" font-size="22" text-anchor="start">blood_type</text>
+<text x="1555.00" y="326.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,334H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="356.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="356.00" font-size="22" text-anchor="start">medical_conditions</text>
+<text x="1555.00" y="356.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,364H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="386.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="386.00" font-size="22" text-anchor="start">medications</text>
+<text x="1555.00" y="386.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,394H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="416.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="416.00" font-size="22" text-anchor="start">emergency_contact</text>
+<text x="1555.00" y="416.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,424H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="446.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="446.00" font-size="22" text-anchor="start">created_at</text>
+<text x="1555.00" y="446.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,454H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="476.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="476.00" font-size="22" text-anchor="start">photo_url</text>
+<text x="1555.00" y="476.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,484H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="506.00" font-size="22" text-anchor="start">date</text>
+<text x="1104.00" y="506.00" font-size="22" text-anchor="start">date_of_birth</text>
+<text x="1555.00" y="506.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,514H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="536.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="536.00" font-size="22" text-anchor="start">emergency_contact_phone</text>
+<text x="1555.00" y="536.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,544H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="566.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="566.00" font-size="22" text-anchor="start">updated_at</text>
+<text x="1555.00" y="566.00" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-wearable_devices"><rect x="940" y="664.0" width="660" height="344" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="940" y="664.0" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="1270.00" y="694.00" font-size="24" text-anchor="middle" font-weight="bold">WEARABLE_DEVICES</text>
+<path d="M1096,708.0V1008.0" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M1510,708.0V1008.0" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="730.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="730.00" font-size="22" text-anchor="start">id</text>
+<text x="1555.00" y="730.00" font-size="21" text-anchor="middle">PK</text>
+<path d="M940,738.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="760.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="760.00" font-size="22" text-anchor="start">caregiver_id</text>
+<text x="1555.00" y="760.00" font-size="21" text-anchor="middle">FK*</text>
+<path d="M940,768.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="790.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="790.00" font-size="22" text-anchor="start">elderly_id</text>
+<text x="1555.00" y="790.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M940,798.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="820.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="820.00" font-size="22" text-anchor="start">device_name</text>
+<text x="1555.00" y="820.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,828.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="850.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="850.00" font-size="22" text-anchor="start">token_hash</text>
+<text x="1555.00" y="850.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,858.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="880.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="880.00" font-size="22" text-anchor="start">expires_at</text>
+<text x="1555.00" y="880.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,888.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="910.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="910.00" font-size="22" text-anchor="start">revoked_at</text>
+<text x="1555.00" y="910.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,918.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="940.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="940.00" font-size="22" text-anchor="start">paired_at</text>
+<text x="1555.00" y="940.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,948.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="970.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="970.00" font-size="22" text-anchor="start">last_seen_at</text>
+<text x="1555.00" y="970.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,978.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1000.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1000.00" font-size="22" text-anchor="start">last_history_at</text>
+<text x="1555.00" y="1000.00" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-wearable_live_state"><rect x="940" y="1098.0" width="660" height="884" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="940" y="1098.0" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="1270.00" y="1128.00" font-size="24" text-anchor="middle" font-weight="bold">WEARABLE_LIVE_STATE</text>
+<path d="M1096,1142.0V1982.0" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M1510,1142.0V1982.0" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1164.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="1164.00" font-size="22" text-anchor="start">elderly_id</text>
+<text x="1555.00" y="1164.00" font-size="21" text-anchor="middle">PK/FK</text>
+<path d="M940,1172.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1194.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="1194.00" font-size="22" text-anchor="start">device_id</text>
+<text x="1555.00" y="1194.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M940,1202.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1224.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="1224.00" font-size="22" text-anchor="start">heart_rate_bpm</text>
+<text x="1555.00" y="1224.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1232.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1254.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1254.00" font-size="22" text-anchor="start">heart_rate_measured_at</text>
+<text x="1555.00" y="1254.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1262.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1284.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="1284.00" font-size="22" text-anchor="start">latitude</text>
+<text x="1555.00" y="1284.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1292.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1314.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="1314.00" font-size="22" text-anchor="start">longitude</text>
+<text x="1555.00" y="1314.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1322.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1344.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="1344.00" font-size="22" text-anchor="start">accuracy_m</text>
+<text x="1555.00" y="1344.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1352.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1374.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1374.00" font-size="22" text-anchor="start">gps_measured_at</text>
+<text x="1555.00" y="1374.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1382.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1404.00" font-size="22" text-anchor="start">int</text>
+<text x="1104.00" y="1404.00" font-size="22" text-anchor="start">battery_percent</text>
+<text x="1555.00" y="1404.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1412.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1434.00" font-size="22" text-anchor="start">bool</text>
+<text x="1104.00" y="1434.00" font-size="22" text-anchor="start">monitoring</text>
+<text x="1555.00" y="1434.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1442.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1464.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1464.00" font-size="22" text-anchor="start">status_at</text>
+<text x="1555.00" y="1464.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1472.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1494.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1494.00" font-size="22" text-anchor="start">received_at</text>
+<text x="1555.00" y="1494.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1502.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1524.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="1524.00" font-size="22" text-anchor="start">spo2_percent</text>
+<text x="1555.00" y="1524.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1532.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1554.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1554.00" font-size="22" text-anchor="start">spo2_measured_at</text>
+<text x="1555.00" y="1554.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1562.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1584.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="1584.00" font-size="22" text-anchor="start">skin_temp_celsius</text>
+<text x="1555.00" y="1584.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1592.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1614.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1614.00" font-size="22" text-anchor="start">skin_temp_measured_at</text>
+<text x="1555.00" y="1614.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1622.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1644.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="1644.00" font-size="22" text-anchor="start">hrv_rmssd_ms</text>
+<text x="1555.00" y="1644.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1652.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1674.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1674.00" font-size="22" text-anchor="start">hrv_measured_at</text>
+<text x="1555.00" y="1674.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1682.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1704.00" font-size="22" text-anchor="start">int</text>
+<text x="1104.00" y="1704.00" font-size="22" text-anchor="start">steps_count</text>
+<text x="1555.00" y="1704.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1712.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1734.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1734.00" font-size="22" text-anchor="start">steps_measured_at</text>
+<text x="1555.00" y="1734.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1742.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1764.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="1764.00" font-size="22" text-anchor="start">location_source</text>
+<text x="1555.00" y="1764.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1772.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1794.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="1794.00" font-size="22" text-anchor="start">gps_status</text>
+<text x="1555.00" y="1794.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1802.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1824.00" font-size="22" text-anchor="start">jsonb</text>
+<text x="1104.00" y="1824.00" font-size="22" text-anchor="start">sensor_status</text>
+<text x="1555.00" y="1824.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1832.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1854.00" font-size="22" text-anchor="start">int</text>
+<text x="1104.00" y="1854.00" font-size="22" text-anchor="start">stress_score</text>
+<text x="1555.00" y="1854.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1862.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1884.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="1884.00" font-size="22" text-anchor="start">stress_baseline_rmssd</text>
+<text x="1555.00" y="1884.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1892.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1914.00" font-size="22" text-anchor="start">int</text>
+<text x="1104.00" y="1914.00" font-size="22" text-anchor="start">stress_reference_count</text>
+<text x="1555.00" y="1914.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1922.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1944.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="1944.00" font-size="22" text-anchor="start">sleep_hours</text>
+<text x="1555.00" y="1944.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,1952.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="1974.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="1974.00" font-size="22" text-anchor="start">sleep_measured_at</text>
+<text x="1555.00" y="1974.00" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-vital_sign_logs"><rect x="940" y="2072.0" width="660" height="944" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="940" y="2072.0" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="1270.00" y="2102.00" font-size="24" text-anchor="middle" font-weight="bold">VITAL_SIGN_LOGS</text>
+<path d="M1096,2116.0V3016.0" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M1510,2116.0V3016.0" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2138.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="2138.00" font-size="22" text-anchor="start">id</text>
+<text x="1555.00" y="2138.00" font-size="21" text-anchor="middle">PK</text>
+<path d="M940,2146.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2168.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="2168.00" font-size="22" text-anchor="start">elderly_id</text>
+<text x="1555.00" y="2168.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M940,2176.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2198.00" font-size="22" text-anchor="start">numeric(6,2)</text>
+<text x="1104.00" y="2198.00" font-size="22" text-anchor="start">heart_rate_bpm</text>
+<text x="1555.00" y="2198.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2206.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2228.00" font-size="22" text-anchor="start">numeric(5,2)</text>
+<text x="1104.00" y="2228.00" font-size="22" text-anchor="start">spo2_percent</text>
+<text x="1555.00" y="2228.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2236.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2258.00" font-size="22" text-anchor="start">int</text>
+<text x="1104.00" y="2258.00" font-size="22" text-anchor="start">stress_score</text>
+<text x="1555.00" y="2258.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2266.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2288.00" font-size="22" text-anchor="start">numeric(5,2)</text>
+<text x="1104.00" y="2288.00" font-size="22" text-anchor="start">skin_temp_celsius</text>
+<text x="1555.00" y="2288.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2296.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2318.00" font-size="22" text-anchor="start">int</text>
+<text x="1104.00" y="2318.00" font-size="22" text-anchor="start">steps_count</text>
+<text x="1555.00" y="2318.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2326.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2348.00" font-size="22" text-anchor="start">int</text>
+<text x="1104.00" y="2348.00" font-size="22" text-anchor="start">active_minutes</text>
+<text x="1555.00" y="2348.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2356.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2378.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="2378.00" font-size="22" text-anchor="start">overall_status</text>
+<text x="1555.00" y="2378.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2386.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2408.00" font-size="22" text-anchor="start">numeric(5,2)</text>
+<text x="1104.00" y="2408.00" font-size="22" text-anchor="start">ai_risk_score</text>
+<text x="1555.00" y="2408.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2416.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2438.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="2438.00" font-size="22" text-anchor="start">source</text>
+<text x="1555.00" y="2438.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2446.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2468.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="2468.00" font-size="22" text-anchor="start">recorded_at</text>
+<text x="1555.00" y="2468.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2476.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2498.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="2498.00" font-size="22" text-anchor="start">synced_at</text>
+<text x="1555.00" y="2498.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2506.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2528.00" font-size="22" text-anchor="start">numeric(5,2)</text>
+<text x="1104.00" y="2528.00" font-size="22" text-anchor="start">sleep_hours</text>
+<text x="1555.00" y="2528.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2536.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2558.00" font-size="22" text-anchor="start">numeric</text>
+<text x="1104.00" y="2558.00" font-size="22" text-anchor="start">hrv_rmssd_ms</text>
+<text x="1555.00" y="2558.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2566.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2588.00" font-size="22" text-anchor="start">jsonb</text>
+<text x="1104.00" y="2588.00" font-size="22" text-anchor="start">measurement_times</text>
+<text x="1555.00" y="2588.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2596.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2618.00" font-size="22" text-anchor="start">jsonb</text>
+<text x="1104.00" y="2618.00" font-size="22" text-anchor="start">sleep_history</text>
+<text x="1555.00" y="2618.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2626.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2648.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="2648.00" font-size="22" text-anchor="start">watch_device_id</text>
+<text x="1555.00" y="2648.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M940,2656.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2678.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="2678.00" font-size="22" text-anchor="start">watch_sample_id</text>
+<text x="1555.00" y="2678.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2686.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2708.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="2708.00" font-size="22" text-anchor="start">watch_metric</text>
+<text x="1555.00" y="2708.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2716.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2738.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="2738.00" font-size="22" text-anchor="start">watch_measured_at</text>
+<text x="1555.00" y="2738.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2746.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2768.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="2768.00" font-size="22" text-anchor="start">stress_baseline_rmssd</text>
+<text x="1555.00" y="2768.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2776.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2798.00" font-size="22" text-anchor="start">int</text>
+<text x="1104.00" y="2798.00" font-size="22" text-anchor="start">stress_reference_count</text>
+<text x="1555.00" y="2798.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2806.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2828.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="2828.00" font-size="22" text-anchor="start">stress_model_version</text>
+<text x="1555.00" y="2828.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2836.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2858.00" font-size="22" text-anchor="start">bool</text>
+<text x="1104.00" y="2858.00" font-size="22" text-anchor="start">is_superseded</text>
+<text x="1555.00" y="2858.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2866.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2888.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="2888.00" font-size="22" text-anchor="start">measurement_origin</text>
+<text x="1555.00" y="2888.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2896.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2918.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="2918.00" font-size="22" text-anchor="start">source_device_id</text>
+<text x="1555.00" y="2918.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2926.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2948.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="2948.00" font-size="22" text-anchor="start">source_record_key</text>
+<text x="1555.00" y="2948.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2956.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="2978.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="2978.00" font-size="22" text-anchor="start">source_group_key</text>
+<text x="1555.00" y="2978.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,2986.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3008.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="3008.00" font-size="22" text-anchor="start">source_revision_at</text>
+<text x="1555.00" y="3008.00" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-watch_location_points"><rect x="940" y="3106.0" width="660" height="314" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="940" y="3106.0" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="1270.00" y="3136.00" font-size="24" text-anchor="middle" font-weight="bold">WATCH_LOCATION_POINTS</text>
+<path d="M1096,3150.0V3420.0" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M1510,3150.0V3420.0" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3172.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="3172.00" font-size="22" text-anchor="start">id</text>
+<text x="1555.00" y="3172.00" font-size="21" text-anchor="middle">PK</text>
+<path d="M940,3180.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3202.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="3202.00" font-size="22" text-anchor="start">elderly_id</text>
+<text x="1555.00" y="3202.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M940,3210.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3232.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1104.00" y="3232.00" font-size="22" text-anchor="start">device_id</text>
+<text x="1555.00" y="3232.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M940,3240.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3262.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="3262.00" font-size="22" text-anchor="start">latitude</text>
+<text x="1555.00" y="3262.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,3270.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3292.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="3292.00" font-size="22" text-anchor="start">longitude</text>
+<text x="1555.00" y="3292.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,3300.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3322.00" font-size="22" text-anchor="start">float8</text>
+<text x="1104.00" y="3322.00" font-size="22" text-anchor="start">accuracy_m</text>
+<text x="1555.00" y="3322.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,3330.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3352.00" font-size="22" text-anchor="start">text</text>
+<text x="1104.00" y="3352.00" font-size="22" text-anchor="start">location_source</text>
+<text x="1555.00" y="3352.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,3360.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3382.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="3382.00" font-size="22" text-anchor="start">measured_at</text>
+<text x="1555.00" y="3382.00" font-size="21" text-anchor="middle"></text>
+<path d="M940,3390.0H1600" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="947.00" y="3412.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1104.00" y="3412.00" font-size="22" text-anchor="start">received_at</text>
+<text x="1555.00" y="3412.00" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-emergency_events"><rect x="1800" y="50" width="660" height="434" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="1800" y="50" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="2130.00" y="80.00" font-size="24" text-anchor="middle" font-weight="bold">EMERGENCY_EVENTS</text>
+<path d="M1956,94V484" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M2370,94V484" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="116.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="116.00" font-size="22" text-anchor="start">id</text>
+<text x="2415.00" y="116.00" font-size="21" text-anchor="middle">PK</text>
+<path d="M1800,124H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="146.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="146.00" font-size="22" text-anchor="start">elderly_id</text>
+<text x="2415.00" y="146.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,154H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="176.00" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="176.00" font-size="22" text-anchor="start">event_type</text>
+<text x="2415.00" y="176.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,184H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="206.00" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="206.00" font-size="22" text-anchor="start">severity</text>
+<text x="2415.00" y="206.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,214H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="236.00" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="236.00" font-size="22" text-anchor="start">description</text>
+<text x="2415.00" y="236.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,244H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="266.00" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="266.00" font-size="22" text-anchor="start">location</text>
+<text x="2415.00" y="266.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,274H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="296.00" font-size="22" text-anchor="start">jsonb</text>
+<text x="1964.00" y="296.00" font-size="22" text-anchor="start">vital_snapshot</text>
+<text x="2415.00" y="296.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,304H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="326.00" font-size="22" text-anchor="start">int</text>
+<text x="1964.00" y="326.00" font-size="22" text-anchor="start">response_time_s</text>
+<text x="2415.00" y="326.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,334H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="356.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="356.00" font-size="22" text-anchor="start">responded_by</text>
+<text x="2415.00" y="356.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,364H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="386.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="386.00" font-size="22" text-anchor="start">responded_at</text>
+<text x="2415.00" y="386.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,394H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="416.00" font-size="22" text-anchor="start">bool</text>
+<text x="1964.00" y="416.00" font-size="22" text-anchor="start">is_resolved</text>
+<text x="2415.00" y="416.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,424H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="446.00" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="446.00" font-size="22" text-anchor="start">resolution_notes</text>
+<text x="2415.00" y="446.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,454H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="476.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="476.00" font-size="22" text-anchor="start">triggered_at</text>
+<text x="2415.00" y="476.00" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-health_alerts"><rect x="1800" y="661.2" width="660" height="614" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="1800" y="661.2" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="2130.00" y="691.20" font-size="24" text-anchor="middle" font-weight="bold">HEALTH_ALERTS</text>
+<path d="M1956,705.2V1275.2" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M2370,705.2V1275.2" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="727.20" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="727.20" font-size="22" text-anchor="start">id</text>
+<text x="2415.00" y="727.20" font-size="21" text-anchor="middle">PK</text>
+<path d="M1800,735.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="757.20" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="757.20" font-size="22" text-anchor="start">elderly_id</text>
+<text x="2415.00" y="757.20" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,765.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="787.20" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="787.20" font-size="22" text-anchor="start">alert_type</text>
+<text x="2415.00" y="787.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,795.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="817.20" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="817.20" font-size="22" text-anchor="start">severity</text>
+<text x="2415.00" y="817.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,825.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="847.20" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="847.20" font-size="22" text-anchor="start">title</text>
+<text x="2415.00" y="847.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,855.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="877.20" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="877.20" font-size="22" text-anchor="start">message</text>
+<text x="2415.00" y="877.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,885.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="907.20" font-size="22" text-anchor="start">numeric</text>
+<text x="1964.00" y="907.20" font-size="22" text-anchor="start">metric_value</text>
+<text x="2415.00" y="907.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,915.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="937.20" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="937.20" font-size="22" text-anchor="start">metric_unit</text>
+<text x="2415.00" y="937.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,945.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="967.20" font-size="22" text-anchor="start">numeric</text>
+<text x="1964.00" y="967.20" font-size="22" text-anchor="start">threshold_value</text>
+<text x="2415.00" y="967.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,975.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="997.20" font-size="22" text-anchor="start">bool</text>
+<text x="1964.00" y="997.20" font-size="22" text-anchor="start">is_read</text>
+<text x="2415.00" y="997.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,1005.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1027.20" font-size="22" text-anchor="start">bool</text>
+<text x="1964.00" y="1027.20" font-size="22" text-anchor="start">is_resolved</text>
+<text x="2415.00" y="1027.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,1035.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1057.20" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="1057.20" font-size="22" text-anchor="start">resolved_at</text>
+<text x="2415.00" y="1057.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,1065.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1087.20" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="1087.20" font-size="22" text-anchor="start">resolved_by</text>
+<text x="2415.00" y="1087.20" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,1095.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1117.20" font-size="22" text-anchor="start">bool</text>
+<text x="1964.00" y="1117.20" font-size="22" text-anchor="start">ai_generated</text>
+<text x="2415.00" y="1117.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,1125.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1147.20" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="1147.20" font-size="22" text-anchor="start">triggered_at</text>
+<text x="2415.00" y="1147.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,1155.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1177.20" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="1177.20" font-size="22" text-anchor="start">acknowledged_at</text>
+<text x="2415.00" y="1177.20" font-size="21" text-anchor="middle"></text>
+<path d="M1800,1185.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1207.20" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="1207.20" font-size="22" text-anchor="start">acknowledged_by</text>
+<text x="2415.00" y="1207.20" font-size="21" text-anchor="middle">FK*</text>
+<path d="M1800,1215.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1237.20" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="1237.20" font-size="22" text-anchor="start">emergency_event_id</text>
+<text x="2415.00" y="1237.20" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,1245.2H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1267.20" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="1267.20" font-size="22" text-anchor="start">resolution_note</text>
+<text x="2415.00" y="1267.20" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-alert_response_events"><rect x="1800" y="1452.4" width="660" height="254" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="1800" y="1452.4" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="2130.00" y="1482.40" font-size="24" text-anchor="middle" font-weight="bold">ALERT_RESPONSE_EVENTS</text>
+<path d="M1956,1496.4V1706.4" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M2370,1496.4V1706.4" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1518.40" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="1518.40" font-size="22" text-anchor="start">id</text>
+<text x="2415.00" y="1518.40" font-size="21" text-anchor="middle">PK</text>
+<path d="M1800,1526.4H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1548.40" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="1548.40" font-size="22" text-anchor="start">alert_id</text>
+<text x="2415.00" y="1548.40" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,1556.4H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1578.40" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="1578.40" font-size="22" text-anchor="start">elderly_id</text>
+<text x="2415.00" y="1578.40" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,1586.4H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1608.40" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="1608.40" font-size="22" text-anchor="start">actor_id</text>
+<text x="2415.00" y="1608.40" font-size="21" text-anchor="middle">FK*</text>
+<path d="M1800,1616.4H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1638.40" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="1638.40" font-size="22" text-anchor="start">action</text>
+<text x="2415.00" y="1638.40" font-size="21" text-anchor="middle"></text>
+<path d="M1800,1646.4H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1668.40" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="1668.40" font-size="22" text-anchor="start">note</text>
+<text x="2415.00" y="1668.40" font-size="21" text-anchor="middle"></text>
+<path d="M1800,1676.4H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1698.40" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="1698.40" font-size="22" text-anchor="start">occurred_at</text>
+<text x="2415.00" y="1698.40" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-caregiver_notifications"><rect x="1800" y="1883.6" width="660" height="524" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="1800" y="1883.6" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="2130.00" y="1913.60" font-size="24" text-anchor="middle" font-weight="bold">CAREGIVER_NOTIFICATIONS</text>
+<path d="M1956,1927.6V2407.6" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M2370,1927.6V2407.6" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1949.60" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="1949.60" font-size="22" text-anchor="start">id</text>
+<text x="2415.00" y="1949.60" font-size="21" text-anchor="middle">PK</text>
+<path d="M1800,1957.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="1979.60" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="1979.60" font-size="22" text-anchor="start">caregiver_id</text>
+<text x="2415.00" y="1979.60" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,1987.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2009.60" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="2009.60" font-size="22" text-anchor="start">elderly_id</text>
+<text x="2415.00" y="2009.60" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,2017.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2039.60" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="2039.60" font-size="22" text-anchor="start">alert_id</text>
+<text x="2415.00" y="2039.60" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,2047.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2069.60" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="2069.60" font-size="22" text-anchor="start">notification_type</text>
+<text x="2415.00" y="2069.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2077.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2099.60" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="2099.60" font-size="22" text-anchor="start">title</text>
+<text x="2415.00" y="2099.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2107.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2129.60" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="2129.60" font-size="22" text-anchor="start">body</text>
+<text x="2415.00" y="2129.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2137.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2159.60" font-size="22" text-anchor="start">jsonb</text>
+<text x="1964.00" y="2159.60" font-size="22" text-anchor="start">data</text>
+<text x="2415.00" y="2159.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2167.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2189.60" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="2189.60" font-size="22" text-anchor="start">channel</text>
+<text x="2415.00" y="2189.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2197.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2219.60" font-size="22" text-anchor="start">bool</text>
+<text x="1964.00" y="2219.60" font-size="22" text-anchor="start">is_read</text>
+<text x="2415.00" y="2219.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2227.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2249.60" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="2249.60" font-size="22" text-anchor="start">read_at</text>
+<text x="2415.00" y="2249.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2257.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2279.60" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="2279.60" font-size="22" text-anchor="start">sent_at</text>
+<text x="2415.00" y="2279.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2287.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2309.60" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="2309.60" font-size="22" text-anchor="start">delivery_status</text>
+<text x="2415.00" y="2309.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2317.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2339.60" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="2339.60" font-size="22" text-anchor="start">event_key</text>
+<text x="2415.00" y="2339.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2347.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2369.60" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="2369.60" font-size="22" text-anchor="start">push_status</text>
+<text x="2415.00" y="2369.60" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2377.6H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2399.60" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="2399.60" font-size="22" text-anchor="start">push_error</text>
+<text x="2415.00" y="2399.60" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-patient_safe_zones"><rect x="1800" y="2584.8" width="660" height="314" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="1800" y="2584.8" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="2130.00" y="2614.80" font-size="24" text-anchor="middle" font-weight="bold">PATIENT_SAFE_ZONES</text>
+<path d="M1956,2628.8V2898.8" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M2370,2628.8V2898.8" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2650.80" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="2650.80" font-size="22" text-anchor="start">elderly_id</text>
+<text x="2415.00" y="2650.80" font-size="21" text-anchor="middle">PK/FK</text>
+<path d="M1800,2658.8H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2680.80" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="2680.80" font-size="22" text-anchor="start">caregiver_id</text>
+<text x="2415.00" y="2680.80" font-size="21" text-anchor="middle">FK*</text>
+<path d="M1800,2688.8H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2710.80" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="2710.80" font-size="22" text-anchor="start">name</text>
+<text x="2415.00" y="2710.80" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2718.8H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2740.80" font-size="22" text-anchor="start">float8</text>
+<text x="1964.00" y="2740.80" font-size="22" text-anchor="start">latitude</text>
+<text x="2415.00" y="2740.80" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2748.8H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2770.80" font-size="22" text-anchor="start">float8</text>
+<text x="1964.00" y="2770.80" font-size="22" text-anchor="start">longitude</text>
+<text x="2415.00" y="2770.80" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2778.8H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2800.80" font-size="22" text-anchor="start">int</text>
+<text x="1964.00" y="2800.80" font-size="22" text-anchor="start">radius_m</text>
+<text x="2415.00" y="2800.80" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2808.8H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2830.80" font-size="22" text-anchor="start">bool</text>
+<text x="1964.00" y="2830.80" font-size="22" text-anchor="start">enabled</text>
+<text x="2415.00" y="2830.80" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2838.8H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2860.80" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="2860.80" font-size="22" text-anchor="start">revision</text>
+<text x="2415.00" y="2860.80" font-size="21" text-anchor="middle"></text>
+<path d="M1800,2868.8H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="2890.80" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="2890.80" font-size="22" text-anchor="start">updated_at</text>
+<text x="2415.00" y="2890.80" font-size="21" text-anchor="middle"></text>
+</g>
+<g id="table-safe_zone_events"><rect x="1800" y="3076.0" width="660" height="344" fill="white" stroke="#2F7E28" stroke-width="2"/>
+<rect x="1800" y="3076.0" width="660" height="44" fill="#A7CD8C" stroke="#2F7E28" stroke-width="2"/>
+<text x="2130.00" y="3106.00" font-size="24" text-anchor="middle" font-weight="bold">SAFE_ZONE_EVENTS</text>
+<path d="M1956,3120.0V3420.0" stroke="#2F7E28" stroke-width="1.4"/>
+<path d="M2370,3120.0V3420.0" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3142.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="3142.00" font-size="22" text-anchor="start">id</text>
+<text x="2415.00" y="3142.00" font-size="21" text-anchor="middle">PK</text>
+<path d="M1800,3150.0H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3172.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="3172.00" font-size="22" text-anchor="start">elderly_id</text>
+<text x="2415.00" y="3172.00" font-size="21" text-anchor="middle">FK</text>
+<path d="M1800,3180.0H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3202.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="3202.00" font-size="22" text-anchor="start">zone_revision</text>
+<text x="2415.00" y="3202.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,3210.0H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3232.00" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="3232.00" font-size="22" text-anchor="start">zone_name</text>
+<text x="2415.00" y="3232.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,3240.0H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3262.00" font-size="22" text-anchor="start">text</text>
+<text x="1964.00" y="3262.00" font-size="22" text-anchor="start">direction</text>
+<text x="2415.00" y="3262.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,3270.0H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3292.00" font-size="22" text-anchor="start">float8</text>
+<text x="1964.00" y="3292.00" font-size="22" text-anchor="start">distance_m</text>
+<text x="2415.00" y="3292.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,3300.0H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3322.00" font-size="22" text-anchor="start">float8</text>
+<text x="1964.00" y="3322.00" font-size="22" text-anchor="start">accuracy_m</text>
+<text x="2415.00" y="3322.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,3330.0H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3352.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="3352.00" font-size="22" text-anchor="start">measured_at</text>
+<text x="2415.00" y="3352.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,3360.0H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3382.00" font-size="22" text-anchor="start">timestamptz</text>
+<text x="1964.00" y="3382.00" font-size="22" text-anchor="start">created_at</text>
+<text x="2415.00" y="3382.00" font-size="21" text-anchor="middle"></text>
+<path d="M1800,3390.0H2460" stroke="#2F7E28" stroke-width="1.4"/>
+<text x="1807.00" y="3412.00" font-size="22" text-anchor="start">uuid</text>
+<text x="1964.00" y="3412.00" font-size="22" text-anchor="start">alert_id</text>
+<text x="2415.00" y="3412.00" font-size="21" text-anchor="middle">FK</text>
+</g>
+<text x="1270.00" y="3477.00" font-size="22" text-anchor="middle">PK = primary key     FK = foreign key     FK* = external auth.users reference     Lines show declared relationships</text>
+</svg>

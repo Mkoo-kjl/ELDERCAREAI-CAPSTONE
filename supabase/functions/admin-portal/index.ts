@@ -257,7 +257,7 @@ Deno.serve(async (request) => {
       const type = String(body.type ?? '') as keyof typeof reports;
       const report = reports[type];
       if (!report) return problem('Invalid report type.', 400);
-      const rows = await db.from(report.table).select(report.columns)
+      const rows = await db.from(report.table).select<string>(report.columns)
         .gte(report.time, range.from).lte(report.time, range.to)
         .order(report.time, { ascending: false }).limit(2001);
       must(rows);

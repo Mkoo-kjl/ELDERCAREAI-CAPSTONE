@@ -22,7 +22,7 @@
     "@react-navigation/native": "^7.1.8",
     "@supabase/supabase-js": "^2.108.2",
     "expo": "~54.0.34",
-    "expo-asset": "~12.0.13",
+    "expo-asset": "~12.0.14",
     "expo-audio": "~1.1.1",
     "expo-auth-session": "~7.0.11",
     "expo-background-task": "~1.0.10",
@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@testing-library/react-native": "^14.0.1",
-    "@types/jest": "^30.0.0",
+    "@types/jest": "29.5.14",
     "@types/react": "~19.1.10",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",

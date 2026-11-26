@@ -1,0 +1,92 @@
+{
+  "stages": [
+    {
+      "x": 110,
+      "heading": [
+        "DATA SOURCE",
+        "LAYER"
+      ],
+      "stroke": "#20DD35",
+      "lines": [
+        "Galaxy Watch6",
+        "Sensor readings",
+        "Samsung Health",
+        "Sleep / oxygen",
+        "history",
+        "Patient profiles",
+        "Care schedules"
+      ]
+    },
+    {
+      "x": 368,
+      "heading": [
+        "DATA PROCESSING",
+        "LAYER"
+      ],
+      "stroke": "#5AA5FF",
+      "lines": [
+        "Secure data intake",
+        "Patient verification",
+        "Data validation",
+        "Duplicate filtering",
+        "Time-stamped data",
+        "Supabase storage"
+      ]
+    },
+    {
+      "x": 626,
+      "heading": [
+        "ANALYTICS AND AI",
+        "LAYER"
+      ],
+      "stroke": "#20DD35",
+      "lines": [
+        "Personal baselines",
+        "Threshold analysis",
+        "Linear projections",
+        "Elle AI (Gemini)",
+        "Prescription drafts"
+      ]
+    },
+    {
+      "x": 884,
+      "heading": [
+        "CARE AND ALERT",
+        "LAYER"
+      ],
+      "stroke": "#5AA5FF",
+      "lines": [
+        "Alert classification",
+        "Medication alerts",
+        "Appointment alerts",
+        "SOS requests",
+        "Safe-zone alerts",
+        "Care-plan support"
+      ]
+    },
+    {
+      "x": 1142,
+      "heading": [
+        "PRESENTATION",
+        "LAYER"
+      ],
+      "stroke": "#20DD35",
+      "lines": [
+        "Caregiver",
+        "dashboard",
+        "Health charts",
+        "Recorded history",
+        "Reports / exports",
+        "Phone notifications",
+        "Admin website"
+      ]
+    }
+  ],
+  "outputs": [
+    "Health monitoring and recorded trends",
+    "AI-assisted summaries and explanations",
+    "Medication and appointment support",
+    "Warning and SOS notifications",
+    "Caregiver management support"
+  ]
+}

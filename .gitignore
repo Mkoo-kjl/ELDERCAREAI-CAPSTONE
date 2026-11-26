@@ -47,3 +47,7 @@ tmp/watch-sdk/
 # Temporary renderer for exported system diagrams
 tmp/diagram-renderer/
 tmp/diagram-npm-cache/
+
+# Local QA and document pagination outputs
+/tmp/
+/outputs/document-pagination/

@@ -1,4 +1,18 @@
 export type CarePushJob={id:string;notification_id:string;lease_id:string;token:string;title:string;body:string;data:Record<string,unknown>|null;kind:string;attempts:number;channel_version?:number};
+export const CARE_PUSH_BANNER_GAP_MS=8000;
+/** Space reminder banners per phone, with bounded work per invocation. */
+export function carePushDeliveryPlan(jobs:CarePushJob[]){
+  const batches:CarePushJob[][]=[[],[]],deferred:CarePushJob[]=[],perPhone=new Map<string,number>();
+  const priority:Record<string,number>={sos:0,vital:1,medication:2,appointment:3};
+  for(const job of [...jobs].sort((a,b)=>(priority[a.kind]??4)-(priority[b.kind]??4))){
+    // Preserve immediate emergency/health delivery; only routine reminders queue.
+    if(job.kind!=='medication'&&job.kind!=='appointment'){batches[0].push(job);continue;}
+    const index=perPhone.get(job.token)??0;
+    if(index<batches.length)batches[index].push(job);else deferred.push(job);
+    perPhone.set(job.token,index+1);
+  }
+  return {batches:batches.filter(batch=>batch.length),deferred};
+}
 export const carePushChannels={
   sos:{channelId:'watch-sos-v1'},
   vital:{channelId:'health-warnings-v1'},

@@ -10,7 +10,7 @@ let mockEvent:(value:any)=>void;
 
 let mockLocalEvent:(value:any)=>void;
 
-const mockAudio={seekTo:jest.fn().mockResolvedValue(undefined),play:jest.fn()};
+const mockAudio={seekTo:jest.fn().mockResolvedValue(undefined),play:jest.fn(),pause:jest.fn()};
 
 jest.mock('expo-audio',()=>({useAudioPlayer:()=>mockAudio,setAudioModeAsync:jest.fn().mockResolvedValue(undefined)}));
 
@@ -88,4 +88,14 @@ test('relogin does not replay an old unread SOS and a server-claimed event stays
   mockClaim.mockResolvedValueOnce({data:false,error:null});
   await act(async()=>{mockEvent({new:{...notice,id:'already-presented',sent_at:new Date().toISOString()}});});
   expect(Alert.alert).not.toHaveBeenCalled();
+});
+
+test('opening the phone notification shade silences foreground reminder audio',async()=>{
+  const events=jest.spyOn(AppState,'addEventListener');
+  await render(<WatchCareObserver/>);
+  await act(async()=>{mockLocalEvent(local('medication','sound-stop'));});
+  expect(mockAudio.play).toHaveBeenCalledTimes(1);
+  const blur=events.mock.calls.find(([event])=>event==='blur')![1] as ()=>void;
+  await act(async()=>blur());
+  expect(mockAudio.pause).toHaveBeenCalledTimes(1);
 });

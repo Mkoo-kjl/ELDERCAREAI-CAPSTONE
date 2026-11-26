@@ -1,6 +1,6 @@
 import {createClient} from 'npm:@supabase/supabase-js@2';
 import {json} from '../_shared/cors.ts';
-import {carePushPayload,carePushRetry,carePushError,type CarePushJob} from '../_shared/care-push.ts';
+import {carePushPayload,carePushRetry,carePushError,carePushDeliveryPlan,CARE_PUSH_BANNER_GAP_MS,type CarePushJob} from '../_shared/care-push.ts';
 
 Deno.serve(async request=>{
   if(request.method!=='POST')return json({error:'Method not allowed'},405);
@@ -15,14 +15,24 @@ Deno.serve(async request=>{
     const jobs=(claim.data??[]) as CarePushJob[];
     const changed=new Set<string>();
     if(jobs.length){
+      const plan=carePushDeliveryPlan(jobs);
+      // Leave overflow for the next run rather than holding a worker open for a
+      // large stack of reminders. This is not a failed delivery attempt.
+      for(const job of plan.deferred){
+        const deferred=await db.from('care_push_jobs').update({status:'pending',attempts:Math.max(0,job.attempts-1),lease_id:null,leased_until:null,
+          next_attempt_at:new Date(Date.now()+CARE_PUSH_BANNER_GAP_MS).toISOString()}).eq('id',job.id).eq('lease_id',job.lease_id);
+        if(deferred.error)throw deferred.error;
+      }
+      for(const [batchIndex,batch] of plan.batches.entries()){
+      if(batchIndex)await new Promise(resolve=>setTimeout(resolve,CARE_PUSH_BANNER_GAP_MS));
       let tickets:Record<string,any>[]=[];let transportError:string|null=null;
       try{
         const response=await fetch('https://exp.host/--/api/v2/push/send',{method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify(jobs.map(carePushPayload)),signal:AbortSignal.timeout(15000)});
+          body:JSON.stringify(batch.map(carePushPayload)),signal:AbortSignal.timeout(15000)});
         if(!response.ok)transportError=`PushHTTP${response.status}`;
         else{const payload=await response.json();tickets=Array.isArray(payload.data)?payload.data:payload.data?[payload.data]:[];}
       }catch{transportError='PushNetworkError';}
-      for(const [index,job] of jobs.entries()){
+      for(const [index,job] of batch.entries()){
         const ticket=tickets[index];const accepted=ticket?.status==='ok'&&typeof ticket.id==='string';
         const error=accepted?null:transportError??carePushError(ticket);
         const invalid=error==='DeviceNotRegistered';
@@ -33,6 +43,7 @@ Deno.serve(async request=>{
         if(invalid){const removed=await db.from('caregiver_push_tokens').delete().eq('token',job.token);if(removed.error)throw removed.error;}
         if(accepted)submitted++;else retrying++;
         changed.add(job.notification_id);
+      }
       }
     }
     // Expo recommends checking receipts later. Acceptance is not proof of display.

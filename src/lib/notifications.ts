@@ -113,14 +113,34 @@ export async function openHealthSoundSettings(){
 function storageKey(kind: CareNotificationKind, entityId: string) {
   return `${STORAGE_PREFIX}:${kind}:${entityId}`;
 }
-async function saveIdentifiers(kind: CareNotificationKind, entityId: string, identifiers: string[]) {
-  await AsyncStorage.setItem(storageKey(kind, entityId), JSON.stringify(identifiers));
+type SavedReminder={identifiers:string[];signature:string};
+function savedReminder(value:string):{identifiers:string[];signature?:string}{
+  const saved=JSON.parse(value) as SavedReminder|string[];
+  return Array.isArray(saved)?{identifiers:saved}:saved;
+}
+async function unchangedReminder(kind:CareNotificationKind,id:string,signature:string){
+  const value=await AsyncStorage.getItem(storageKey(kind,id));
+  if(!value)return false;
+  try{
+    const saved=savedReminder(value);
+    if(saved.signature!==signature||!saved.identifiers.length)return false;
+    const pending=new Set((await Notifications.getAllScheduledNotificationsAsync()).map(item=>item.identifier));
+    const relevant=saved.identifiers.filter(identifier=>{
+      if(pending.has(identifier))return true;
+      const dated=/:([0-9]{13})(:15)?$/.exec(identifier);
+      return !dated||Number(dated[1])-(dated[2]?15*60_000:0)+(kind==='appointment'?8000:0)>Date.now();
+    });
+    return relevant.length>0&&relevant.every(identifier=>pending.has(identifier))&&await hasNotificationPermission();
+  }catch{return false;}
+}
+async function saveIdentifiers(kind: CareNotificationKind, entityId: string, identifiers: string[],signature:string) {
+  await AsyncStorage.setItem(storageKey(kind, entityId), JSON.stringify({identifiers,signature}));
 }
 async function cancelCareNotificationsNow(kind: CareNotificationKind, entityId: string) {
   const key = storageKey(kind, entityId);
   const saved = await AsyncStorage.getItem(key);
   if (saved) {
-    const identifiers = JSON.parse(saved) as string[];
+    const {identifiers} = savedReminder(saved);
     await Promise.all(identifiers.map((identifier) => Notifications.cancelScheduledNotificationAsync(identifier).catch(() => undefined)));
   }
   await AsyncStorage.removeItem(key);
@@ -133,7 +153,7 @@ export async function cancelAllCareNotifications() {
     const saved = await AsyncStorage.getItem(key);
     if (!saved) return;
     try {
-      const identifiers = JSON.parse(saved) as string[];
+      const {identifiers} = savedReminder(saved);
       await Promise.all(identifiers.map((identifier) => Notifications.cancelScheduledNotificationAsync(identifier).catch(() => undefined)));
     } catch { /* Ignore malformed local reminder metadata. */ }
   }));
@@ -149,12 +169,15 @@ async function scheduleAppointmentNotificationNow(input: ReminderOwner & {
   purpose?: string | null;
 }, requestPermission = true) {
   const epoch=reminderEpoch;
+  const date = new Date(input.appointmentAt);
+  if (Number.isNaN(date.getTime()))return false;
+  const signature=JSON.stringify([3,input.caregiverId??null,input.elderlyId??null,input.title,date.toISOString(),input.doctorName??null,input.location??null,input.purpose??null]);
+  if(await unchangedReminder('appointment',input.id,signature))return true;
   await cancelCareNotificationsNow('appointment', input.id);
   const allowed = requestPermission ? await ensureNotificationPermission() : await hasNotificationPermission();
   if (!allowed) return false;
   await initializeNotifications();
-  const date = new Date(input.appointmentAt);
-  if (Number.isNaN(date.getTime()) || date.getTime() <= Date.now()) return false;
+  if (date.getTime() <= Date.now()) return false;
   const details = [input.doctorName, input.location].filter(Boolean).join(' • ');
   const identifier = await Notifications.scheduleNotificationAsync({
     identifier: `appointment:${input.id}:${date.getTime()}`,
@@ -162,11 +185,12 @@ async function scheduleAppointmentNotificationNow(input: ReminderOwner & {
       title: `Appointment now: ${input.title}`,
       body: `${input.elderlyName} • ${formatCareDateTime(date)}${details ? ` • ${details}` : ''}${input.purpose ? ` • ${input.purpose}` : ''}`,
       sound: APPOINTMENT_SOUND,
+      autoDismiss:true,
       data: reminderData('appointment',input,date.toISOString()),
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DATE,
-      date,
+      date:phoneAppointmentDelivery(date),
       channelId: APPOINTMENT_CHANNEL_ID,
     },
   });
@@ -175,13 +199,21 @@ async function scheduleAppointmentNotificationNow(input: ReminderOwner & {
   if(advance.getTime()>Date.now())identifiers.push(await Notifications.scheduleNotificationAsync({
     identifier:`appointment:${input.id}:${date.getTime()}:15`,
     content:{title:`Appointment in 15 minutes: ${input.title}`,body:`${input.elderlyName} • ${formatCareDateTime(date)}${details?` • ${details}`:''}${input.purpose?` • ${input.purpose}`:''}`,sound:APPOINTMENT_SOUND,data:reminderData('appointment',input,date.toISOString())},
-    trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:advance,channelId:APPOINTMENT_CHANNEL_ID},
+    trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:phoneAppointmentDelivery(advance),channelId:APPOINTMENT_CHANNEL_ID},
   }));
   if(epoch!==reminderEpoch){await Promise.all(identifiers.map(id=>Notifications.cancelScheduledNotificationAsync(id).catch(()=>undefined)));return false;}
-  await saveIdentifiers('appointment', input.id, identifiers);
+  await saveIdentifiers('appointment', input.id, identifiers,signature);
   return true;
 }
 const parseTime = parseCareTime;
+/** Keep Android's appointment banner separate from medication alarms on the minute.
+ * Only phone presentation moves; the saved appointment and displayed due time do not.
+ */
+export function phoneAppointmentDelivery(due:Date){
+  if(Platform.OS!=='android')return due;
+  const earliest=new Date(due);earliest.setSeconds(8,0);
+  return new Date(Math.max(due.getTime(),earliest.getTime()));
+}
 export function secondDailyTime(value: string) {
   const parsed = parseTime(value);
   if (!parsed) return value;
@@ -204,6 +236,11 @@ async function scheduleMedicationNotificationsNow(input: ReminderOwner & {
   timezone?:string;
 }, requestPermission = true) {
   const epoch=reminderEpoch;
+  const deviceZone=Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Manila';
+  const scheduleZone=input.timezone??deviceZone;
+  const clocks=[...new Set(input.timesOfDay.map(value=>parseTime(value)?.canonical).filter((value):value is string=>Boolean(value)))].sort();
+  const signature=JSON.stringify([3,input.caregiverId??null,input.elderlyId??null,input.medicationName,input.dosage??null,input.frequency.toLowerCase(),clocks,input.startDate??null,input.endDate??null,input.reminderEnabled!==false,scheduleZone]);
+  if(await unchangedReminder('medication',input.id,signature))return true;
   await cancelCareNotificationsNow('medication', input.id);
   if (input.reminderEnabled === false || input.frequency.toLowerCase() === 'as needed' || !input.timesOfDay.length) return true;
   const allowed = requestPermission ? await ensureNotificationPermission() : await hasNotificationPermission();
@@ -212,14 +249,12 @@ async function scheduleMedicationNotificationsNow(input: ReminderOwner & {
   const identifiers: string[] = [];
   const weekly = input.frequency.toLowerCase() === 'weekly';
   const weekday = (input.startDate ? new Date(`${input.startDate}T12:00:00`) : new Date()).getDay() + 1;
-  for (const value of [...new Set(input.timesOfDay.map(value=>parseTime(value)?.canonical).filter((value):value is string=>Boolean(value)))]) {
+  for (const value of clocks) {
     const time = parseTime(value);
     if (!time) continue;
     const trigger = weekly
       ? { type: Notifications.SchedulableTriggerInputTypes.WEEKLY, weekday, hour: time.hour, minute: time.minute, channelId: MEDICATION_CHANNEL_ID } as const
       : { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: time.hour, minute: time.minute, channelId: MEDICATION_CHANNEL_ID } as const;
-    const deviceZone=Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Manila';
-    const scheduleZone=input.timezone??deviceZone;
     const today=careZoneParts(new Date(),scheduleZone).day;
     const bounded=Boolean(input.endDate)||(input.startDate??'')>today||scheduleZone!==deviceZone;
     if(bounded){
@@ -238,6 +273,7 @@ async function scheduleMedicationNotificationsNow(input: ReminderOwner & {
         title: 'Medication reminder',
         body: `${input.elderlyName}: Time for ${input.medicationName}${input.dosage ? ` (${input.dosage})` : ''}.`,
         sound: MEDICATION_SOUND,
+        autoDismiss:true,
         data: reminderData('medication',input),
       },
       trigger,
@@ -245,7 +281,7 @@ async function scheduleMedicationNotificationsNow(input: ReminderOwner & {
     identifiers.push(identifier);
   }
   if(epoch!==reminderEpoch){await Promise.all(identifiers.map(id=>Notifications.cancelScheduledNotificationAsync(id).catch(()=>undefined)));return false;}
-  await saveIdentifiers('medication', input.id, identifiers);
+  await saveIdentifiers('medication', input.id, identifiers,signature);
   return identifiers.length > 0 || Boolean(input.endDate) || (input.startDate??'')>careZoneParts(new Date(),input.timezone).day;
 }
 // A refresh and save can reconcile the same entity concurrently. Serialize by

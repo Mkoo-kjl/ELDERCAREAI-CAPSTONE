@@ -10,7 +10,7 @@ let mockEvent:(value:any)=>void;
 
 let mockLocalEvent:(value:any)=>void;
 
-const mockAudio={seekTo:jest.fn().mockResolvedValue(undefined),play:jest.fn()};
+const mockAudio={seekTo:jest.fn().mockResolvedValue(undefined),play:jest.fn(),pause:jest.fn()};
 
 jest.mock('expo-audio',()=>({useAudioPlayer:()=>mockAudio,setAudioModeAsync:jest.fn().mockResolvedValue(undefined)}));
 
@@ -48,7 +48,13 @@ test('simultaneous local medication and appointment reminders queue and sound in
     expect(Alert.alert).toHaveBeenCalledTimes(1);expect(mockAudio.play).toHaveBeenCalledTimes(1);
     expect((Alert.alert as jest.Mock).mock.calls[0][0]).toBe('medication reminder');
     await act(async()=>{(Alert.alert as jest.Mock).mock.calls[0][2][0].onPress();jest.advanceTimersByTime(250);});
+    expect(mockAudio.pause).toHaveBeenCalledTimes(1);
     expect(Alert.alert).toHaveBeenCalledTimes(2);expect(mockAudio.play).toHaveBeenCalledTimes(2);
     expect((Alert.alert as jest.Mock).mock.calls[1][0]).toBe('appointment reminder');
+    // A late native dismissal from the first dialog must not silence the next.
+    await act(async()=>{(Alert.alert as jest.Mock).mock.calls[0][3].onDismiss();});
+    expect(mockAudio.pause).toHaveBeenCalledTimes(1);
+    await act(async()=>{(Alert.alert as jest.Mock).mock.calls[1][2][1].onPress();});
+    expect(mockAudio.pause).toHaveBeenCalledTimes(2);
   }finally{jest.useRealTimers();}
 });

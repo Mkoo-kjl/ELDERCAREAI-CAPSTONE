@@ -4,6 +4,7 @@ import {router,type Href} from 'expo-router';
 import {useAuth} from '@/src/providers/AuthProvider';
 import {initializeNotifications} from '@/src/lib/notifications';
 import {careNotificationRoute} from '@/src/lib/notification-route';
+import {stopCareNoticeSound} from '@/src/lib/care-notice-sound';
 
 export function CareNotificationObserver(){
   const {session,isLoading}=useAuth();const userId=session?.user.id;
@@ -11,7 +12,11 @@ export function CareNotificationObserver(){
   useEffect(()=>{
     // Preserve a cold-start tap until session restoration has completed.
     if(isLoading||!userId)return;
-    const open=(notification:Notifications.Notification)=>{const destination=careNotificationRoute(notification.request.content.data);if(destination)router.push(destination as Href);};
+    const open=(notification:Notifications.Notification)=>{
+      stopCareNoticeSound();
+      if(notification.request.identifier)void Notifications.dismissNotificationAsync(notification.request.identifier).catch(()=>undefined);
+      const destination=careNotificationRoute(notification.request.content.data);if(destination)router.push(destination as Href);
+    };
     const previous=Notifications.getLastNotificationResponse();
     if(previous?.notification){open(previous.notification);Notifications.clearLastNotificationResponse();}
     const subscription=Notifications.addNotificationResponseReceivedListener(response=>open(response.notification));

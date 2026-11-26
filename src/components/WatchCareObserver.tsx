@@ -13,6 +13,7 @@ import {useAuth} from '@/src/providers/AuthProvider';
 import {useHealthData} from '@/src/providers/HealthDataProvider';
 import {refreshCarePushRegistration,isCarePushRegistered} from '@/src/lib/watch-push';
 import {careNotificationRoute} from '@/src/lib/notification-route';
+import {playCareNoticeSound,stopCareNoticeSound} from '@/src/lib/care-notice-sound';
 
 type CareNotice={id:string;title:string;body:string;elderly_id?:string;data?:{watch_sos_id?:string;care_kind?:string;url?:string;rule?:string};sent_at:string};
 export function WatchCareObserver(){
@@ -29,13 +30,15 @@ export function WatchCareObserver(){
   const queue=useRef<NoticeQueue<{id:string;notice:CareNotice;isSos:boolean;linked:boolean}>|null>(null);
   const display=useCallback((notice:CareNotice,isSos:boolean,linked=false,done=()=>{})=>{
     const player=isSos?sosPlayer:notice.data?.care_kind==='medication'?medicationPlayer:notice.data?.care_kind==='appointment'?appointmentPlayer:vitalPlayer;
+    const stopSound=playCareNoticeSound(player);
+    let finished=false;
+    const finish=()=>{if(finished)return;finished=true;stopSound();done();};
     Vibration.vibrate(isSos?[0,500,180,500]:[0,250,180,250]);
-    void player.seekTo(0).catch(()=>undefined).then(()=>player.play()).catch(()=>undefined);
     Alert.alert(notice.title,isSos?`${notice.body}\nThis request does not place an emergency-service call.`:notice.body,[
-      {text:'Dismiss',style:'cancel',onPress:done},
-      ...(linked?[{text:'View linked medications',onPress:()=>{done();router.push({pathname:'/care',params:{tab:'Medications',metric:vitalForRule(notice.data?.rule)!}});}}]:[]),
-      {text:isSos?'View SOS':notice.data?.care_kind==='medication'?'View medication':notice.data?.care_kind==='appointment'?'View appointment':'View alert',onPress:()=>{done();router.push((careNotificationRoute(notice.data)??(isSos?'/alerts?tab=Emergency':'/alerts?tab=Alerts')) as Href);}},
-    ],{cancelable:true,onDismiss:done});
+      {text:'Dismiss',style:'cancel',onPress:finish},
+      ...(linked?[{text:'View linked medications',onPress:()=>{finish();router.push({pathname:'/care',params:{tab:'Medications',metric:vitalForRule(notice.data?.rule)!}});}}]:[]),
+      {text:isSos?'View SOS':notice.data?.care_kind==='medication'?'View medication':notice.data?.care_kind==='appointment'?'View appointment':'View alert',onPress:()=>{finish();router.push((careNotificationRoute(notice.data)??(isSos?'/alerts?tab=Emergency':'/alerts?tab=Alerts')) as Href);}},
+    ],{cancelable:true,onDismiss:finish});
   },[sosPlayer,vitalPlayer,medicationPlayer,appointmentPlayer]);
   useEffect(()=>{
     let active=true;
@@ -51,7 +54,7 @@ export function WatchCareObserver(){
         if(active&&activeUser.current===userId)display(item.notice,item.isSos,item.linked,done);else done();
       })();
     });
-    queue.current=next;return()=>{active=false;next.stop();queue.current=null;};
+    queue.current=next;return()=>{active=false;next.stop();queue.current=null;stopCareNoticeSound();};
   },[display,userId,patient]);
   useEffect(()=>{if(userId)void refreshCarePushRegistration(userId);},[userId]);
   useEffect(()=>{
@@ -97,8 +100,9 @@ export function WatchCareObserver(){
       else if(['vital','sos','medication','appointment'].includes(String(notification.request.content.data?.care_kind)))void load();
     });
     void load();const timer=setInterval(()=>{if(AppState.currentState==='active')void load();},5000);
-    const resume=AppState.addEventListener('change',state=>{if(state==='active')void load();});
-    return()=>{active=false;clearInterval(timer);resume.remove();push.remove();void supabase.removeChannel(channel);};
+    const resume=AppState.addEventListener('change',state=>{if(state==='active')void load();else stopCareNoticeSound();});
+    const blur=AppState.addEventListener('blur',stopCareNoticeSound);
+    return()=>{active=false;clearInterval(timer);resume.remove();blur.remove();push.remove();void supabase.removeChannel(channel);};
   },[userId,patient,display]);
   return null;
 }
