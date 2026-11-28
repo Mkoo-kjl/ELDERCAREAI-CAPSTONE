@@ -51,3 +51,6 @@ tmp/diagram-npm-cache/
 # Local QA and document pagination outputs
 /tmp/
 /outputs/document-pagination/
+
+# Large local manuscript (exceeds GitHub's regular file-size limit)
+/output/documents/MAIN MANU.docx
